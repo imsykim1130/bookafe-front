@@ -1,17 +1,18 @@
-import InputBox from '../components/inputBox.tsx';
-import { useRef, useState } from 'react';
-import Button from '../components/Button.tsx';
-import { SignInRequestDto } from '../api/request.dto.ts';
+import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
+import { SignInRequestDto, SignUpRequestDto } from '../api/request.dto.ts';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { signInRequest, signUpRequest } from '../api';
 import { ResponseDto, SignInResponseDto } from '../api/response.dto.ts';
 import { useCookies } from 'react-cookie';
-import { InputErrorType } from '../utils/item.ts';
+import { Input } from '@/components/ui/input.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import moment from 'moment';
 
 const Auth = () => {
+  // index: top
   const { authType } = useParams();
   const navigate = useNavigate();
-  const [_, setCookies, deleteCookies] = useCookies();
+  const [, setCookies] = useCookies(['jwt']);
   const { state } = useLocation();
   const pathname = state ? state.pathname : null;
 
@@ -30,13 +31,13 @@ const Auth = () => {
   const phoneNumberRegExp = new RegExp('^01[0-9]([0-9]{3,4})([0-9]{4})$');
 
   // Error state
-  const [emailErr, setEmailErr] = useState<InputErrorType>({ error: false, message: '' });
-  const [passwordErr, setPasswordErr] = useState<InputErrorType>({ error: false, message: '' });
-  const [nicknameErr, setNicknameErr] = useState<InputErrorType>({ error: false, message: '' });
-  const [addressErr, setAddressErr] = useState<InputErrorType>({ error: false, message: '' });
-  const [phoneNumberErr, setPhoneNumberErr] = useState<InputErrorType>({ error: false, message: '' });
+  const [emailErr, setEmailErr] = useState<boolean>(false);
+  const [passwordErr, setPasswordErr] = useState<boolean>(false);
+  const [nicknameErr, setNicknameErr] = useState<boolean>(false);
+  const [addressErr, setAddressErr] = useState<boolean>(false);
+  const [phoneNumberErr, setPhoneNumberErr] = useState<boolean>(false);
 
-  // Functions
+  // function: 로그인 / 회원가입 페이지 이동
   function changeAuthType() {
     if (authType === 'sign-in') {
       navigate('/auth/sign-up');
@@ -45,224 +46,288 @@ const Auth = () => {
     }
   }
 
-  // Response
-  // 로그인 요청
-  const signInResponse = async (result: SignInResponseDto | ResponseDto | null) => {
-    // 로그인 응답
-    if (!result) {
-      console.log('네트워크 오류입니다. 관리자에게 문의하세요.');
-      return;
-    }
-    const { code, message } = result as ResponseDto;
-    if (code === 'SE' || code === 'NU') {
-      console.log(message);
-    }
-    if (code !== 'SU') {
-      // 로그인 실패 시 jwt 쿠키에서 지우기
-      deleteCookies('jwt');
-      return;
-    }
-
-    // jwt 쿠키에 넣기
-    const { jwt } = result as SignInResponseDto;
-    const now = new Date().getTime();
-    const expires = new Date(now + 60 * 60 * 1000); // 1시간
+  // function: 토큰 쿠키에 넣기
+  const saveJwtToCookie = (jwt: string) => {
+    const now = Date.now();
+    const after = moment(now).add(1, 'hour').toDate();
+    const expires = after; // 1시간
     setCookies('jwt', jwt, { expires, path: '/' });
-    console.log(pathname);
-    if (pathname) {
-      navigate(pathname);
-      return;
-    }
-    navigate('/');
   };
 
-  // Handler
-  // 로그인, 회원가입 버튼 클릭 핸들러
-  const signInUpButtonClickHandler = async () => {
-    // 로그인
-    if (!emailRef.current || !passwordRef.current) return;
+  // function: 로그인
+  const signIn = () => {
+    if (!emailRef.current || !passwordRef.current || emailErr || passwordErr) return;
+    const requestDto: SignInRequestDto = {
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+    };
 
-    if (authType === 'sign-in') {
-      if (emailRef.current.value.length === 0) {
-        setEmailErr({ error: true, message: '이메일은 필수 입력값입니다.' });
+    signInRequest(requestDto).then((response) => {
+      // 응답이 없는 경우
+      if (!response) {
+        window.alert('서버 에러');
+        return;
       }
-      if (passwordRef.current.value.length === 0) {
-        setPasswordErr({ error: true, message: '비밀번호는 필수 입력값입니다.' });
+
+      const { code, message } = response as ResponseDto;
+
+      // 로그인 실패
+      if (code !== 'SU') {
+        window.alert(message);
+        return;
       }
 
-      const isAllInputValid = emailRef.current.value.length && passwordRef.current.value.length;
+      // 로그인 성공
+      const { jwt } = response as SignInResponseDto;
+      saveJwtToCookie(jwt);
 
-      const signInRequestDto: SignInRequestDto = {
-        email: emailRef.current.value,
-        password: passwordRef.current.value,
-      };
-
-      if (isAllInputValid) {
-        await signInRequest(signInRequestDto).then((result) => signInResponse(result));
+      // 페이지 이동
+      if (pathname) {
+        navigate(pathname);
+        return;
       }
-    }
+      navigate('/');
+    });
+  };
 
-    // 회원가입
+  // function: 정규표현식 검증
+  const validate = (regExp: RegExp, item: string) => {
+    return regExp.test(item);
+  };
+
+  // function: 회원가입
+  function signUp() {
+    // ref 여부 검증
     if (
-      !nicknameRef.current ||
+      !emailRef.current ||
       !passwordRef.current ||
+      !nicknameRef.current ||
       !addressRef.current ||
       !addressDetailRef.current ||
       !phoneNumberRef.current
-    )
+    ) {
       return;
+    }
 
-    if (authType === 'sign-up') {
-      if (emailRef.current.value.length === 0) {
-        setEmailErr({ error: true, message: '이메일은 필수 입력값입니다.' });
-      }
-      if (passwordRef.current.value.length === 0) {
-        setPasswordErr({ error: true, message: '비밀번호는 필수 입력값입니다.' });
-      }
-      if (nicknameRef.current.value.length === 0) {
-        setNicknameErr({ error: true, message: '닉네임은 필수 입력값입니다.' });
-      }
-      if (addressRef.current.value.length === 0) {
-        setAddressErr({ error: true, message: '주소는 필수 입력값입니다.' });
-      }
-      if (phoneNumberRef.current.value.length === 0) {
-        setPhoneNumberErr({ error: true, message: '휴대폰 번호는 필수 입력값입니다.' });
-      }
+    // 에러가 하나라도 있으면 회원가입 불가
+    if (emailErr || passwordErr || nicknameErr || addressRef.current.value === '' || phoneNumberErr) {
+      setAddressErr(true);
+      return;
+    }
 
-      const isAllInputValid =
-        emailRef.current.value.length &&
-        passwordRef.current.value.length &&
-        nicknameRef.current.value.length &&
-        addressRef.current.value.length &&
-        phoneNumberRef.current.value.length;
-
-      if (isAllInputValid) {
-        console.log('회원가입 요청');
-        await signUpRequest({
-          email: emailRef.current.value,
-          password: passwordRef.current.value,
-          nickname: nicknameRef.current.value,
-          address: nicknameRef.current.value,
-          addressDetail: addressRef.current.value,
-          phoneNumber: nicknameRef.current.value,
-          role: 'user',
-        }).then((result) => {
-          if (!result) {
-            window.alert('네트워크 오류. 다시 시도해주세요.');
-            return;
-          }
-          const { code } = result;
-
-          if (code === 'EU') {
-            window.alert('이미 존재하는 계정입니다.');
-          }
-          if (code === 'EN') {
-            window.alert('이미 존재하는 닉네임입니다.');
-          }
-          if (code === 'SE' || code === 'DBE') {
-            window.alert('서버 에러입니다. 관리자에게 문의하세요.');
-          }
-          if (code !== 'SU') {
-            return;
-          }
-          navigate('/auth/sign-in');
-        });
-      } else {
+    const requestDto: SignUpRequestDto = {
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+      nickname: nicknameRef.current.value,
+      address: addressRef.current.value,
+      addressDetail: addressDetailRef.current.value,
+      phoneNumber: phoneNumberRef.current.value,
+      role: 'user',
+    };
+    signUpRequest(requestDto).then((response) => {
+      if (!response) {
+        window.alert('서버 에러');
+      }
+      const { code, message } = response as ResponseDto;
+      if (code !== 'SU') {
+        window.alert(message);
         return;
       }
+      window.alert('회원가입 성공!');
+      navigate('/auth/sign-in');
+    });
+  }
+
+  // function: 값이 변경될 때 마다 정규표현식 검증을 통해 에러 여부 결정
+  const inputChangeHandler = (
+    event: ChangeEvent<HTMLInputElement>,
+    regExp: RegExp,
+    setErr: Dispatch<SetStateAction<boolean>>,
+  ) => {
+    const value = event.target.value;
+    const isValid = validate(regExp, value);
+
+    if (value === '') {
+      setErr(false);
+      return;
+    }
+    if (isValid) {
+      setErr(false);
+    } else {
+      setErr(true);
     }
   };
 
   // Render
   return (
-    <div className="flex flex-col items-center gap-10">
-      <span className={'text-xl font-bold'}>{authType === 'sign-in' ? '로그인' : '회원가입'}</span>
-      <div className="w-full max-w-[330px] mb-[30px] flex flex-col gap-[20px]">
-        <InputBox
-          ref={emailRef}
-          type={'email'}
-          placeholder={'이메일을 입력해 주세요.'}
-          name={'이메일'}
-          error={emailErr}
-          setError={setEmailErr}
-          regExg={emailRegExp}
-        />
-        <InputBox
-          ref={passwordRef}
-          type={'password'}
-          placeholder={'비밀번호를 입력해 주세요.'}
-          name={'비밀번호'}
-          error={passwordErr}
-          setError={setPasswordErr}
-          regExg={passwordRegExp}
-        />
-        {authType === 'sign-up' && (
-          <>
-            <InputBox
-              ref={nicknameRef}
-              type={'text'}
-              placeholder={'닉네임을 입력해 주세요.'}
-              name={'닉네임'}
-              error={nicknameErr}
-              setError={setNicknameErr}
-              regExg={nicknameRegExp}
-            />
+    <main className={'flex flex-col items-center mt-[100px]'}>
+      {/* 페이지 이름 */}
+      <h1 className={'mb-12 text-xl font-bold'}>{authType === 'sign-in' ? '로그인' : '회원가입'}</h1>
 
-            <InputBox
-              ref={addressRef}
-              type={'text'}
-              placeholder={'주소를 입력해 주세요.'}
-              name={'주소'}
-              error={addressErr}
-              setError={setAddressErr}
-            />
-
-            <InputBox
-              ref={addressDetailRef}
-              type={'text'}
-              placeholder={'상세주소를 입력해 주세요.'}
-              name={'상세주소'}
-            />
-
-            <InputBox
-              ref={phoneNumberRef}
-              type={'text'}
-              placeholder={'휴대폰 번호 숫자만 입력해 주세요.'}
-              name={'휴대폰 번호'}
-              error={phoneNumberErr}
-              setError={setPhoneNumberErr}
-              regExg={phoneNumberRegExp}
-            />
-          </>
+      <div className="w-[250px] flex flex-col items-center gap-6">
+        {/* 로그인 관련 버튼 */}
+        {authType === 'sign-in' && (
+          <div className="w-full max-w-[330px] mb-[30px] flex flex-col gap-12">
+            {/* 이메일 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-envelope"></i>
+                <Input
+                  ref={emailRef}
+                  type={'email'}
+                  placeholder={'이메일'}
+                  className={'px-5 py-6'}
+                  onChange={(e) => {
+                    inputChangeHandler(e, emailRegExp, setEmailErr);
+                  }}
+                />
+              </div>
+              {emailErr && <p className={'absolute left-0 top-14 text-red-600'}>이메일 형식이 맞지 않습니다</p>}
+            </div>
+            {/* 비밀번호 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-lock"></i>
+                <Input
+                  ref={passwordRef}
+                  type={'password'}
+                  placeholder={'비밀번호'}
+                  className={'px-5 py-6'}
+                  onChange={(e) => {
+                    inputChangeHandler(e, passwordRegExp, setPasswordErr);
+                  }}
+                />
+              </div>
+              {passwordErr && <p className={'absolute left-0 top-14 text-red-600'}>비밀번호는 8자 이상입니다</p>}
+            </div>
+          </div>
         )}
-      </div>
-      {/*로그인,회원가입 버튼*/}
-      <div className="w-full max-w-[330px] mb-[20px]" onClick={signInUpButtonClickHandler}>
+
+        {/* 회원가입 관련 */}
+        {authType === 'sign-up' && (
+          <div className="w-full max-w-[330px] mb-[30px] flex flex-col gap-12">
+            {/* 이메일 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-envelope"></i>
+                <Input
+                  ref={emailRef}
+                  type={'email'}
+                  placeholder={'이메일'}
+                  className={'px-5 py-6'}
+                  onChange={(e) => {
+                    inputChangeHandler(e, emailRegExp, setEmailErr);
+                  }}
+                />
+              </div>
+              {emailErr && <p className={'absolute left-0 top-14 text-red-600'}>이메일 형식이 맞지 않습니다</p>}
+            </div>
+            {/* 비밀번호 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-lock"></i>
+                <Input
+                  ref={passwordRef}
+                  type={'password'}
+                  placeholder={'비밀번호'}
+                  className={'px-5 py-6'}
+                  onChange={(e) => {
+                    inputChangeHandler(e, passwordRegExp, setPasswordErr);
+                  }}
+                />
+              </div>
+              {passwordErr && <p className={'absolute left-0 top-14 text-red-600'}>비밀번호는 8자 이상이어야 합니다</p>}
+            </div>
+            {/* 닉네임 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-lock"></i>
+                <Input
+                  ref={nicknameRef}
+                  type={'text'}
+                  placeholder={'닉네임'}
+                  className={'px-5 py-6'}
+                  onChange={(e) => {
+                    inputChangeHandler(e, nicknameRegExp, setNicknameErr);
+                  }}
+                />
+              </div>
+              {nicknameErr && <p className={'absolute left-0 top-14 text-red-600'}>닉네입은 8자 이상이어야 합니다</p>}
+            </div>
+            {/* 주소 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-lock"></i>
+                <Input
+                  ref={addressRef}
+                  type={'text'}
+                  placeholder={'주소'}
+                  className={'px-5 py-6'}
+                  onChange={() => {
+                    setAddressErr(false);
+                  }}
+                />
+              </div>
+              {addressErr && <p className={'absolute left-0 top-14 text-red-600'}>주소는 필수 입력사항입니다</p>}
+            </div>
+            {/* 상세주소 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-lock"></i>
+                <Input ref={addressDetailRef} type={'text'} placeholder={'상세주소'} className={'px-5 py-6'} />
+              </div>
+            </div>
+            {/* 휴대폰번호 */}
+            <div className={'relative flex flex-col gap-5'}>
+              <div>
+                <i className="absolute top-1/2 -translate-y-1/2 -left-7 fi fi-rr-lock"></i>
+                <Input
+                  ref={phoneNumberRef}
+                  type={'text'}
+                  placeholder={'휴대폰번호'}
+                  className={'px-5 py-6'}
+                  onChange={(e) => {
+                    inputChangeHandler(e, phoneNumberRegExp, setPhoneNumberErr);
+                  }}
+                />
+              </div>
+              {phoneNumberErr && <p className={'absolute left-0 top-14 text-red-600'}>정확한 번호를 입력해주세요</p>}
+            </div>
+          </div>
+        )}
+
+        {/*로그인,회원가입 버튼*/}
         <Button
-          name={authType === 'sign-in' ? '로그인' : '회원가입'}
-          bgColor="bg-black"
-          bgOpacity={60}
-          bgHoverOpacity={80}
-          textColor="text-white"
-          textSize="md"
-        />
-      </div>
-      <div className="flex flex-col gap-[20px] text-sm items-center">
-        <div className="flex gap-[10px]">
-          <p className="text-default-black">
-            {authType === 'sign-in' ? '아직 계정이 없으신가요?' : '이미 계정이 있으신가요?'}
-          </p>
-          <button className="text-dark-black font-semibold" onClick={changeAuthType}>
-            {`${authType === 'sign-in' ? '회원가입' : '로그인'} 하러 가기 >`}
+          onClick={() => {
+            if (authType === 'sign-in') {
+              signIn();
+            }
+            if (authType === 'sign-up') {
+              signUp();
+            }
+          }}
+          className={'w-full py-7'}
+        >
+          {authType === 'sign-in' ? '로그인' : '회원가입'}
+        </Button>
+
+        <div className="flex flex-col gap-[20px] text-sm items-center">
+          <div className="flex gap-[10px]">
+            <p className="text-default-black">
+              {authType === 'sign-in' ? '아직 계정이 없으신가요?' : '이미 계정이 있으신가요?'}
+            </p>
+            <button className="text-dark-black font-semibold" onClick={changeAuthType}>
+              {`${authType === 'sign-in' ? '회원가입' : '로그인'} 하러 가기 >`}
+            </button>
+          </div>
+          <p className="text-light-black">or</p>
+          <button className="flex gap-[5px] rounded-[5px] border-[0.5px] border-black border-opacity-40 px-[10px] py-[5px] hover:bg-black hover:bg-opacity-10 transition duration-100">
+            <i className="fi fi-brands-google"></i>
+            <p>구글 계정으로 인증하기</p>
           </button>
         </div>
-        <p className="text-light-black">or</p>
-        <button className="flex gap-[5px] rounded-[5px] border-[0.5px] border-black border-opacity-40 px-[10px] py-[5px] hover:bg-black hover:bg-opacity-10 transition duration-100">
-          <i className="fi fi-brands-google"></i>
-          <p>구글 계정으로 인증하기</p>
-        </button>
       </div>
-    </div>
+    </main>
   );
 };
 
