@@ -8,7 +8,7 @@ import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 
 const OrderDetailPage = () => {
   const [orderDetailList, setOrderDetailList] = useState<OrderDetail[] | null>(null);
-  const [cookie, _] = useCookies();
+  const [cookie] = useCookies(['jwt']);
   const navigate = useNavigate();
   const orderCount = orderDetailList ? orderDetailList.length : 0;
 
@@ -36,6 +36,7 @@ const OrderDetailPage = () => {
     });
   };
 
+  // 초기 렌더링
   useEffect(() => {
     // 로그인 시간 만료시 로그인 화면으로 이동
     if (!cookie.jwt) {
@@ -53,8 +54,10 @@ const OrderDetailPage = () => {
       startDate: now,
       endDate: now,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 날짜 변경 시 주문 내역 받아오기
   useEffect(() => {
     // 로그인 시간 만료시 로그인 화면으로 이동
     if (!cookie.jwt) {
@@ -64,6 +67,7 @@ const OrderDetailPage = () => {
 
     // 주문 내역 받아오기
     getOrderDetailList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate]);
 
   return (
