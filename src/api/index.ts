@@ -294,7 +294,7 @@ export const deleteCartBookRequest = async (jwt: string, isbn: string) => {
 };
 
 // 주문하기
-export const createOrderRequest = async (jwt: String, requestDto: PostOrderRequestDto) => {
+export const createOrderRequest = async (jwt: string, requestDto: PostOrderRequestDto) => {
   return await axios
     .post(`http://localhost:8080/api/v1/order`, requestDto, {
       headers: {
@@ -311,7 +311,7 @@ export const createOrderRequest = async (jwt: String, requestDto: PostOrderReque
 };
 
 // 보유 포인트 가져오기
-export const getTotalPointRequest = async (token: String): Promise<number | null> => {
+export const getTotalPointRequest = async (token: string): Promise<number | null> => {
   return await axios
     .get('http://localhost:8080/api/v1/point/total', {
       headers: {
