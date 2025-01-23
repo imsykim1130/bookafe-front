@@ -1,4 +1,3 @@
-import PageTitle from '../components/PageTitle.tsx';
 import { Dispatch, forwardRef, RefObject, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { CartBookData, CouponData, OrderInfoData } from '../api/item.ts';
 import {
@@ -17,7 +16,7 @@ import { PostOrderRequestDto } from '../api/request.dto.ts';
 
 /// 전체
 const Cart = () => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const [cartBookList, setCartBookList] = useState<CartBookData[] | null>(null);
 
@@ -44,6 +43,7 @@ const Cart = () => {
 
   useEffect(() => {
     getCartBookList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -55,14 +55,13 @@ const Cart = () => {
       });
       return;
     }
-  }, [cookies.jwt]);
+  }, [cookies.jwt, navigate]);
 
   return (
-    <div className={'relative'}>
-      <PageTitle title={'장바구니'} />
-      <main>
+    <main className={'relative mt-[40px]'}>
+      <div className="flex justify-center">
         {cartBookList && cartBookList.length ? (
-          <div className={'mx-[10%] grid grid-cols-1 gap-20 min-[1100px]:grid-cols-2 min-[1100px]:mx-[10%]'}>
+          <div className={'w-full flex flex-col gap-[60px] max-w-[600px] mx-[5%]'}>
             <CartBookListSection
               cartBookList={cartBookList}
               getCartBookList={getCartBookList}
@@ -77,8 +76,8 @@ const Cart = () => {
             </p>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </main>
   );
 };
 
@@ -127,7 +126,7 @@ const CartBookComp = ({
   changeCount: (changeCount: number, isbn: string) => void;
   getCartBookList: () => void;
 }) => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
 
   const deleteCartBook = () => {
     deleteCartBookRequest(cookies.jwt, book.isbn).then((response) => {
@@ -203,13 +202,14 @@ const CartBookComp = ({
         </div>
       </article>
     ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [book.count],
   );
 };
 
 ////// 배송 관련 정보
 const OrderInfo = () => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const addressRef = useRef<HTMLInputElement>(null);
   const addressDetailRef = useRef<HTMLInputElement>(null);
@@ -291,7 +291,7 @@ const DeliveryInfo = ({
   addressDetailRef: RefObject<HTMLInputElement>;
   phoneNumberRef: RefObject<HTMLInputElement>;
 }) => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const [deliveryInfo, setDeliveryInfo] = useState<OrderInfoData | null>(null);
 
   const getDeliveryInfo = () => {
@@ -367,7 +367,7 @@ const CouponInfo = ({
   couponId: number | null;
   changeCouponId: (couponId: number | null) => void;
 }) => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const [couponList, setCouponList] = useState<CouponData[] | null>(null);
 
   const getCouponList = async () => {
@@ -378,6 +378,8 @@ const CouponInfo = ({
 
   useEffect(() => {
     getCouponList();
+    // 첫 렌더링에만 실행되도록 하기 위해 추가
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -415,6 +417,7 @@ const CouponDataComp = ({ coupon, selectedCouponId }: { coupon: CouponData; sele
     } else {
       setIsSelected(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCouponId]);
 
   return (
@@ -440,7 +443,7 @@ const PointInfo = ({
   usePoint: number | null;
   setUsePoint: Dispatch<SetStateAction<number | null>>;
 }) => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const [point, setPoint] = useState<number | null>(null);
 
   const getTotalPoint = async () => {
@@ -451,6 +454,7 @@ const PointInfo = ({
 
   useEffect(() => {
     getTotalPoint();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
