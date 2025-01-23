@@ -1,0 +1,130 @@
+import { useEffect, useState } from 'react';
+import { BookPrevData, TodayBookInterface } from '../../../api/item.ts';
+import { useNavigate } from 'react-router-dom';
+import { getRecommendBookRequest, getSearchBookRequest } from '../../../api';
+import SearchBox from '@/components/SearchBox.tsx';
+import BookPrev from '@/components/BookPrev.tsx';
+import { useDebounce } from '@/hook';
+import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
+import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
+
+const RecommendBook = () => {
+  const [recommendBook, setRecommendBook] = useState<TodayBookInterface | null>(null);
+  const navigate = useNavigate();
+
+  const getRecommendBook = () => {
+    getRecommendBookRequest().then((res) => {
+      if (!res) {
+        window.alert('책 로딩 실패. 다시 시도해주세요');
+      }
+      setRecommendBook(res);
+    });
+  };
+
+  const bookClickHandler = () => {
+    navigate('/book/detail/' + recommendBook?.isbn);
+  };
+
+  useEffect(() => {
+    getRecommendBook();
+  }, []);
+
+  return (
+    <section className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh] overflow-hidden">
+      {/* 검색 */}
+      <SearchSection />
+      <div className={'flex flex-col gap-[30px] overflow-hidden'}>
+        {/* 배경 이미지 */}
+        <div className={'absolute top-0 left-0 w-full -z-10 blur-2xl'}>
+          {recommendBook && (
+            <img src={recommendBook.bookImg} alt="book background image" className={`w-[100%] opacity-10`} />
+          )}
+        </div>
+        <div className="flex flex-col md:flex-row-reverse items-center md:items-start gap-[40px]">
+          {/* 타이틀, 후기, 책 정보 이동 버튼 */}
+          <div className={'flex flex-col items-center md:items-start gap-[20px]'}>
+            <div className={'flex flex-col items-center md:items-start gap-[5px]'}>
+              <h1 className={'text-black text-opacity-75 text-[30px] font-bold'}>
+                {recommendBook ? recommendBook.title : ''}
+              </h1>
+              <p className={'text-black text-opacity-40 text-[12px]'}>
+                {recommendBook ? recommendBook.favoriteComment : ''}
+              </p>
+            </div>
+            <button
+              className={' border-[1px] border-black border-opacity-60 rounded-[5px] p-[5px] text-[12px]'}
+              onClick={bookClickHandler}
+            >
+              자세히 보기
+            </button>
+          </div>
+          <div className={'w-[120px] rounded-[5px] overflow-hidden shadow-2xl'}>
+            {recommendBook ? (
+              <img src={recommendBook.bookImg} alt="book cover image" className={'w-full drop-shadow-2xl'} />
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const SearchSection = () => {
+  const [searchBookList, setSearchBookList] = useState<BookPrevData[]>([]);
+  const [searchWord, setSearchWord] = useState<string>('');
+  const debouncedSearchWord = useDebounce(searchWord, 500);
+
+  // function: 책 검색하기
+  const searchBook = () => {
+    const requestDto: getSearchBookListRequestDto = {
+      query: debouncedSearchWord,
+      sort: 'accuracy',
+      page: 1,
+      size: 10,
+      target: 'title',
+    };
+    getSearchBookRequest(requestDto)
+      .then((response) => {
+        // 책 데이터 받아오기 성공
+        const { bookList } = response.data as getSearchBookListResponseDto;
+        setSearchBookList(bookList);
+      })
+      .catch((error) => {
+        // 책 데이터 받아오기 실패
+        console.log(error.response.data);
+      });
+  };
+
+  useEffect(() => {
+    if (debouncedSearchWord === '') {
+      setSearchBookList([]);
+      return;
+    }
+    searchBook();
+  }, [debouncedSearchWord]);
+
+  return (
+    <div className={'absolute top-[100px]'}>
+      <SearchBox searchWord={searchWord} setSearchWord={setSearchWord} />
+      {/* 검색 미리보기 */}
+      {searchBookList.length ? (
+        <div
+          className={
+            'absolute z-50 w-full h-[400px] p-[5px] top-[70px] left-1/2 -translate-x-1/2 flex flex-col bg-white rounded-[10px] drop-shadow-md overflow-scroll scroll-smooth'
+          }
+        >
+          {searchBookList.map((book) => (
+            <div key={book.isbn} className={'rounded-[10px] p-[15px] hover:bg-black hover:bg-opacity-5 duration-200'}>
+              <BookPrev bookImg={book.bookImg} author={book.author} title={book.title} isbn={book.isbn} imgSize={70} />
+            </div>
+          ))}
+          <button className={'font-semibold py-[10px] hover:bg-black hover:bg-opacity-5 rounded-[10px]'}>
+            검색결과 더보기
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export default RecommendBook;
