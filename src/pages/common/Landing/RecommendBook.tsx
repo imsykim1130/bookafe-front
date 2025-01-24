@@ -30,7 +30,7 @@ const RecommendBook = () => {
   }, []);
 
   return (
-    <section className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh] overflow-hidden">
+    <div className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh]">
       {/* 검색 */}
       <SearchSection />
       <div className={'flex flex-col gap-[30px] overflow-hidden'}>
@@ -65,7 +65,7 @@ const RecommendBook = () => {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
@@ -95,16 +95,18 @@ const SearchSection = () => {
       });
   };
 
+  // 검색어 변경 시 책 검색
   useEffect(() => {
     if (debouncedSearchWord === '') {
       setSearchBookList([]);
       return;
     }
     searchBook();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchWord]);
 
   return (
-    <div className={'absolute top-[100px]'}>
+    <div className={'absolute top-[60px]'}>
       <SearchBox searchWord={searchWord} setSearchWord={setSearchWord} />
       {/* 검색 미리보기 */}
       {searchBookList.length ? (

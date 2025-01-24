@@ -3,7 +3,7 @@ import Top10 from './Top10.tsx';
 
 const Landing = () => {
   return (
-    <main className={'flex flex-col'}>
+    <main className={'flex flex-col overflow-y-hidden'}>
       <RecommendBook />
       <Top10 />
     </main>
