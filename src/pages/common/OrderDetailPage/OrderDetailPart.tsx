@@ -12,7 +12,7 @@ const OrderDetailPart = ({
 }) => {
   const [more, setMore] = useState(false);
   const [totalPrice, setTotalPrice] = useState<number>(0);
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
 
   const calculateTotalPrice = () => {
     let price = 0;
@@ -41,7 +41,9 @@ const OrderDetailPart = ({
   };
 
   return (
-    <article className={'flex flex-col gap-[15px] p-[20px] text-md bg-white rounded-[5px]'}>
+    <article
+      className={'flex flex-col gap-[15px] text-md bg-white py-[30px] border-b-[1px] border-black border-opacity-40'}
+    >
       <div className={'flex items-center justify-between font-bold'}>
         <div className={'flex items-center gap-[5px]'}>
           <p>주문번호 {orderDetail.orderId}</p>
