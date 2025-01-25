@@ -10,7 +10,7 @@ const Header = () => {
 
   const { authType } = useParams();
   const { profileImg } = useSelector((state: { user: userState }) => state.user);
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
@@ -43,14 +43,14 @@ const Header = () => {
     >
       {/*로고*/}
       <Link to="/" className="w-[30px] h-[30px] flex justify-center items-center">
-        <i className="fi fi-ss-book-alt"></i>
+        <i className="fi fi-ss-book-alt text-[px]"></i>
       </Link>
       {/*네비게이션*/}
       <nav className="relative flex gap-[20px] items-center">
         {/*장바구니*/}
         {!isAuthPage ? (
           <Link to="/cart" className="w-[30px] h-[30px] flex justify-center items-center cursor-pointer">
-            <i className="fi fi-rr-shopping-cart"></i>
+            <i className="fi fi-rr-shopping-cart text-[15px]"></i>
           </Link>
         ) : (
           ''
@@ -58,7 +58,7 @@ const Header = () => {
         {/*좋아요*/}
         {!isAuthPage ? (
           <Link to={'/favorite'} className="w-[30px] h-[30px] flex justify-center items-center cursor-pointer">
-            <i className="fi fi-rs-heart"></i>
+            <i className="fi fi-rs-heart text-[15px]"></i>
           </Link>
         ) : (
           ''
@@ -70,7 +70,11 @@ const Header = () => {
             className="w-[30px] h-[30px] rounded-full flex items-center justify-center overflow-hidden"
           >
             <div className={'w-[20px] h-[20px] rounded-full flex items-center justify-center overflow-hidden'}>
-              {profileImageUrl ? <img src={profileImageUrl} alt="profile img" /> : <i className="fi fi-rr-user"></i>}
+              {profileImageUrl ? (
+                <img src={profileImageUrl} alt="profile img" />
+              ) : (
+                <i className="fi fi-rr-user text-[15px]"></i>
+              )}
             </div>
           </Link>
         ) : (
@@ -85,7 +89,7 @@ const Header = () => {
               navigate('/auth/sign-in', { state: { pathname: pathname } });
             }}
           >
-            <i className="fi fi-rr-insert-alt"></i>
+            <i className="fi fi-rr-insert-alt text-[15px]"></i>
           </div>
         ) : (
           ''
@@ -93,7 +97,7 @@ const Header = () => {
         {/* 회원가입 */}
         {isAuthPage && authType === 'sign-in' ? (
           <Link to={'/auth/sign-up'} className="w-[30px] h-[30px] flex justify-center items-center cursor-pointer">
-            <i className="fi fi-rr-user-add"></i>
+            <i className="fi fi-rr-user-add text-[15px]"></i>
           </Link>
         ) : (
           ''
