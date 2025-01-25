@@ -36,14 +36,14 @@ const BookSection = ({
       {/* 책 표지*/}
       <img src={book.bookImg} className={'w-full absolute -z-10 top-0 blur-2xl'}></img>
       <div className={'w-[150px]'}>
-        <img src={book.bookImg} alt="book cover image" className={'w-full rounded-[10px] shadow-2xl'} />
+        <img
+          src={book.bookImg}
+          alt="book cover image"
+          className={'w-full rounded-[10px] shadow-[0_0_40px_rgba(0,0,0,0.7)]'}
+        />
       </div>
       {/* 상세설명 */}
-      <div
-        className={
-          'max-w-[700px] mx-[5%] flex flex-col gap-[30px] p-[30px] mt-[60px] rounded-[20px] shadow-2xl bg-white'
-        }
-      >
+      <div className={'max-w-[700px] mx-[5%] flex flex-col gap-[30px] p-[30px] mt-[60px] rounded-[20px] bg-white'}>
         {/* 위 */}
         <div className={'flex justify-between'}>
           {/* 왼쪽 */}

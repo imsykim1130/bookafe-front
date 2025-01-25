@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Auth from './pages/Auth.tsx';
 import App from './App.tsx';
 import User from './pages/User.tsx';
-import Favorite from './pages/Favorite.tsx';
 import { Provider } from 'react-redux';
 import Search from './pages/Search.tsx';
 
@@ -13,11 +12,13 @@ import Point from './pages/Point.tsx';
 import OrderStatus from './pages/admin/OrderStatus.tsx';
 import RecommendBook from './pages/admin/RecommendBook.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
-import Cart from './pages/Cart.tsx';
+
 import { store } from './redux';
 import BookDetail from './pages/common/BookDetail';
 import Landing from './pages/common/Landing';
 import OrderDetailPage from './pages/common/OrderDetailPage';
+import Cart from './pages/common/Cart/index.tsx';
+import Favorite from './pages/common/Favorite/index.tsx';
 
 const router = createBrowserRouter([
   {

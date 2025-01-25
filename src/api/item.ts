@@ -23,6 +23,7 @@ export interface BookPrevData {
 }
 
 export interface FavoriteBookItem {
+  id: number;
   isbn: string;
   bookImg: string;
   title: string;
@@ -84,7 +85,7 @@ export interface CartBookData {
   price: number;
   author: string;
   isbn: string;
-  img: string;
+  bookImg: string;
 }
 
 export interface OrderBookView {

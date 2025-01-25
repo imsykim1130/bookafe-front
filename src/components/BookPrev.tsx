@@ -6,12 +6,11 @@ interface Props {
   title: string;
   isbn: string;
   price?: number;
-  type?: 'favorite' | 'cart';
   imgSize: number;
 }
 
 const BookPrev = (props: Props) => {
-  const { bookImg, author, title, isbn, type, imgSize, price } = props;
+  const { bookImg, author, title, isbn, imgSize, price } = props;
   const navigate = useNavigate();
 
   const getImageSize = () => {
@@ -25,11 +24,12 @@ const BookPrev = (props: Props) => {
   };
 
   return (
-    <article
-      className={`cursor-pointer flex ${!type ? 'flex-col' : 'flex-row gap-[15px]'}`}
-      onClick={bookImgClickHandler}
-    >
-      <img src={bookImg} alt="book image" className={`rounded-[5px] ` + getImageSize()} />
+    <article className={`cursor-pointer flex flex-col`} onClick={bookImgClickHandler}>
+      <img
+        src={bookImg}
+        alt="book image"
+        className={`${getImageSize()} my-[15px] rounded-[10px] transition-all duration-300 ease shadow-[2px_2px_10px_rgba(0,0,0,0.6)] hover:shadow-[6px_6px_10px_rgba(0,0,0,0.6)] hover:translate-y-[-10px] hover:scale-105`}
+      />
       <div className="flex flex-col gap-[5px] mt-[10px] ml-[5px] text-md">
         <p className="text-default-black font-semibold text-wrap">{title}</p>
         <p className="text-light-black">{author}</p>
