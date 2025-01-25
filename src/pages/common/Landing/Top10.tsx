@@ -33,7 +33,7 @@ const Top10 = () => {
 
   return (
     // top10 섹션 컨테이너
-    <section className={'flex flex-col gap-[50px] py-[40px] min-[800px]:items-center bg-white'}>
+    <section className={'flex flex-col gap-[30px] py-[40px] min-[800px]:items-center bg-white'}>
       {/* 타이틀 컨테이너 */}
       <div className={'flex flex-col items-center gap-[5px]'}>
         <h1 className="font-bold text-dark-black md:text-center text-[18px]">이런 책은 어떠세요?</h1>
@@ -49,7 +49,7 @@ const Top10 = () => {
         {/* 마우스 포인터 표시 */}
         {isMouseInside && (
           <div
-            className="pointer-events-none absolute flex justify-center items-center w-[40px] h-[40px] bg-black rounded-full bg-opacity-40 transform -translate-x-1/2 -translate-y-1/2 text-white text-opacity-100"
+            className="pointer-events-none absolute z-20 flex justify-center items-center w-[40px] h-[40px] bg-black rounded-full bg-opacity-40 transform -translate-x-1/2 -translate-y-1/2 text-white text-opacity-100"
             style={{
               left: `${mousePosition.x}px`,
               top: `${mousePosition.y}px`,

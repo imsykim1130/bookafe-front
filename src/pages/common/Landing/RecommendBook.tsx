@@ -30,10 +30,10 @@ const RecommendBook = () => {
   }, []);
 
   return (
-    <div className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh]">
+    <section className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh]">
       {/* 검색 */}
       <SearchSection />
-      <div className={'flex flex-col gap-[30px] overflow-hidden'}>
+      <div className={'flex flex-col gap-[30px]'}>
         {/* 배경 이미지 */}
         <div className={'absolute top-0 left-0 w-full -z-10 blur-2xl'}>
           {recommendBook && (
@@ -58,14 +58,18 @@ const RecommendBook = () => {
               자세히 보기
             </button>
           </div>
-          <div className={'w-[120px] rounded-[5px] overflow-hidden shadow-2xl'}>
+          <div className={'w-[120px]'}>
             {recommendBook ? (
-              <img src={recommendBook.bookImg} alt="book cover image" className={'w-full drop-shadow-2xl'} />
+              <img
+                src={recommendBook.bookImg}
+                alt="book cover image"
+                className={'w-full rounded-[10px] shadow-[6px_6px_10px_rgba(0,0,0,0.6)]'}
+              />
             ) : null}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
