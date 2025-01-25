@@ -27,6 +27,7 @@ const BookSection = ({
   // 초기 렌더링 시 책 정보 가져오기
   useEffect(() => {
     getBookDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!book) return null;

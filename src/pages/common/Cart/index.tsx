@@ -14,7 +14,6 @@ import { Dispatch, forwardRef, RefObject, SetStateAction, useEffect, useRef, use
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import CartBookComp from './component/CartBook';
-import CartBookButtonPart from './component/CartBookButtonPart';
 
 /// 전체
 const Cart = () => {

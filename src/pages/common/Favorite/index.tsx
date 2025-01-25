@@ -1,4 +1,4 @@
-import { cancelFavoriteRequest, getFavoriteBookListRequest, moveFavoriteBookToCartRequest } from '@/api';
+import { cancelFavoriteRequest, getFavoriteBookListRequest } from '@/api';
 import { FavoriteBookItem } from '@/api/item';
 import PageTitle from '@/components/PageTitle';
 import { useEffect, useState } from 'react';
@@ -23,6 +23,7 @@ const Favorite = () => {
       return;
     }
     getFavoriteBookList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 좋아요 책 정보 가져오기
