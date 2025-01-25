@@ -1,5 +1,5 @@
 import './App.css';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './layout/Header.tsx';
 import Footer from './layout/Footer.tsx';
 import { useCookies } from 'react-cookie';
@@ -14,6 +14,7 @@ import { error, loading, reset, update } from './redux/userSlice.ts';
 const App = () => {
   const [cookies] = useCookies(['jwt']);
   const dispatch = useDispatch();
+  const { pathname } = useLocation();
 
   const getUser = async (dispatch: Dispatch<UnknownAction>, jwt: string) => {
     dispatch(loading());
@@ -39,6 +40,11 @@ const App = () => {
     }
     getUser(dispatch, cookies.jwt);
   }, [cookies.jwt]);
+
+  // 페이지 이동 시 스크롤 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
     <div>
