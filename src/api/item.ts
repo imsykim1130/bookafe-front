@@ -96,7 +96,7 @@ export interface OrderBookView {
 export interface OrderDetail {
   orderId: number;
   orderDatetime: string;
-  orderStatus: string;
+  orderStatus: '배송준비중' | '배송중' | '배송완료';
   orderBookViewsList: OrderBookView[];
 }
 

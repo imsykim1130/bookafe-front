@@ -72,9 +72,9 @@ const Recommend = ({ isbn }: { isbn: string | undefined }) => {
   return (
     <div>
       {isRecommended ? (
-        <i className="fi fi-sr-star cursor-pointer" onClick={deleteRecommendBook}></i>
+        <i className="fi fi-sr-star cursor-pointer text-[16px]" onClick={deleteRecommendBook}></i>
       ) : (
-        <i className="fi fi-rr-star cursor-pointer" onClick={registerRecommendBook}></i>
+        <i className="fi fi-rr-star cursor-pointer text-[16px]" onClick={registerRecommendBook}></i>
       )}
     </div>
   );

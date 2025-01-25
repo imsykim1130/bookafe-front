@@ -1,4 +1,4 @@
-import { BookDetailData, BookPrevData, CommentItem, Meta, UserItem } from './item.ts';
+import { BookDetailData, BookPrevData, CommentItem, Meta, OrderDetail, UserItem } from './item.ts';
 
 export interface ResponseDto {
   code: string;
@@ -34,4 +34,10 @@ export interface GetBookCartUserIdListResponseDto extends ResponseDto {
 
 export interface GetCommentListResponse extends ResponseDto {
   commentItemList: CommentItem[];
+}
+
+export interface GetOrderDetailListResponseDto {
+  isStart: boolean;
+  isEnd: boolean;
+  orderDetailList: OrderDetail[];
 }

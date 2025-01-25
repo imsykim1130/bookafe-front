@@ -24,6 +24,7 @@ const BookSection = ({
     });
   };
 
+  // 초기 렌더링 시 책 정보 가져오기
   useEffect(() => {
     getBookDetail();
   }, []);
@@ -31,16 +32,16 @@ const BookSection = ({
   if (!book) return null;
 
   return (
-    <div className={'relative overflow-hidden pt-[100px] pb-[60px] flex flex-col items-center text-[15px]'}>
+    <div className={'relative overflow-hidden pt-[100px] pb-[60px] flex flex-col items-center'}>
       {/* 책 표지*/}
       <img src={book.bookImg} className={'w-full absolute -z-10 top-0 blur-2xl'}></img>
       <div className={'w-[150px]'}>
-        <img src={book.bookImg} alt="book cover image" className={'w-full rounded-[5px] shadow-2xl'} />
+        <img src={book.bookImg} alt="book cover image" className={'w-full rounded-[10px] shadow-2xl'} />
       </div>
       {/* 상세설명 */}
       <div
         className={
-          'bg-white p-[30px] mt-[60px] mx-[5%] md:mx-[15%] lg:mx-[20%] rounded-[20px] shadow-2xl flex flex-col gap-[30px]'
+          'max-w-[700px] mx-[5%] flex flex-col gap-[30px] p-[30px] mt-[60px] rounded-[20px] shadow-2xl bg-white'
         }
       >
         {/* 위 */}
@@ -56,7 +57,7 @@ const BookSection = ({
             <p>{book.author} 저자</p>
           </div>
           {/* 오른쪽 */}
-          <div className={'flex gap-[20px]'}>
+          <div className={'flex gap-[25px]'}>
             {/* 추천*/}
             {role === 'ROLE_ADMIN' && <Recommend isbn={isbn} />}
             {/* 좋아요 */}
@@ -67,7 +68,7 @@ const BookSection = ({
         </div>
         {/* 아래 */}
         <div>
-          <p>{book.description}</p>
+          <p className="leading-[1.8]">{book.description}</p>
         </div>
       </div>
     </div>

@@ -71,9 +71,9 @@ const Favorite = ({ isbn }: { isbn: string | undefined }) => {
   return (
     <div>
       {isFavorite ? (
-        <i className="fi fi-ss-heart cursor-pointer" onClick={deleteBookFromFavorite}></i>
+        <i className="fi fi-ss-heart cursor-pointer text-[16px]" onClick={deleteBookFromFavorite}></i>
       ) : (
-        <i className="fi fi-rs-heart cursor-pointer" onClick={putBookToFavorite}></i>
+        <i className="fi fi-rs-heart cursor-pointer text-[16px]" onClick={putBookToFavorite}></i>
       )}
     </div>
   );

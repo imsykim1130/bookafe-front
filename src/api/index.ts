@@ -6,7 +6,12 @@ import {
   SignInRequestDto,
   SignUpRequestDto,
 } from './request.dto.ts';
-import { GetCommentListResponse, ResponseDto, SignInResponseDto } from './response.dto.ts';
+import {
+  GetCommentListResponse,
+  GetOrderDetailListResponseDto,
+  ResponseDto,
+  SignInResponseDto,
+} from './response.dto.ts';
 import { Dispatch, MutableRefObject } from 'react';
 import {
   BookDetailData,
@@ -363,7 +368,13 @@ export const deleteOrderSuccessCartBookListRequest = async (jwt: string, cartBoo
 };
 
 // 주문 내역 불러오기
-export const getOrderDetailListRequest = async (jwt: string, start: Date, end: Date) => {
+export const getOrderDetailListRequest = async (
+  jwt: string,
+  start: Date,
+  end: Date,
+  orderStatus: string,
+  page: number,
+) => {
   return await axios
     .get(`http://localhost:8080/api/v1/order/details`, {
       headers: {
@@ -372,9 +383,11 @@ export const getOrderDetailListRequest = async (jwt: string, start: Date, end: D
       params: {
         start: moment(start).format('YYYY-MM-DD HH:mm:ss'),
         end: moment(end).format('YYYY-MM-DD HH:mm:ss'),
+        orderStatus,
+        page,
       },
     })
-    .then((res): OrderDetail[] => {
+    .then((res): GetOrderDetailListResponseDto => {
       return res.data;
     })
     .catch((err) => {

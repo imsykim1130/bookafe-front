@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 interface Props {
   orderDetail: OrderDetail;
+  orderCandelClickHandler: (orderId: number) => void;
 }
 
-function OrderDetailItem({ orderDetail }: Props) {
+function OrderDetailItem({ orderDetail, orderCandelClickHandler }: Props) {
   const { orderId, orderDatetime, orderStatus, orderBookViewsList } = orderDetail;
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -58,6 +59,7 @@ function OrderDetailItem({ orderDetail }: Props) {
         <button
           className="px-4 py-2 border border-gray-300 rounded-[10px] bg-white hover:bg-gray-50 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={orderStatus !== '배송준비중'}
+          onClick={() => orderCandelClickHandler(orderId)}
         >
           취소하기
         </button>

@@ -75,14 +75,14 @@ const Cart = ({ isbn }: { isbn: string | undefined }) => {
     <div>
       {isCart ? (
         <i
-          className="fi fi-sr-shopping-cart cursor-pointer"
+          className="fi fi-sr-shopping-cart cursor-pointer text-[16px]"
           onClick={() => {
             deleteBookFromCart();
           }}
         ></i>
       ) : (
         <i
-          className="fi fi-rr-shopping-cart cursor-pointer"
+          className="fi fi-rr-shopping-cart cursor-pointer text-[16px]"
           onClick={() => {
             putBookToCart();
           }}

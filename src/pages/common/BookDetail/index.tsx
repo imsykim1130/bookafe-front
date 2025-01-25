@@ -15,10 +15,10 @@ const BookDetail = () => {
   };
 
   return (
-    <div>
+    <main>
       <BookSection isbn={isbn} role={role} bookLoadingComplete={bookLoadingComplete} />
       <CommentSection bookLoading={bookLoading} />
-    </div>
+    </main>
   );
 };
 

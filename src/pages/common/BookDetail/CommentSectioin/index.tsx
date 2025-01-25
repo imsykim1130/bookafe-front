@@ -11,7 +11,7 @@ interface Props {
 }
 
 const CommentSection = ({ bookLoading }: Props) => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const { isbn } = useParams();
 
@@ -47,87 +47,91 @@ const CommentSection = ({ bookLoading }: Props) => {
   }, [bookLoading]);
 
   return (
-    <section className={'mt-[60px] mx-[5%] md:mx-[15%] lg:mx-[20%] text-[14px]'}>
-      <div>
-        <p className={'font-semibold text-[16px] my-[15px]'}>리뷰</p>
-      </div>
-      {/* 댓글 작성창 */}
-      {cookies.jwt && (
-        <div className={'flex flex-col gap-[15px]'}>
-          <textarea
-            className={
-              'w-full min-h-[100px] p-[20px] pb-[40px] outline-none border-[1px] border-black border-opacity-15 rounded-[5px] resize-none'
-            }
-            value={content}
-            placeholder={'책에 대한 감상을 남겨주세요 😃'}
-            onChange={(e) => setContent(e.target.value)}
-          />
-          <div className={'flex justify-between items-center'}>
-            <div
+    <section className={'flex justify-center mt-[60px] mx-[5%] text-[14px]'}>
+      <div className={'w-full max-w-[700px]'}>
+        <div>
+          <p className={'font-semibold text-[16px] my-[15px]'}>리뷰</p>
+        </div>
+        {/* 댓글 작성창 */}
+        {/* 로그인 되어 있을 때 */}
+        {cookies.jwt && (
+          <div className={'flex flex-col gap-[15px]'}>
+            <textarea
               className={
-                'border-[1px] border-black border-opacity-10 rounded-[20px] p-[10px] flex gap-[20px] items-center text-[20px]'
+                'w-full min-h-[100px] p-[20px] pb-[40px] outline-none border-[1px] border-black border-opacity-15 rounded-[5px] resize-none'
               }
-            >
-              {emojiList.map((emoji, index) => (
-                <div
-                  key={emoji}
-                  className={`w-[30px] h-[30px] flex justify-center items-center rounded-full ${index === emojiIndex ? 'bg-black bg-opacity-10' : ''}`}
-                >
-                  <span
-                    className={'cursor-pointer'}
-                    onClick={() => {
-                      setEmojiIndex(index);
-                    }}
+              value={content}
+              placeholder={'책에 대한 감상을 남겨주세요 😃'}
+              onChange={(e) => setContent(e.target.value)}
+            />
+            <div className={'flex justify-between items-center'}>
+              <div
+                className={
+                  'border-[1px] border-black border-opacity-10 rounded-[20px] p-[10px] flex gap-[20px] items-center text-[20px]'
+                }
+              >
+                {emojiList.map((emoji, index) => (
+                  <div
+                    key={emoji}
+                    className={`w-[30px] h-[30px] flex justify-center items-center rounded-full ${index === emojiIndex ? 'bg-black bg-opacity-10' : ''}`}
                   >
-                    {emoji}
-                  </span>
-                </div>
-              ))}
+                    <span
+                      className={'cursor-pointer'}
+                      onClick={() => {
+                        setEmojiIndex(index);
+                      }}
+                    >
+                      {emoji}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <button
+                className={
+                  'border-[1px] border-black border-opacity-80 rounded-[5px] px-[10px] py-[5px] duration-200 hover:bg-black hover:bg-opacity-5'
+                }
+                onClick={() => {
+                  if (!isbn) return;
+                  const requestDto: PostCommentRequestDto = {
+                    parentId: null,
+                    isbn: isbn,
+                    content: content,
+                    emoji: emojiList[emojiIndex],
+                  };
+                  postComment(requestDto).then((isSuccess) => {
+                    if (isSuccess) {
+                      setContent('');
+                      setEmojiIndex(0);
+                      getCommentList();
+                    }
+                  });
+                }}
+              >
+                작성
+              </button>
             </div>
-            <button
-              className={
-                'border-[1px] border-black border-opacity-80 rounded-[5px] px-[10px] py-[5px] duration-200 hover:bg-black hover:bg-opacity-5'
-              }
+          </div>
+        )}
+        {/* 로그인 안 되어 있을 때 */}
+        {!cookies.jwt && (
+          <p className={'p-[30px] bg-black bg-opacity-5 rounded-[10px]'}>
+            리뷰 작성은{' '}
+            <span
+              className={'font-semibold cursor-pointer'}
               onClick={() => {
-                if (!isbn) return;
-                const requestDto: PostCommentRequestDto = {
-                  parentId: null,
-                  isbn: isbn,
-                  content: content,
-                  emoji: emojiList[emojiIndex],
-                };
-                postComment(requestDto).then((isSuccess) => {
-                  if (isSuccess) {
-                    setContent('');
-                    setEmojiIndex(0);
-                    getCommentList();
-                  }
-                });
+                navigate('/auth/sign-in', { state: { pathname: '/book/detail/' + isbn } });
               }}
             >
-              작성
-            </button>
-          </div>
+              로그인
+            </span>{' '}
+            후 가능합니다
+          </p>
+        )}
+        {/* 댓글 리스트 */}
+        <div className={'mt-[60px]'}>
+          {commentList &&
+            commentList.map((item) => <CommentComp key={item.id} comment={item} getCommentList={getCommentList} />)}
         </div>
-      )}
-      {!cookies.jwt && (
-        <p className={'p-[20px] bg-black bg-opacity-5'}>
-          리뷰 작성은{' '}
-          <span
-            className={'font-semibold cursor-pointer'}
-            onClick={() => {
-              navigate('/auth/sign-in', { state: { pathname: '/book/detail/' + isbn } });
-            }}
-          >
-            로그인
-          </span>{' '}
-          후 가능합니다
-        </p>
-      )}
-      {/* 댓글 리스트 */}
-      <div className={'mt-[60px]'}>
-        {commentList &&
-          commentList.map((item) => <CommentComp key={item.id} comment={item} getCommentList={getCommentList} />)}
       </div>
     </section>
   );
