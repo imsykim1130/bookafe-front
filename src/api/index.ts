@@ -20,7 +20,6 @@ import {
   CouponData,
   DeliveryStatus,
   FavoriteBookItem,
-  OrderDetail,
   OrderInfoData,
   PointLogItem,
   RecommendBookItem,
