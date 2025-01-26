@@ -44,15 +44,13 @@ const RecommendBook = () => {
           {/* 타이틀, 후기, 책 정보 이동 버튼 */}
           <div className={'flex flex-col items-center md:items-start gap-[20px]'}>
             <div className={'flex flex-col items-center md:items-start gap-[5px]'}>
-              <h1 className={'text-black text-opacity-75 text-[30px] font-bold'}>
-                {recommendBook ? recommendBook.title : ''}
-              </h1>
-              <p className={'text-black text-opacity-40 text-[12px]'}>
-                {recommendBook ? recommendBook.favoriteComment : ''}
-              </p>
+              {/* 타이틀 */}
+              <h1 className={'opacity-90 font-extrabold text-[1.8rem]'}>{recommendBook ? recommendBook.title : ''}</h1>
+              {/* 후기 */}
+              <p className={'text-black text-opacity-40'}>{recommendBook ? recommendBook.favoriteComment : ''}</p>
             </div>
             <button
-              className={' border-[1px] border-black border-opacity-60 rounded-[5px] p-[5px] text-[12px]'}
+              className={' border-[1px] border-black border-opacity-60 rounded-[5px] p-[5px]'}
               onClick={bookClickHandler}
             >
               자세히 보기

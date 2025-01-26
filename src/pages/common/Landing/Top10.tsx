@@ -36,7 +36,7 @@ const Top10 = () => {
     <section className={'flex flex-col gap-[30px] py-[40px] min-[800px]:items-center bg-white'}>
       {/* 타이틀 컨테이너 */}
       <div className={'flex flex-col items-center gap-[5px]'}>
-        <h1 className="font-bold text-dark-black md:text-center text-[18px]">이런 책은 어떠세요?</h1>
+        <h1 className="font-bold text-dark-black md:text-center text-[1.5em]">이런 책은 어떠세요?</h1>
         <p className={'text-black text-opacity-60'}>사람들의 좋아요가 많아요</p>
       </div>
       {/* 책 리스트 컨테이너 */}

@@ -1,26 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Matemasie&family=Noto+Serif+KR:wght@200..900&display=swap');
-@import "../node_modules/@flaticon/flaticon-uicons/css/all/all.css";
+@import '../node_modules/@flaticon/flaticon-uicons/css/all/all.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-* {
-  /* 기본 폰트 사이즈 */
-  font-size: 12px;
-}
-
 #root {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Noto Sans KR", sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.8rem;
 }
 
 @layer base {
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
@@ -112,18 +107,6 @@
 .padding-lg {
   @apply pl-[120px] pr-[120px];
 }
-
-  /* 폰트 크기*/
-.text-sm {
-  @apply text-[10px];
-}
-.text-md {
-  @apply text-[12px];
-}
-.text-lg {
-  @apply text-[20px];
-}
-
 
 /* 글씨 색상 */
 .text-light-black {
