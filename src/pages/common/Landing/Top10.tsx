@@ -1,28 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Top10BookItem } from '../../../api/item.ts';
 import BookPrev from '../../../components/BookPrev.tsx';
 import { getTop10BookListRequest } from '../../../api';
+import { useInView } from 'react-intersection-observer';
 
 const Top10 = () => {
   const [books, setBooks] = useState<Top10BookItem[] | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isMouseInside, setIsMouseInside] = useState(false);
+  const [isMouseInside, setIsMouseInside] = useState<boolean>(false);
+
+  // 책 리스트 컨테이너 첫 번째 요소 참조
+  const [firstRef, firstInView] = useInView({ threshold: 1 });
+  // 책 리스트 컨테이너 마지막 요소 참조
+  const [lastRef, lastInView] = useInView({ threshold: 1 });
+
+  // 책 리스트 컨테이너 스크롤 조작을 위한 참조
+  const bookListRef = useRef<HTMLDivElement>(null);
 
   // 책 리스트 조회
   const getTop10BookList = () => {
     getTop10BookListRequest().then((res) => {
       setBooks(res);
-    });
-  };
-
-  // 마우스 이벤트 핸들러
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const element = e.currentTarget.getBoundingClientRect();
-    const scrollLeft = e.currentTarget.scrollLeft;
-
-    setMousePosition({
-      x: e.clientX - element.left + scrollLeft,
-      y: e.clientY - element.top,
     });
   };
 
@@ -39,41 +36,60 @@ const Top10 = () => {
         <h1 className="font-bold text-dark-black md:text-center text-[1.5em]">이런 책은 어떠세요?</h1>
         <p className={'text-black text-opacity-60'}>사람들의 좋아요가 많아요</p>
       </div>
-      {/* 책 리스트 컨테이너 */}
       <div
-        className="relative max-w-[800px] flex flex-shrink-0 whitespace-nowrap overflow-x-scroll scrollbar-hidden scroll-smooth"
-        onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsMouseInside(true)} // 마우스 포인터 표시
-        onMouseLeave={() => setIsMouseInside(false)} // 마우스 포인터 숨기기
+        className="relative flex max-w-[800px]"
+        onMouseEnter={() => {
+          setIsMouseInside(true);
+        }}
+        onMouseLeave={() => {
+          setIsMouseInside(false);
+        }}
       >
-        {/* 마우스 포인터 표시 */}
-        {isMouseInside && (
-          <div
-            className="pointer-events-none absolute z-20 flex justify-center items-center w-[40px] h-[40px] bg-black rounded-full bg-opacity-40 transform -translate-x-1/2 -translate-y-1/2 text-white text-opacity-100"
-            style={{
-              left: `${mousePosition.x}px`,
-              top: `${mousePosition.y}px`,
-              transition: 'all 0.5s ease-out',
-            }}
-          >
-            scroll
-          </div>
-        )}
-        {/* 책 리스트 */}
-        {books
-          ? books.map((book, index) => (
-              <div key={book.isbn} className="max-w-[100px] flex-shrink-0 mx-[30px]">
-                <BookPrev
-                  key={index}
-                  bookImg={book.bookImg}
-                  author={book.author}
-                  title={book.title}
-                  isbn={book.isbn}
-                  imgSize={150}
-                />
-              </div>
-            ))
-          : null}
+        {/* 좌측 화살표 */}
+        <span
+          className={`cursor-pointer absolute flex items-center justify-center left-0 z-30 w-10 h-10 bg-black rounded-full bg-opacity-30 top-1/4 transition-opacity duration-300 ${!firstInView && isMouseInside ? 'opacity-1' : 'opacity-0'}`}
+          onClick={() => {
+            if (!bookListRef.current) return;
+            bookListRef.current.scrollLeft -= 160;
+          }}
+        >
+          <i className="fi fi-rr-angle-small-left text-white text-[1.5em] flex items-center justify-center"></i>
+        </span>
+        {/* 우측 화살표 */}
+        <span
+          className={`cursor-pointer flex items-center justify-center absolute right-0 z-30 w-10 h-10 bg-black rounded-full bg-opacity-30 top-1/4 transition-opacity duration-300 ${!lastInView && isMouseInside ? 'opacity-1' : 'opacity-0'}`}
+          onClick={() => {
+            if (!bookListRef.current) return;
+            bookListRef.current.scrollLeft += 160;
+          }}
+        >
+          <i className="fi fi-rr-angle-small-right text-white text-[1.5em] flex items-center justify-center"></i>
+        </span>
+        {/* 책 리스트 컨테이너 */}
+        <div
+          ref={bookListRef}
+          className="relative flex flex-shrink-0 w-full overflow-x-scroll whitespace-nowrap scrollbar-hidden scroll-smooth"
+        >
+          {/* 책 리스트 */}
+          <span ref={firstRef}></span>
+          {books
+            ? books.map((book, index) => {
+                return (
+                  <div key={book.isbn} className="max-w-[100px] flex-shrink-0 mx-[30px]">
+                    <BookPrev
+                      key={index}
+                      bookImg={book.bookImg}
+                      author={book.author}
+                      title={book.title}
+                      isbn={book.isbn}
+                      imgSize={150}
+                    />
+                  </div>
+                );
+              })
+            : null}
+          <span ref={lastRef}></span>
+        </div>
       </div>
     </section>
   );
