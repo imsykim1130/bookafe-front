@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Input } from '@/components/ui/input.tsx';
@@ -37,6 +37,8 @@ const Auth = () => {
   const [nicknameErr, setNicknameErr] = useState<boolean>(false);
   const [addressErr, setAddressErr] = useState<boolean>(false);
   const [phoneNumberErr, setPhoneNumberErr] = useState<boolean>(false);
+
+  const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
 
   // function: 로그인 / 회원가입 페이지 이동
   function changeAuthType() {
@@ -111,8 +113,31 @@ const Auth = () => {
     }
 
     // 에러가 하나라도 있으면 회원가입 불가
-    if (emailErr || passwordErr || nicknameErr || addressRef.current.value === '' || phoneNumberErr) {
+    if (addressRef.current.value === '') {
       setAddressErr(true);
+    }
+
+    if (emailRef.current.value === '') {
+      setEmailErr(true);
+    }
+
+    if (passwordRef.current.value === '') {
+      setPasswordErr(true);
+    }
+    if (nicknameRef.current.value === '') {
+      setNicknameErr(true);
+    }
+
+    if (phoneNumberRef.current.value === '') {
+      setPhoneNumberErr(true);
+    }
+
+    if (
+      addressRef.current.value === '' ||
+      emailRef.current.value === '' ||
+      nicknameRef.current.value === '' ||
+      phoneNumberRef.current.value === ''
+    ) {
       return;
     }
 
@@ -166,6 +191,14 @@ const Auth = () => {
       if (!nicknameRef.current) return;
       console.log(res);
       nicknameRef.current.value = res;
+
+      // 생성된 닉네임 길이 검증
+      const isValid = validate(nicknameRegExp, res);
+      if (isValid) {
+        setNicknameErr(false);
+      } else {
+        setNicknameErr(true);
+      }
     });
   };
 
@@ -266,9 +299,17 @@ const Auth = () => {
               {nicknameErr && <p className={'absolute left-0 top-14 text-red-600'}>닉네입은 8자 이상이어야 합니다</p>}
               <button
                 onClick={randomNicknameClickHandler}
+                onMouseEnter={() => setIsTooltipOpen(true)}
+                onMouseLeave={() => setIsTooltipOpen(false)}
                 className="absolute transition-all duration-300 -translate-y-1/2 bg-gray-200 rounded-full w-7 h-7 top-1/2 -right-10 hover:bg-gray-300"
               >
                 <i className="flex items-start justify-center fi fi-rr-shuffle"></i>
+                {/* 툴팁 */}
+                <span
+                  className={`absolute left-0 p-3 text-xs text-white bg-gray-800 rounded-md -top-[3rem] whitespace-nowrap transition-opacity duration-300 ${isTooltipOpen ? 'opacity-100' : 'opacity-0'}`}
+                >
+                  랜덤 닉네임을 추천해드려요
+                </span>
               </button>
             </div>
             {/* 주소 */}
