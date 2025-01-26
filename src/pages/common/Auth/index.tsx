@@ -208,7 +208,7 @@ const Auth = () => {
       {/* 페이지 이름 */}
       <h1 className={'text-xl font-bold'}>{authType === 'sign-in' ? '로그인' : '회원가입'}</h1>
 
-      <div className="flex items-center flex-col max-w-[350px]">
+      <div className="flex items-center flex-col w-[350px]">
         {/* 로그인 관련 버튼 */}
         {authType === 'sign-in' && (
           <div className="w-full my-[40px] flex flex-col gap-9">
@@ -249,7 +249,7 @@ const Auth = () => {
 
         {/* 회원가입 관련 */}
         {authType === 'sign-up' && (
-          <div className="flex items-center gap-9 flex-col max-w-[350px] my-[40px]">
+          <div className="w-full my-[40px] flex flex-col gap-9">
             {/* 이메일 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
@@ -258,7 +258,7 @@ const Auth = () => {
                   ref={emailRef}
                   type={'email'}
                   placeholder={'이메일'}
-                  className={'px-5 py-6'}
+                  className={'w-full px-5 py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, emailRegExp, setEmailErr);
                   }}
@@ -274,7 +274,7 @@ const Auth = () => {
                   ref={passwordRef}
                   type={'password'}
                   placeholder={'비밀번호'}
-                  className={'px-5 py-6'}
+                  className={'w-full px-5 py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, passwordRegExp, setPasswordErr);
                   }}
@@ -285,12 +285,12 @@ const Auth = () => {
             {/* 닉네임 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-lock"></i>
+                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-id-card-clip-alt"></i>
                 <Input
                   ref={nicknameRef}
                   type={'text'}
                   placeholder={'닉네임'}
-                  className={'px-5 py-6'}
+                  className={'w-full px-5 py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, nicknameRegExp, setNicknameErr);
                   }}
@@ -315,12 +315,12 @@ const Auth = () => {
             {/* 주소 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-lock"></i>
+                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-postal-address"></i>
                 <Input
                   ref={addressRef}
                   type={'text'}
                   placeholder={'주소'}
-                  className={'px-5 py-6'}
+                  className={'w-full px-5 py-6'}
                   onChange={() => {
                     setAddressErr(false);
                   }}
@@ -331,19 +331,19 @@ const Auth = () => {
             {/* 상세주소 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-lock"></i>
-                <Input ref={addressDetailRef} type={'text'} placeholder={'상세주소'} className={'px-5 py-6'} />
+                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-postal-address"></i>
+                <Input ref={addressDetailRef} type={'text'} placeholder={'상세주소'} className={'w-full px-5 py-6'} />
               </div>
             </div>
             {/* 휴대폰번호 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-lock"></i>
+                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-mobile-notch"></i>
                 <Input
                   ref={phoneNumberRef}
                   type={'text'}
                   placeholder={'휴대폰번호'}
-                  className={'px-5 py-6'}
+                  className={'w-full px-5 py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, phoneNumberRegExp, setPhoneNumberErr);
                   }}
