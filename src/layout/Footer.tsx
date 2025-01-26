@@ -5,10 +5,12 @@ const Footer = () => {
   const isAuthPage = pathname.includes('/auth/');
 
   return !isAuthPage ? (
-    <footer className="flex justify-center items-center h-[50px] bg-light-gray">
-      <p className="text-sm text-light-black">© 2025 Bookafe. All rights reserved.</p>
+    <footer className="flex justify-center pt-20 pb-5 bg-light-gray">
+      <p className="text-xs text-light-black">© 2025 Bookafe. All rights reserved.</p>
     </footer>
-  ) : '';
+  ) : (
+    ''
+  );
 };
 
 export default Footer;
