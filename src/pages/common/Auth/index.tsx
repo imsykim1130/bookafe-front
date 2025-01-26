@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Input } from '@/components/ui/input.tsx';
@@ -7,6 +7,7 @@ import moment from 'moment';
 import { signInRequest, signUpRequest } from '@/api';
 import { SignInRequestDto, SignUpRequestDto } from '@/api/request.dto';
 import { ResponseDto, SignInResponseDto } from '@/api/response.dto';
+import { getRandomNickname } from '@/utils';
 
 const Auth = () => {
   // index: top
@@ -158,16 +159,26 @@ const Auth = () => {
     }
   };
 
+  // 랜덤 닉네임 생성 버튼 클릭 핸들러
+  const randomNicknameClickHandler = () => {
+    getRandomNickname().then((res) => {
+      if (!res) return;
+      if (!nicknameRef.current) return;
+      console.log(res);
+      nicknameRef.current.value = res;
+    });
+  };
+
   // Render
   return (
-    <main className={'flex flex-col items-center mt-[100px]'}>
+    <main className={'flex flex-col items-center mt-[100px] px-[5%]'}>
       {/* 페이지 이름 */}
-      <h1 className={'mb-12 text-xl font-bold'}>{authType === 'sign-in' ? '로그인' : '회원가입'}</h1>
+      <h1 className={'text-xl font-bold'}>{authType === 'sign-in' ? '로그인' : '회원가입'}</h1>
 
-      <div className="w-[250px] flex flex-col items-center gap-6">
+      <div className="flex items-center flex-col max-w-[350px]">
         {/* 로그인 관련 버튼 */}
         {authType === 'sign-in' && (
-          <div className="w-full max-w-[330px] mb-[30px] flex flex-col gap-12">
+          <div className="w-full my-[40px] flex flex-col gap-9">
             {/* 이메일 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
@@ -205,7 +216,7 @@ const Auth = () => {
 
         {/* 회원가입 관련 */}
         {authType === 'sign-up' && (
-          <div className="w-full max-w-[330px] mb-[30px] flex flex-col gap-12">
+          <div className="flex items-center gap-9 flex-col max-w-[350px] my-[40px]">
             {/* 이메일 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
@@ -253,6 +264,12 @@ const Auth = () => {
                 />
               </div>
               {nicknameErr && <p className={'absolute left-0 top-14 text-red-600'}>닉네입은 8자 이상이어야 합니다</p>}
+              <button
+                onClick={randomNicknameClickHandler}
+                className="absolute transition-all duration-300 -translate-y-1/2 bg-gray-200 rounded-full w-7 h-7 top-1/2 -right-10 hover:bg-gray-300"
+              >
+                <i className="flex items-start justify-center fi fi-rr-shuffle"></i>
+              </button>
             </div>
             {/* 주소 */}
             <div className={'relative flex flex-col gap-5'}>
@@ -298,6 +315,7 @@ const Auth = () => {
 
         {/*로그인,회원가입 버튼*/}
         <Button
+          className={'w-full py-7 border-gray-400 flex items-center'}
           onClick={() => {
             if (authType === 'sign-in') {
               signIn();
@@ -306,12 +324,11 @@ const Auth = () => {
               signUp();
             }
           }}
-          className={'w-full py-7'}
         >
           {authType === 'sign-in' ? '로그인' : '회원가입'}
         </Button>
 
-        <div className="flex flex-col gap-[20px] text-sm items-center">
+        <div className="flex flex-col gap-[20px] items-center mt-[30px]">
           <div className="flex gap-[10px]">
             <p className="text-default-black">
               {authType === 'sign-in' ? '아직 계정이 없으신가요?' : '이미 계정이 있으신가요?'}
@@ -321,10 +338,11 @@ const Auth = () => {
             </button>
           </div>
           <p className="text-light-black">or</p>
-          <button className="flex gap-[5px] rounded-[5px] border-[0.5px] border-black border-opacity-40 px-[10px] py-[5px] hover:bg-black hover:bg-opacity-10 transition duration-100">
-            <i className="fi fi-brands-google"></i>
-            <p>구글 계정으로 인증하기</p>
-          </button>
+          {/* 구글 계정으로 인증하기 */}
+          <Button variant={'outline'} className={'border-gray-400 flex items-center'}>
+            <i className="flex items-center justify-center fi fi-brands-google"></i>
+            구글 계정으로 인증하기
+          </Button>
         </div>
       </div>
     </main>

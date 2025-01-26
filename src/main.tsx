@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Auth from './pages/Auth.tsx';
+
 import App from './App.tsx';
 import User from './pages/User.tsx';
 import { Provider } from 'react-redux';
@@ -19,6 +19,7 @@ import Landing from './pages/common/Landing';
 import OrderDetailPage from './pages/common/OrderDetailPage';
 import Cart from './pages/common/Cart/index.tsx';
 import Favorite from './pages/common/Favorite/index.tsx';
+import Auth from './pages/common/Auth/index.tsx';
 
 const router = createBrowserRouter([
   {
