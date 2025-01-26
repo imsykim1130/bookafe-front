@@ -7,14 +7,13 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true,
 });
 
-
 export const getRandomNickname = async (): Promise<string | null> => {
   const randomNickname = await openai.chat.completions
     .create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
-        { role: 'system', content: '너는 한글 랜덤 닉네임을 생성해주는 봇이야.' },
-        { role: 'user', content: '띄어쓰기 없이 8자 이상 20자 이하의 닉네임 1개를 생성해줘.' },
+        { role: 'system', content: '너는 8글자 이상 20글자 이하의 한글 랜덤 닉네임을 생성해주는 봇이야.' },
+        { role: 'user', content: '띄어쓰기 없이 8글자 이상 20글자 이하의 한글 닉네임 1개를 생성해줘.' },
       ],
       store: true,
     })
@@ -27,4 +26,4 @@ export const getRandomNickname = async (): Promise<string | null> => {
     });
 
   return randomNickname;
-}
+};
