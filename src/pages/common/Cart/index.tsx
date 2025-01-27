@@ -4,29 +4,110 @@ import {
   getCartBookListRequest,
   getCouponListRequest,
   getOrderInfoRequest,
+  getSearchBookListRequest,
   getTotalPointRequest,
+  putBookToCartRequest,
 } from '@/api/index.ts';
-import { CartBookData, CouponData, OrderInfoData } from '@/api/item';
-import { PostOrderRequestDto } from '@/api/request.dto';
+import { BookPrevData, CartBookData, CouponData, OrderInfoData } from '@/api/item';
+import { getSearchBookListRequestDto, PostOrderRequestDto } from '@/api/request.dto';
 import Button from '@/components/Button';
 import { Dispatch, forwardRef, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
 
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import CartBookComp from './component/CartBook';
+import BookPrev from '@/components/BookPrev';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { getSearchBookListResponseDto, ResponseDto } from '@/api/response.dto';
+
+gsap.registerPlugin(useGSAP);
 
 /// 전체
 const Cart = () => {
   const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const [cartBookList, setCartBookList] = useState<CartBookData[] | null>(null);
+  const [keywordList, setKeywordList] = useState<string[]>([]);
+  const [keywordBookList, setKeywordBookList] = useState<BookPrevData[] | null>(null);
+  const [keywordIndex, setKeywordIndex] = useState<number | null>(null);
+
+  // gsap
+  const keywordListRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const keywordListContainer = keywordListRef.current;
+      if (!keywordListContainer) return;
+      gsap.to('.keyword', {
+        opacity: 1,
+        duration: 2,
+        ease: 'power1.inOut',
+        stagger: 0.2,
+      });
+    },
+    { dependencies: [keywordList], scope: keywordListRef },
+  );
 
   // 장바구니 책 리스트 가져오기
   const getCartBookList = async () => {
     await getCartBookListRequest(cookies.jwt).then((response) => {
-      if (response === null) return;
+      if (response === null) {
+        return;
+      }
+      if (response.length === 0) {
+        getRecommendKeywordList();
+      }
       setCartBookList(response);
     });
+  };
+
+  // 추천 키워드 가져오기
+  const getRecommendKeywordList = async () => {
+    setKeywordList(['나비', '호랑이', '소녀', '소년']);
+  };
+
+  // 추천 키워드로 책 가져오기
+  const getKeywordBookList = (keywordIndex: number) => {
+    // todo: 추천 키워드로 책 가져오기
+    const keyword = keywordList[keywordIndex];
+    const requestDto: getSearchBookListRequestDto = {
+      query: keyword,
+      sort: 'accuracy',
+      target: 'title',
+      page: 1,
+      size: 6,
+    };
+    getSearchBookListRequest(requestDto).then((response) => {
+      // 네트워크 에러
+      if (response === null) {
+        window.alert('서버 에러. 관리자에게 문의하세요');
+        return;
+      }
+
+      // 응답 실패
+      const { code, message } = response as ResponseDto;
+
+      if (code !== 'SU') {
+        window.alert(message);
+        return;
+      }
+
+      // 응답 성공
+      const { bookList } = response as getSearchBookListResponseDto;
+      setKeywordBookList(bookList);
+      setKeywordIndex(keywordIndex);
+    });
+  };
+
+  // 추천 키워드 클릭 핸들러
+  const keywordClickHandler = (index: number) => {
+    if (index === keywordIndex) {
+      setKeywordIndex(null);
+      setKeywordBookList(null);
+      return;
+    }
+    getKeywordBookList(index);
   };
 
   // 장바구니 수량 감소
@@ -42,11 +123,26 @@ const Cart = () => {
     });
   };
 
+  // 책 장바구니 담기
+  const putBookToCart = (isbn: string) => {
+    putBookToCartRequest(cookies.jwt, isbn).then((response) => {
+      if (!response) {
+        window.alert('다시 시도해주세요');
+        return;
+      }
+      if (response) {
+        getCartBookList();
+      }
+    });
+  };
+
+  // 첫 렌더링 시 장바구니 책 리스트 가져오기
   useEffect(() => {
     getCartBookList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 로그인 여부 확인
   useEffect(() => {
     if (!cookies.jwt) {
       navigate('/auth/sign-in', {
@@ -59,25 +155,67 @@ const Cart = () => {
   }, [cookies.jwt, navigate]);
 
   return (
-    <main className={'relative mt-[40px]'}>
-      <div className="flex justify-center">
-        {cartBookList && cartBookList.length ? (
-          <div className={'w-full flex flex-col gap-[60px] max-w-[600px] mx-[5%]'}>
-            <CartBookListSection
-              cartBookList={cartBookList}
-              getCartBookList={getCartBookList}
-              changeCount={changeCount}
-            />
-            <OrderInfo />
-          </div>
-        ) : (
-          <div className={'w-full h-[65vh] flex justify-center items-center'}>
-            <p className={'text-[16px] text-black text-opacity-40'}>
-              <span>🛒</span> 장바구니가 비었습니다
-            </p>
-          </div>
-        )}
-      </div>
+    <main className={'relative mt-[40px] px-[5%] flex flex-col items-center'}>
+      {/* 장바구니에 책이 있을 때 */}
+      {cartBookList && cartBookList.length ? (
+        <>
+          <CartBookListSection
+            cartBookList={cartBookList}
+            getCartBookList={getCartBookList}
+            changeCount={changeCount}
+          />
+          <OrderInfo />
+        </>
+      ) : null}
+      {/* 장바구니 비었을 때 */}
+      {!cartBookList ||
+        (cartBookList.length === 0 && (
+          <section className="w-full max-w-[600px]">
+            <div>
+              <h1 className="text-[1.8rem] font-semibold">장바구니가 비었습니다...</h1>
+              <p className="my-3">키워드를 추천해드릴게요. 원하는 책을 찾아보세요.</p>
+            </div>
+            {/* 추천 키워드*/}
+            <div ref={keywordListRef} className="flex flex-wrap gap-5 mt-10 text-[1rem] font-semibold">
+              {keywordList.map((keyword, index) => (
+                <span
+                  key={keyword}
+                  className={`keyword px-4 py-2 border-gray-300 rounded-2xl border-[1px] cursor-pointer opacity-0 ${index === keywordIndex ? 'border-gray-800 bg-gray-100 shadow-lg' : ''}`}
+                  onClick={() => {
+                    keywordClickHandler(index);
+                  }}
+                >
+                  {keyword}
+                </span>
+              ))}
+            </div>
+            {/* 키워드 검색 책 리스트 */}
+            <div className="flex flex-wrap gap-x-14">
+              {keywordBookList && keywordBookList.length > 0
+                ? keywordBookList.map((book) => (
+                    <div key={book.isbn} className="relative py-5 w-[8rem]">
+                      <BookPrev
+                        bookImg={book.bookImg}
+                        author={book.author}
+                        title={book.title}
+                        isbn={book.isbn}
+                        imgSize={9}
+                      />
+                      {/* 장바구니 아이콘 */}
+                      <div
+                        onClick={() => {
+                          putBookToCart(book.isbn);
+                        }}
+                        className="absolute top-11 right-2 z-10 flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-lg border-[1px] border-gray-300 hover:bg-gray-100 cursor-pointer transition-all duration-300"
+                      >
+                        <i className="fi fi-rr-shopping-cart text-[1rem] text-gray-800 flex items-center justify-center" />
+                      </div>
+                    </div>
+                  ))
+                : null}
+            </div>
+          </section>
+        ))}
     </main>
   );
 };
@@ -88,12 +226,12 @@ interface CartBookListSectionProps {
   changeCount: (changeCount: number, isbn: string) => void;
 }
 
-//// 장바구니 책 리스트
+// 장바구니 책 리스트
 const CartBookListSection = ({ cartBookList, getCartBookList, changeCount }: CartBookListSectionProps) => {
   return (
-    <section>
+    <section className={'w-full max-w-[600px]'}>
       <div className={'flex flex-col gap-[5px]'}>
-        <h2 className={'font-bold text-[16px]'}>구매목록</h2>
+        <h2 className={'font-bold text-[1.2rem]'}>구매목록</h2>
         <p className={'text-[14px] text-black text-opacity-40'}>구매할 책을 다시 한 번 확인해주세요</p>
       </div>
       <div>
@@ -108,7 +246,7 @@ const CartBookListSection = ({ cartBookList, getCartBookList, changeCount }: Car
   );
 };
 
-////// 배송 관련 정보
+// 배송 관련 정보
 const OrderInfo = () => {
   const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
@@ -148,9 +286,11 @@ const OrderInfo = () => {
   };
 
   return (
-    <div className={'min-w-[350px]'}>
+    <div className={'w-full max-w-[600px]'}>
+      {/* 배송 정보 */}
       <DeliveryInfo addressRef={addressRef} addressDetailRef={addressDetailRef} phoneNumberRef={phoneNumberRef} />
-      <h2 className={'text-[16px] font-semibold mt-[60px]'}>할인</h2>
+      {/* 할인 */}
+      <h2 className={'text-[1.2rem] font-bold py-[2rem]'}>할인</h2>
       <CouponInfo couponId={couponId} changeCouponId={changeCouponId} />
       <PointInfo usePoint={usePoint} setUsePoint={setUsePoint} />
       <div className={'mt-[60px] flex flex-col gap-[15px]'}>
@@ -183,6 +323,7 @@ const OrderInfo = () => {
   );
 };
 
+// 배송 정보
 const DeliveryInfo = ({
   addressRef,
   addressDetailRef,
@@ -203,14 +344,14 @@ const DeliveryInfo = ({
   };
 
   return (
-    <section className={'text-[14px]'}>
-      <div className={'flex justify-between'}>
-        <h2 className={'text-[16px] font-bold'}>배송정보 확인</h2>
+    <section className={'text-[14px] py-[4rem]'}>
+      <div className={'flex justify-between py-[2rem]'}>
+        <h2 className={'text-[1.2rem] font-bold'}>배송정보 확인</h2>
         <p className={'cursor-pointer'} onClick={getDeliveryInfo}>
           {'주문자 정보와 동일 정보 사용하기 >'}
         </p>
       </div>
-      <div className={'mt-[30px]'}>
+      <div>
         <InputBox ref={addressRef} type={'text'} name={'주소'} value={deliveryInfo ? deliveryInfo.address : null} />
         <InputBox
           ref={addressDetailRef}
@@ -284,13 +425,13 @@ const CouponInfo = ({
   }, []);
 
   return (
-    <section className={'text-[14px] mt-[20px]'}>
-      <div className={'flex flex-col gap-[5px]'}>
+    <section className={'text-[14px] py-[2rem]'}>
+      <div className={'flex flex-col'}>
         <div className={'flex justify-between'}>
           <p className={'font-semibold'}>사용가능한 쿠폰</p>
           <p>{couponList ? couponList.length + ' 개' : '정보를 가져올 수 없습니다'}</p>
         </div>
-        <div className={'mt-[10px] flex flex-col gap-[10px]'}>
+        <div className={'flex flex-col'}>
           {couponList &&
             couponList.length > 0 &&
             couponList.map((coupon) => (
@@ -359,7 +500,7 @@ const PointInfo = ({
   }, []);
 
   return (
-    <section className={'mt-[30px] text-[14px]'}>
+    <section className={'py-[2rem] text-[14px]'}>
       <div>
         <p className={'font-semibold'}>포인트</p>
       </div>

@@ -2,6 +2,7 @@ import { deleteCartBookRequest } from '@/api';
 import { CartBookData } from '@/api/item';
 import { useMemo } from 'react';
 import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
 
 const CartBookComp = ({
   book,
@@ -12,6 +13,7 @@ const CartBookComp = ({
   changeCount: (changeCount: number, isbn: string) => void;
   getCartBookList: () => void;
 }) => {
+  const navigate = useNavigate();
   const [cookies] = useCookies(['jwt']);
   const discounted = (book.price * (100 - book.discountPercent)) / 100;
 
@@ -38,7 +40,15 @@ const CartBookComp = ({
             'w-[120px] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.4)] transition-all duration-300 ease hover:drop-shadow-[2px_2px_5px_rgba(0,0,0,0.8)] cursor-pointer'
           }
         >
-          <img src={book.bookImg} alt="book cover image" className={'rounded-[5px]'} />
+          {/* 책 이미지 */}
+          <img
+            src={book.bookImg}
+            alt="book cover image"
+            className={'rounded-[5px]'}
+            onClick={() => {
+              navigate(`/book/detail/${book.isbn}`);
+            }}
+          />
         </div>
 
         {/* 오른쪽 */}
