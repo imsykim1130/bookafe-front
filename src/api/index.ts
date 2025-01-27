@@ -9,6 +9,7 @@ import {
 import {
   GetCommentListResponse,
   GetOrderDetailListResponseDto,
+  getSearchBookListResponseDto,
   ResponseDto,
   SignInResponseDto,
 } from './response.dto.ts';
@@ -72,6 +73,24 @@ export const getSearchBookRequest = async (requestParams: getSearchBookListReque
   return await axios.get(getSearchBookUrl, {
     params: requestParams,
   });
+};
+
+// 추천 키워드로 책 가져오기
+export const getSearchBookListRequest = async (requestParams: getSearchBookListRequestDto) => {
+  return await axios
+    .get(getSearchBookUrl, {
+      params: requestParams,
+    })
+    .then((res): getSearchBookListResponseDto => {
+      // 응답 데이터 반환
+      return res.data;
+    })
+    .catch((err): ResponseDto | null => {
+      // 응답이 없으면 null 반환
+      if (!err.response) return null;
+      // 에러 응답 데이터 반환
+      return err.response.data;
+    });
 };
 
 export const bookRequest = async (
@@ -692,15 +711,11 @@ export const getIsCartRequest = async (jwt: string, isbn: string) => {
 // 장바구니 담기
 export const putBookToCartRequest = async (jwt: string, isbn: string) => {
   return await axios
-    .put(
-      `http://localhost:8080/api/v1/cart/${isbn}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+    .put(`http://localhost:8080/api/v1/cart/${isbn}`, null, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
       },
-    )
+    })
     .then(() => true)
     .catch((err) => {
       console.log(err.response.data);
