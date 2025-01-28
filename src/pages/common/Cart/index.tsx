@@ -155,7 +155,7 @@ const Cart = () => {
   }, [cookies.jwt, navigate]);
 
   return (
-    <main className={'relative mt-[40px] px-[5%] flex flex-col items-center'}>
+    <main className={'mt-[40px] relative px-[5%] flex flex-col items-center'}>
       {/* 장바구니에 책이 있을 때 */}
       {cartBookList && cartBookList.length ? (
         <>
@@ -173,7 +173,7 @@ const Cart = () => {
           <section className="w-full max-w-[600px]">
             <div>
               <h1 className="text-[1.8rem] font-semibold">장바구니가 비었습니다...</h1>
-              <p className="my-3">키워드를 추천해드릴게요. 원하는 책을 찾아보세요.</p>
+              <p className="py-3 text-[1rem]">키워드를 추천해드릴게요. 원하는 책을 찾아보세요.</p>
             </div>
             {/* 추천 키워드*/}
             <div ref={keywordListRef} className="flex flex-wrap gap-5 mt-10 text-[1rem] font-semibold">
