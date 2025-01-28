@@ -1,6 +1,5 @@
 import { cancelFavoriteRequest, getFavoriteBookListRequest } from '@/api';
 import { FavoriteBookItem } from '@/api/item';
-import PageTitle from '@/components/PageTitle';
 import { useEffect, useState } from 'react';
 
 import { useCookies } from 'react-cookie';
@@ -46,18 +45,25 @@ const Favorite = () => {
   };
 
   return (
-    <main>
-      {/* 페이지 타이틀 */}
-      <PageTitle title={'좋아요'} />
-      {/* 페이지 컨텐츠 */}
-      <div className={'text-[14px] mx-[5%] md:mx-[10%] lg:mx-[15%] flex flex-col items-center'}>
-        <div className={'w-full md:max-w-[650px]'}>
+    <main className={'flex flex-col items-center mt-[40px]'}>
+      <div className={'w-full max-w-[600px]'}>
+        {/* 좋아요 책 있을 때 */}
+        <section>
           {favoriteBookList
             ? favoriteBookList.map((book) => (
                 <FavoriteBook key={book.isbn} book={book} deleteFavoriteBook={deleteFavoriteBook} />
               ))
             : null}
-        </div>
+        </section>
+        {/* 좋아요 책 없을 때 */}
+        <section>
+          {!favoriteBookList || favoriteBookList.length === 0 ? (
+            <>
+              <h1 className={'text-[1.8rem] font-semibold'}>결과가 없습니다.</h1>
+              <p className="py-3 text-[1rem]">문제가 있는 경우 관리자에게 문의해주세요.</p>
+            </>
+          ) : null}
+        </section>
       </div>
     </main>
   );
