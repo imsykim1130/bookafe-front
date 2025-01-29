@@ -77,35 +77,6 @@ const RecommendBook = () => {
       className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh]"
       onClick={emptyClickHandler}
     >
-      {/* 검색 */}
-      <div className={'absolute top-[60px] w-[25rem]'}>
-        <SearchBox searchWord={searchWord} setSearchWord={setSearchWord} />
-        {/* 검색 미리보기 */}
-        {searchBookList.length ? (
-          <div
-            className={
-              'absolute z-50 w-full h-[400px] p-[5px] top-[70px] left-1/2 -translate-x-1/2 flex flex-col bg-white rounded-[10px] drop-shadow-md overflow-scroll scroll-smooth'
-            }
-          >
-            {searchBookList.map((book) => (
-              <div key={book.isbn} className={'rounded-[10px] p-[15px] hover:bg-black hover:bg-opacity-5 duration-200'}>
-                <div className={'w-[100px]'}>
-                  <BookPrev
-                    bookImg={book.bookImg}
-                    author={book.author}
-                    title={book.title}
-                    isbn={book.isbn}
-                    imgSize={3}
-                  />
-                </div>
-              </div>
-            ))}
-            <button className={'font-semibold py-[10px] hover:bg-black hover:bg-opacity-5 rounded-[10px]'}>
-              검색결과 더보기
-            </button>
-          </div>
-        ) : null}
-      </div>
       <div className={'flex flex-col gap-[30px]'}>
         {/* 배경 이미지 */}
         <div className={'absolute top-0 left-0 w-full -z-10 blur-2xl'}>
@@ -139,6 +110,36 @@ const RecommendBook = () => {
             ) : null}
           </div>
         </div>
+      </div>
+
+      {/* 검색 */}
+      <div className={'absolute top-[60px] w-[25rem]'}>
+        <SearchBox searchWord={searchWord} setSearchWord={setSearchWord} />
+        {/* 검색 미리보기 */}
+        {searchBookList.length ? (
+          <div
+            className={
+              'mt-[1rem] z-50 w-full h-[400px] p-[5px] flex flex-col bg-white rounded-[10px] drop-shadow-md overflow-scroll scroll-smooth'
+            }
+          >
+            {searchBookList.map((book) => (
+              <div key={book.isbn} className={'rounded-[10px] p-[15px] hover:bg-black hover:bg-opacity-5 duration-200'}>
+                <div className={'w-[100px]'}>
+                  <BookPrev
+                    bookImg={book.bookImg}
+                    author={book.author}
+                    title={book.title}
+                    isbn={book.isbn}
+                    imgSize={3}
+                  />
+                </div>
+              </div>
+            ))}
+            <button className={'font-semibold py-[10px] hover:bg-black hover:bg-opacity-5 rounded-[10px]'}>
+              검색결과 더보기
+            </button>
+          </div>
+        ) : null}
       </div>
     </section>
   );
