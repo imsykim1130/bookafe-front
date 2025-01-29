@@ -1,115 +1,96 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
-import PageTitle from '../../components/PageTitle.tsx';
 import { DeliveryStatus } from '../../api/item.ts';
 import { getDeliveryStatusListRequest } from '../../api';
-import moment from 'moment';
-import Calendar from 'react-calendar';
 import OrderStatusComp from '../../components/OrderStatusComp.tsx';
-
-// function
+import { getJwt } from '@/utils/index.ts';
+import { GetDeliveryStatusListResponseDto } from '@/api/response.dto.ts';
+import Dropdown from '../common/OrderDetailPage/component/Dropdown.tsx';
+import DateInput from '../../components/DateInput';
 
 // component
 const OrderStatus = () => {
-  // const { role } = useSelector((state: { user: userState }) => state.user);
   const navigate = useNavigate();
-  const [cookies, _] = useCookies();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [isCalOpen, setIsCalOpen] = useState<boolean>(false);
-  const [orderStatusIndex, setOrderStatusIndex] = useState<number>(0);
-  const [date, setDate] = useState<Date>(new Date());
+
+  const now = new Date();
+
+  const [date, setDate] = useState<Date>(now);
   const [orderStatusItemList, setOrderStatusItemList] = useState<DeliveryStatus[] | null>(null);
   const [renderKey, setRenderKey] = useState<number>(0);
 
+  const [page, setPage] = useState<number>(0);
+  const [isFirst, setIsFirst] = useState<boolean>(false);
+  const [isLast, setIsLast] = useState<boolean>(false);
+
+  const [orderStatus, setOrderStatus] = useState<string>('전체');
   const orderStatusList = ['전체', '배송준비중', '배송중', '배송완료'];
+
+  const getDeliveryStatusList = () => {
+    getDeliveryStatusListRequest(orderStatus, date, getJwt(), page).then((response) => {
+      const { isFirst, isLast, deliveryStatusViewList } = response as GetDeliveryStatusListResponseDto;
+      setOrderStatusItemList(deliveryStatusViewList);
+      setIsFirst(isFirst);
+      setIsLast(isLast);
+    });
+  };
 
   useEffect(() => {
     // 토큰 검증
-    if (!cookies.jwt) {
+    if (!getJwt()) {
       navigate('/auth/sign-in');
     }
+    getDeliveryStatusList();
+  }, [date, page, orderStatus, renderKey]);
 
-    getDeliveryStatusListRequest(orderStatusList[orderStatusIndex], date, cookies.jwt).then((response) => {
-      setOrderStatusItemList(response);
-    });
-  }, [date, orderStatusIndex, renderKey]);
+  /**
+   * 필터링
+   * 1. 배송상태
+   * 2. 달력
+   * 배송상태
+   * 1. 배송상태 리스트
+   * 2. 페이지네이션
+   */
 
   return (
-    <div>
-      <PageTitle title={'배송상태'} />
-      <main className={'px-[5%] md:px-[10%] lg:px-[15%]'}>
+    <main className={'px-[5%] flex flex-col items-center py-[2rem]'}>
+      <div className={'w-full max-w-[600px]'}>
         {/* 필터링 */}
         <div className={'flex items-center justify-between'}>
           {/* 배송상태*/}
-          <div
-            className={
-              'relative w-[120px] flex justify-between items-center p-[10px] border-[0.5px] border-black border-opacity-80 rounded-[5px] cursor-pointer'
-            }
-            onClick={() => {
-              if (!isOpen) {
-                setIsOpen(true);
-              }
+          <Dropdown
+            changeSelected={(value) => {
+              setOrderStatus(value);
             }}
-          >
-            <p>{orderStatusList[orderStatusIndex]}</p>
-            <i className="fi fi-rr-caret-down"></i>
-            {isOpen ? (
-              <div
-                className={
-                  'absolute w-full flex flex-col items-center bg-white left-0 top-[60px] border-[0.5px] border-black border-opacity-80 rounded-[5px]'
-                }
-              >
-                {orderStatusList.map((item, index) => (
-                  <p
-                    key={item}
-                    className={'w-full p-[10px] hover:bg-black hover:bg-opacity-10'}
-                    onClick={() => {
-                      setOrderStatusIndex(index);
-                      setIsOpen(false);
-                    }}
-                  >
-                    {item}
-                  </p>
-                ))}
-              </div>
-            ) : null}
-          </div>
+            options={orderStatusList}
+          />
           {/* 달력 */}
-          <div
-            className={'relative flex items-center gap-[10px] cursor-pointer'}
-            onClick={() => {
-              if (!isCalOpen) {
-                setIsCalOpen(true);
-              }
-            }}
-          >
-            <i className="fi fi-br-calendar-day"></i>
-            <p>{moment(date).format('YYYY.MM.DD')}</p>
-            {isCalOpen ? (
-              <Calendar
-                value={date}
-                formatDay={(_, date) => moment(date).format('DD')}
-                onClickDay={(value, _) => {
-                  setDate(value);
-                  setIsCalOpen(false);
-                }}
-                className={'absolute right-0 top-[40px] min-w-[300px]'}
-              />
-            ) : null}
-          </div>
+          <DateInput date={date} setDate={setDate} />
         </div>
+
+        {/* 배송상태 */}
         <div>
-          {orderStatusItemList ? (
-            orderStatusItemList.map((item: DeliveryStatus) => (
-              <OrderStatusComp key={item.orderId} item={item} renderKey={renderKey} setRenderKey={setRenderKey} />
-            ))
-          ) : (
-            <p>주문이 존재하지 않습니다</p>
-          )}
+          {/* 배송상태 리스트 */}
+          <div>
+            {orderStatusItemList ? (
+              orderStatusItemList.map((item: DeliveryStatus) => (
+                <OrderStatusComp key={item.orderId} item={item} renderKey={renderKey} setRenderKey={setRenderKey} />
+              ))
+            ) : (
+              <p className="text-[1.5rem] font-semibold py-[2rem]">주문이 존재하지 않습니다</p>
+            )}
+          </div>
+          {/* 페이지네이션 */}
+          {orderStatusItemList && orderStatusItemList.length ? (
+            <div className="flex items-center justify-center gap-[2rem] py-[2rem]">
+              {!isFirst ? <button onClick={() => setPage(page - 1)}>이전</button> : null}
+              <span className="font-semibold">{page + 1}</span>
+              {!isLast ? <button onClick={() => setPage(page + 1)}>다음</button> : null}
+            </div>
+          ) : null}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 };
 

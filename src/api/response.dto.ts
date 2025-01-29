@@ -45,5 +45,5 @@ export interface GetOrderDetailListResponseDto {
 export interface GetDeliveryStatusListResponseDto {
   isFirst: boolean;
   isLast: boolean;
-  deliveryStatusList: DeliveryStatus[];
+  deliveryStatusViewList: DeliveryStatus[];
 }

@@ -1,7 +1,8 @@
 import { DeliveryStatus } from '../api/item.ts';
 import { changeDeliveryStatusRequest } from '../api';
-import { useCookies } from 'react-cookie';
 import { Dispatch, SetStateAction } from 'react';
+import { getJwt } from '@/utils/cookie.ts';
+import moment from 'moment';
 
 // function
 function getButtonName(name: 'READY' | 'DELIVERING' | 'DELIVERED' | string) {
@@ -82,7 +83,6 @@ const OrderStatusComp = ({
   renderKey: number;
   setRenderKey: Dispatch<SetStateAction<number>>;
 }) => {
-  const [cookies, _] = useCookies();
   return (
     <div className={'flex flex-col gap-[30px] border-b-[1px] border-black border-opacity-10 py-[30px]'}>
       {/* top */}
@@ -90,7 +90,7 @@ const OrderStatusComp = ({
         <p className={'font-bold'}>주문번호 {item.orderId}</p>
         <div className={'flex items-center gap-[10px] text-black text-opacity-60'}>
           <p>{item.email}</p>
-          <p>{item.orderDate}</p>
+          <p>{moment(item.orderDate).format('YYYY.MM.DD')}</p>
         </div>
       </div>
       {/* bottom */}
@@ -98,7 +98,7 @@ const OrderStatusComp = ({
         <button
           className={buttonShape(item.orderStatus)}
           onClick={() =>
-            deliveryStatusChangeButtonClickHandler(item.orderId, item.orderStatus, cookies.jwt, renderKey, setRenderKey)
+            deliveryStatusChangeButtonClickHandler(item.orderId, item.orderStatus, getJwt(), renderKey, setRenderKey)
           }
         >
           {getButtonName(item.orderStatus) ? getButtonName(item.orderStatus) : null}
