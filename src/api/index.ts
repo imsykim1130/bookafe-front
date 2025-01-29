@@ -8,6 +8,7 @@ import {
 } from './request.dto.ts';
 import {
   GetCommentListResponse,
+  GetDeliveryStatusListResponseDto,
   GetOrderDetailListResponseDto,
   getSearchBookListResponseDto,
   ResponseDto,
@@ -19,7 +20,6 @@ import {
   CartBookData,
   CommentItem,
   CouponData,
-  DeliveryStatus,
   FavoriteBookItem,
   OrderInfoData,
   PointLogItem,
@@ -432,9 +432,7 @@ export const cancelOrderRequest = async (jwt: string, orderId: number) => {
 };
 
 // 배송정보 리스트 가져오기
-// 입력: 배송상태(선택), 날짜(선택)
-// 출력: 주문번호, 이메일, 주문날짜, 배송상태
-export const getDeliveryStatusListRequest = async (orderStatus: string, datetime: Date, jwt: string) => {
+export const getDeliveryStatusListRequest = async (orderStatus: string, datetime: Date, jwt: string, page: number) => {
   return await axios
     .get('http://localhost:8080/api/v1/order/delivery-status-list', {
       headers: {
@@ -443,9 +441,10 @@ export const getDeliveryStatusListRequest = async (orderStatus: string, datetime
       params: {
         orderStatus,
         datetime: moment(datetime).format('YYYY-MM-DD HH:mm:ss'),
+        page,
       },
     })
-    .then((res): DeliveryStatus[] => {
+    .then((res): GetDeliveryStatusListResponseDto => {
       return res.data;
     })
     .catch((err) => {
