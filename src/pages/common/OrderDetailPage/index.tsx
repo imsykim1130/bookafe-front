@@ -88,7 +88,7 @@ const OrderDetailPage = () => {
       <div className="w-full max-w-[600px] flex flex-col gap-[30px]">
         <div className="sticky top-[100px] flex items-center justify-between bg-white">
           {/* 주문 상태 선택 */}
-          <Dropdown changeSelected={changeSelectedStatus} />
+          <Dropdown changeSelected={changeSelectedStatus} options={['전체', '배송준비중', '배송중', '배송완료']} />
           {/* 날짜 필터*/}
           <div className="flex items-center justify-end">
             {/* 캘린더 아이콘 */}
@@ -132,13 +132,13 @@ const OrderDetailPage = () => {
         <div className="flex items-center justify-center gap-[20px]">
           {!isFirst && (
             <button onClick={prevPageClickHandler}>
-              <i className="fi fi-rr-angle-circle-left flex items-center justify-center"></i>
+              <i className="flex items-center justify-center fi fi-rr-angle-circle-left"></i>
             </button>
           )}
           <span className="font-semibold">{page + 1}</span>
           {!isLast && (
             <button onClick={nextPageClickHandler}>
-              <i className="fi fi-rr-angle-circle-right flex items-center justify-center"></i>
+              <i className="flex items-center justify-center fi fi-rr-angle-circle-right"></i>
             </button>
           )}
         </div>

@@ -1,19 +1,21 @@
 interface Props {
   changeSelected: (value: string) => void;
+  options: string[];
 }
 
-function Dropdown({ changeSelected }: Props) {
+function Dropdown({ changeSelected, options }: Props) {
   return (
-    <div className="w-[100px]">
+    <div className="min-w-[100px]">
       <div className="relative">
         <select
           onChange={(e) => changeSelected(e.target.value)}
           className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 border border-slate-200 rounded-[10px] pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
         >
-          <option value="전체">전체</option>
-          <option value="배송준비중">배송준비중</option>
-          <option value="배송중">배송중</option>
-          <option value="배송완료">배송완료</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
         <svg
           xmlns="http://www.w3.org/2000/svg"
