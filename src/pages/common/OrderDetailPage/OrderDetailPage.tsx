@@ -118,29 +118,34 @@ const OrderDetailPage = () => {
         </div>
         <div className="flex flex-col gap-[10px]">
           {/* 주문 리스트 */}
-          {orderDetailList &&
+          {orderDetailList && orderDetailList.length ? (
             orderDetailList.map((orderDetail: OrderDetail) => (
               <OrderDetailItem
                 key={orderDetail.orderId}
                 orderDetail={orderDetail}
                 orderCandelClickHandler={cancelOrderClickHandler}
               />
-            ))}
-        </div>
-        {/* 페이지 버튼 */}
-        <div className="flex items-center justify-center gap-[20px]">
-          {!isFirst && (
-            <button onClick={prevPageClickHandler}>
-              <i className="flex items-center justify-center fi fi-rr-angle-circle-left"></i>
-            </button>
-          )}
-          <span className="font-semibold">{page + 1}</span>
-          {!isLast && (
-            <button onClick={nextPageClickHandler}>
-              <i className="flex items-center justify-center fi fi-rr-angle-circle-right"></i>
-            </button>
+            ))
+          ) : (
+            <p className="text-[1.2rem] font-semibold">주문 내역이 없습니다 🥲</p>
           )}
         </div>
+        {/* 페이지네이션 */}
+        {orderDetailList && orderDetailList.length ? (
+          <div className="flex items-center justify-center gap-[20px]">
+            {!isFirst && (
+              <button onClick={prevPageClickHandler}>
+                <i className="flex items-center justify-center fi fi-rr-angle-circle-left"></i>
+              </button>
+            )}
+            <span className="font-semibold">{page + 1}</span>
+            {!isLast && (
+              <button onClick={nextPageClickHandler}>
+                <i className="flex items-center justify-center fi fi-rr-angle-circle-right"></i>
+              </button>
+            )}
+          </div>
+        ) : null}
       </div>
     </main>
   );
