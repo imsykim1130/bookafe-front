@@ -91,8 +91,6 @@ const OrderDetailPage = () => {
           <Dropdown changeSelected={changeSelectedStatus} options={['전체', '배송준비중', '배송중', '배송완료']} />
           {/* 날짜 필터*/}
           <div className="flex items-center justify-end">
-            {/* 캘린더 아이콘 */}
-            <i className="fi fi-br-calendar-day translate-y-[px] opacity-60"></i>
             {/* 시작 날짜 */}
             <div className="flex items-center gap-[10px] ml-[10px]">
               <input
@@ -104,6 +102,7 @@ const OrderDetailPage = () => {
                   setStartDate(date);
                 }}
               />
+              {/* 끝 날짜 */}
               <span className="text-gray-400">~</span>
               <input
                 type="date"
