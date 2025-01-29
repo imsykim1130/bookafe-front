@@ -1,11 +1,12 @@
 interface Props {
   changeSelected: (value: string) => void;
   options: string[];
+  className?: string;
 }
 
-function Dropdown({ changeSelected, options }: Props) {
+function Dropdown({ changeSelected, options, className }: Props) {
   return (
-    <div className="min-w-[100px]">
+    <div className={`min-w-[100px] ${className ? className : ''}`}>
       <div className="relative">
         <select
           onChange={(e) => changeSelected(e.target.value)}
