@@ -138,6 +138,15 @@ const Cart = () => {
 
   // 첫 렌더링 시 장바구니 책 리스트 가져오기
   useEffect(() => {
+    if (!cookies.jwt) {
+      window.alert('로그인이 필요합니다');
+      navigate('/auth/sign-in', {
+        state: {
+          pathname: '/cart',
+        },
+      });
+      return;
+    }
     getCartBookList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
