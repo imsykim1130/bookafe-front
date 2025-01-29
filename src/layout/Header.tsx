@@ -3,13 +3,15 @@ import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { userState } from '../redux/userSlice.ts';
+import { removeJwt } from '@/utils/index.ts';
 
 const Header = () => {
   const { pathname } = useLocation();
   const isAuthPage = pathname.includes('/auth/');
 
   const { authType } = useParams();
-  const { profileImg } = useSelector((state: { user: userState }) => state.user);
+  const { profileImg, role } = useSelector((state: { user: userState }) => state.user);
+  const isAdmin = role === 'ROLE_ADMIN';
   const [cookies] = useCookies(['jwt']);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -37,6 +39,11 @@ const Header = () => {
     changeProfileImage(profileImg);
   }, [profileImg]);
 
+  function logoutClickHandler() {
+    removeJwt();
+    navigate('/auth/sign-in');
+  }
+
   return (
     <header
       className={`sticky z-40 top-0 w-full flex justify-between items-center px-[5%] md:px-[10%] lg:px-[15%] py-5 bg-white shadow-[0_0_4px_rgba(0,0,0,0.1)]`}
@@ -48,7 +55,7 @@ const Header = () => {
       {/*네비게이션*/}
       <nav className="relative flex gap-[2rem] md:gap-[3rem] items-center">
         {/*장바구니*/}
-        {!isAuthPage ? (
+        {!isAuthPage && !isAdmin ? (
           <Link to="/cart" className="w-[30px] h-[30px] flex justify-center items-center cursor-pointer">
             <i className="fi fi-rr-shopping-cart text-[15px] md:hidden"></i>
             <p className="hidden md:block text-nowrap">장바구니</p>
@@ -57,7 +64,7 @@ const Header = () => {
           ''
         )}
         {/*좋아요*/}
-        {!isAuthPage ? (
+        {!isAuthPage && !isAdmin ? (
           <Link to={'/favorite'} className="w-[30px] h-[30px] flex justify-center items-center cursor-pointer">
             <i className="fi fi-rs-heart text-[15px]  md:hidden"></i>
             <p className="hidden md:block text-nowrap">좋아요</p>
@@ -66,7 +73,7 @@ const Header = () => {
           ''
         )}
         {/*유저*/}
-        {isLoggedIn ? (
+        {isLoggedIn && !isAdmin ? (
           <Link
             to={'/user'}
             className="w-[30px] h-[30px] rounded-full flex items-center justify-center overflow-hidden"
@@ -84,7 +91,7 @@ const Header = () => {
         )}
 
         {/* 로그인 */}
-        {(!isAuthPage && !cookies.jwt) || (isAuthPage && authType === 'sign-up') ? (
+        {(!isAuthPage && !isAdmin && !cookies.jwt) || (isAuthPage && authType === 'sign-up') ? (
           <div
             className="w-[30px] h-[30px] flex justify-center items-center cursor-pointer"
             onClick={() => {
@@ -98,11 +105,25 @@ const Header = () => {
           ''
         )}
         {/* 회원가입 */}
-        {isAuthPage && authType === 'sign-in' ? (
+        {isAuthPage && !isAdmin && authType === 'sign-in' ? (
           <Link to={'/auth/sign-up'} className="w-[30px] h-[30px] flex justify-center items-center cursor-pointer">
             <i className="fi fi-rr-user-add text-[15px] flex items-center justify-center md:hidden"></i>
             <p className="hidden md:block text-nowrap">회원가입</p>
           </Link>
+        ) : (
+          ''
+        )}
+
+        {isAdmin ? (
+          <button
+            className="flex items-center justify-center cursor-pointer"
+            onClick={() => {
+              logoutClickHandler(navigate, removeJwt);
+            }}
+          >
+            <i className="fi fi-rr-user-add text-[15px] flex items-center justify-center md:hidden"></i>
+            <p className="hidden md:block text-nowrap">로그아웃</p>
+          </button>
         ) : (
           ''
         )}
