@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import moment from 'moment/moment';
 import { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
@@ -5,7 +6,6 @@ import { getPointLogListRequest, getTotalPointRequest } from '../api';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { PointLogItem } from '../api/item.ts';
-import PageTitle from '../components/PageTitle.tsx';
 import Dropdown from './common/OrderDetailPage/component/Dropdown.tsx';
 
 const Point = () => {
@@ -15,8 +15,7 @@ const Point = () => {
   const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
 
-  const [isOpen, setIsOpen] = useState(false);
-
+  // state: 날짜 관련 state
   const [isStart, setIsStart] = useState<boolean>(false);
   const [isEnd, setIsEnd] = useState<boolean>(false);
 
@@ -26,6 +25,7 @@ const Point = () => {
   const [start, setStart] = useState<Date>(startDate);
   const [end, setEnd] = useState<Date>(new Date());
 
+  // state: 종류 필터링 관련 state
   const filterList = ['전체', '적립', '사용'];
   const [filter, setFilter] = useState<string>('전체');
 
@@ -33,12 +33,14 @@ const Point = () => {
   const [isFirst, setIsFirst] = useState<boolean>(false);
   const [isLast, setIsLast] = useState<boolean>(false);
 
+  // function: 총 포인트 가져오기
   const getTotalPoint = () => {
     return getTotalPointRequest(cookies.jwt).then((res) => {
       setTotalPoint(res);
     });
   };
 
+  // function: 포인트 변경 내역 리스트 가져오기
   const getPointLog = () => {
     getPointLogListRequest(cookies.jwt, start, end, page, filter).then((res) => {
       if (!res) return;
@@ -48,6 +50,12 @@ const Point = () => {
     });
   };
 
+  // function: 종류 필터링 변경 시 실행
+  const changeSelected = (value: string) => {
+    setFilter(value);
+  };
+
+  // effect: 첫 렌더링 시 실행
   useEffect(() => {
     // 인증 시간 만료 시 로그인 화면으로 이동
     if (!cookies.jwt) {
@@ -61,14 +69,12 @@ const Point = () => {
     getPointLog();
   }, []);
 
+  // effect: 날짜 또는 종류 필터링 시 실행
   useEffect(() => {
     getPointLog();
   }, [start, end, filter, page]);
 
-  const changeSelected = (value: string) => {
-    setFilter(value);
-  };
-
+  // render
   return (
     <main className={'flex flex-col items-center px-[5%] py-[3rem]'}>
       <div className="w-full max-w-[600px]">
