@@ -45,7 +45,7 @@ const Favorite = () => {
   };
 
   return (
-    <main className={'flex flex-col items-center mt-[40px]'}>
+    <main className={'flex flex-col items-center mt-[40px] px-[5%]'}>
       <div className={'w-full max-w-[600px]'}>
         {/* 좋아요 책 있을 때 */}
         <section>
