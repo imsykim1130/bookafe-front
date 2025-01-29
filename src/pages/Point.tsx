@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import moment from 'moment/moment';
 import { useEffect, useState } from 'react';
-import Calendar from 'react-calendar';
 import { getPointLogListRequest, getTotalPointRequest } from '../api';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
@@ -16,14 +14,11 @@ const Point = () => {
   const navigate = useNavigate();
 
   // state: 날짜 관련 state
-  const [isStart, setIsStart] = useState<boolean>(false);
-  const [isEnd, setIsEnd] = useState<boolean>(false);
+  const start = new Date();
+  start.setMonth(start.getMonth() - 3);
 
-  const startDate = new Date();
-  startDate.setMonth(startDate.getMonth() - 3);
-
-  const [start, setStart] = useState<Date>(startDate);
-  const [end, setEnd] = useState<Date>(new Date());
+  const [startDate, setStartDate] = useState<Date>(start);
+  const [endDate, setEndDate] = useState<Date>(new Date());
 
   // state: 종류 필터링 관련 state
   const filterList = ['전체', '적립', '사용'];
@@ -42,7 +37,7 @@ const Point = () => {
 
   // function: 포인트 변경 내역 리스트 가져오기
   const getPointLog = () => {
-    getPointLogListRequest(cookies.jwt, start, end, page, filter).then((res) => {
+    getPointLogListRequest(cookies.jwt, startDate, endDate, page, filter).then((res) => {
       if (!res) return;
       setPointLog(res.pointLogList);
       setIsFirst(res.first);
@@ -72,7 +67,7 @@ const Point = () => {
   // effect: 날짜 또는 종류 필터링 시 실행
   useEffect(() => {
     getPointLog();
-  }, [start, end, filter, page]);
+  }, [startDate, endDate, filter, page]);
 
   // render
   return (
@@ -87,64 +82,29 @@ const Point = () => {
         <section className={'mt-[50px] text-md flex items-center justify-between cursor-pointer'}>
           {/* 종류 */}
           <Dropdown changeSelected={changeSelected} options={filterList} />
-          {/* 달력 */}
-          <div className={'flex items-center gap-[10px]'}>
-            <i className="fi fi-br-calendar-day"></i>
-            <div className={'flex items-center gap-[5px] text-[14px]'}>
-              <div className={'relative'}>
-                <span
-                  className={'cursor-pointer'}
-                  onClick={() => {
-                    if (!isStart) {
-                      setIsStart(true);
-                      setIsEnd(false);
-                    } else {
-                      setIsStart(false);
-                    }
-                  }}
-                >
-                  {moment(start).format('YYYY-MM-DD')}
-                </span>
-                {isStart ? (
-                  <div className={'w-[230px] absolute right-0 top-[30px]'}>
-                    <Calendar
-                      formatDay={(_, date) => moment(date).format('DD')}
-                      onClickDay={(value) => {
-                        setStart(value);
-                        setIsStart(false);
-                      }}
-                    />
-                  </div>
-                ) : null}
-              </div>
-              <span>~</span>
-              <div className={'relative'}>
-                <span
-                  className={'cursor-pointer'}
-                  onClick={() => {
-                    if (!isEnd) {
-                      setIsEnd(true);
-                      setIsStart(false);
-                    } else {
-                      setIsEnd(false);
-                    }
-                  }}
-                >
-                  {moment(end).format('YYYY-MM-DD')}
-                </span>
-                {isEnd ? (
-                  <div className={'w-[230px] absolute right-0 top-[30px]'}>
-                    <Calendar
-                      formatDay={(_, date) => moment(date).format('DD')}
-                      onClickDay={(value) => {
-                        setEnd(value);
-                        setIsEnd(false);
-                      }}
-                    />
-                  </div>
-                ) : null}
-              </div>
-            </div>
+          {/* 날짜 */}
+          <div className="flex items-center gap-[10px] ml-[10px]">
+            {/* 시작 날짜 */}
+            <input
+              type="date"
+              value={startDate.toISOString().split('T')[0]}
+              className="px-3 py-1.5 bg-white border border-gray-200 rounded-[10px]"
+              onChange={(e) => {
+                const date = new Date(e.target.value);
+                setStartDate(date);
+              }}
+            />
+            {/* 끝 날짜 */}
+            <span className="text-gray-400">~</span>
+            <input
+              type="date"
+              value={endDate.toISOString().split('T')[0]}
+              className="px-3 py-1.5 bg-white border border-gray-200 rounded-[10px]"
+              onChange={(e) => {
+                const date = new Date(e.target.value);
+                setEndDate(date);
+              }}
+            />
           </div>
         </section>
 
@@ -167,31 +127,33 @@ const Point = () => {
             )}
           </div>
           {/* pagination */}
-          <div className={'flex justify-center mt-[30px]'}>
-            <div className={'relative text-[14px]'}>
-              {isFirst ? null : (
-                <span
-                  className={'cursor-pointer absolute top-0 left-[-60px]'}
-                  onClick={() => {
-                    setPage(page - 1);
-                  }}
-                >
-                  {'< 이전'}
-                </span>
-              )}
-              <span className={'font-bold'}>{page + 1}</span>
-              {isLast ? null : (
-                <span
-                  className={'cursor-pointer absolute top-0 right-[-60px]'}
-                  onClick={() => {
-                    setPage(page + 1);
-                  }}
-                >
-                  {'다음 >'}
-                </span>
-              )}
+          {pointLog && pointLog.length ? (
+            <div className={'flex justify-center mt-[30px]'}>
+              <div className={'relative text-[14px]'}>
+                {isFirst ? null : (
+                  <span
+                    className={'cursor-pointer absolute top-0 left-[-60px]'}
+                    onClick={() => {
+                      setPage(page - 1);
+                    }}
+                  >
+                    {'< 이전'}
+                  </span>
+                )}
+                <span className={'font-bold'}>{page + 1}</span>
+                {isLast ? null : (
+                  <span
+                    className={'cursor-pointer absolute top-0 right-[-60px]'}
+                    onClick={() => {
+                      setPage(page + 1);
+                    }}
+                  >
+                    {'다음 >'}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
+          ) : null}
         </section>
       </div>
     </main>
