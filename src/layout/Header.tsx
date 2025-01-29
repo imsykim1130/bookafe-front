@@ -118,11 +118,10 @@ const Header = () => {
           <button
             className="flex items-center justify-center cursor-pointer"
             onClick={() => {
-              logoutClickHandler(navigate, removeJwt);
+              logoutClickHandler();
             }}
           >
-            <i className="fi fi-rr-user-add text-[15px] flex items-center justify-center md:hidden"></i>
-            <p className="hidden md:block text-nowrap">로그아웃</p>
+            <p className="text-nowrap">로그아웃</p>
           </button>
         ) : (
           ''
