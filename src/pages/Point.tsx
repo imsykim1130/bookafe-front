@@ -6,12 +6,13 @@ import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { PointLogItem } from '../api/item.ts';
 import PageTitle from '../components/PageTitle.tsx';
+import Dropdown from './common/OrderDetailPage/component/Dropdown.tsx';
 
 const Point = () => {
   const [totalPoint, setTotalPoint] = useState<number | null>(null);
   const [pointLog, setPointLog] = useState<PointLogItem[] | null>(null);
 
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +27,7 @@ const Point = () => {
   const [end, setEnd] = useState<Date>(new Date());
 
   const filterList = ['전체', '적립', '사용'];
-  const [filterIndex, setFilterIndex] = useState(0);
+  const [filter, setFilter] = useState<string>('전체');
 
   const [page, setPage] = useState<number>(0);
   const [isFirst, setIsFirst] = useState<boolean>(false);
@@ -39,7 +40,7 @@ const Point = () => {
   };
 
   const getPointLog = () => {
-    getPointLogListRequest(cookies.jwt, start, end, page, filterList[filterIndex]).then((res) => {
+    getPointLogListRequest(cookies.jwt, start, end, page, filter).then((res) => {
       if (!res) return;
       setPointLog(res.pointLogList);
       setIsFirst(res.first);
@@ -62,58 +63,24 @@ const Point = () => {
 
   useEffect(() => {
     getPointLog();
-  }, [start, end, filterIndex, page]);
+  }, [start, end, filter, page]);
 
-  const filterClickHandler = () => {
-    if (!isOpen) {
-      setIsOpen(true);
-    }
-  };
-
-  const filterItemClickHandler = (index: number) => {
-    setFilterIndex(index);
-    setIsOpen(false);
+  const changeSelected = (value: string) => {
+    setFilter(value);
   };
 
   return (
-    <div>
-      {/* 화면 제목*/}
-      <PageTitle title={'포인트'} />
-      <main className={'mx-[5%] md:mx-[10%] lg:mx-[15%]'}>
+    <main className={'flex flex-col items-center px-[5%] py-[3rem]'}>
+      <div className="w-full max-w-[600px]">
         {/* 보유 포인트*/}
         <div>
           <h2 className={'font-semibold'}>보유 포인트</h2>
-          <p className={'font-bold text-[32px]'}>{totalPoint}</p>
+          <p className={'font-bold text-[32px]'}>{totalPoint + ' P'}</p>
         </div>
         {/* 필터링 */}
         <section className={'mt-[50px] text-md flex items-center justify-between cursor-pointer'}>
           {/* 종류 */}
-          <button
-            className={
-              'relative w-[100px] border-[1px] border-black border-opacity-80 rounded-[5px] flex items-center justify-between gap-[5px] px-[10px] py-[5px]'
-            }
-            onClick={filterClickHandler}
-          >
-            <p>{filterList[filterIndex]}</p>
-            <i className="fi fi-rr-caret-down"></i>
-            {isOpen ? (
-              <div
-                className={
-                  'absolute top-[35px] left-0 flex flex-col items-start gap-[15px] w-full px-[10px] py-[10px] bg-white border-[1px] border-black border-opacity-80 rounded-[5px]'
-                }
-              >
-                {filterList.map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => filterItemClickHandler(index)}
-                    className={'w-full flex justify-start'}
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </button>
+          <Dropdown changeSelected={changeSelected} options={filterList} />
           {/* 달력 */}
           <div className={'flex items-center gap-[10px]'}>
             <i className="fi fi-br-calendar-day"></i>
@@ -136,7 +103,7 @@ const Point = () => {
                   <div className={'w-[230px] absolute right-0 top-[30px]'}>
                     <Calendar
                       formatDay={(_, date) => moment(date).format('DD')}
-                      onClickDay={(value, _) => {
+                      onClickDay={(value) => {
                         setStart(value);
                         setIsStart(false);
                       }}
@@ -163,7 +130,7 @@ const Point = () => {
                   <div className={'w-[230px] absolute right-0 top-[30px]'}>
                     <Calendar
                       formatDay={(_, date) => moment(date).format('DD')}
-                      onClickDay={(value, _) => {
+                      onClickDay={(value) => {
                         setEnd(value);
                         setIsEnd(false);
                       }}
@@ -190,7 +157,7 @@ const Point = () => {
                 </div>
               ))
             ) : (
-              <div>결과가 없습니다 🥲</div>
+              <p className="text-[1.2rem] font-semibold">결과가 없습니다 🥲</p>
             )}
           </div>
           {/* pagination */}
@@ -220,8 +187,8 @@ const Point = () => {
             </div>
           </div>
         </section>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 };
 

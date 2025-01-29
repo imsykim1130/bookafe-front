@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { OrderDetail } from '../../../api/item.ts';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { cancelOrderRequest, getOrderDetailListRequest } from '../../../api';
+import { cancelOrderRequest, getOrderDetailListRequest } from '../../../api/index.ts';
 import OrderDetailItem from './component/OrderDetailItem.tsx';
 import Dropdown from './component/Dropdown.tsx';
 

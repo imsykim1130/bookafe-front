@@ -16,7 +16,7 @@ import UserManagement from './pages/admin/UserManagement.tsx';
 import { store } from './redux';
 import BookDetail from './pages/common/BookDetail';
 import Landing from './pages/common/Landing';
-import OrderDetailPage from './pages/common/OrderDetailPage';
+import OrderDetailPage from './pages/common/OrderDetailPage/OrderDetailPage.tsx';
 import Cart from './pages/common/Cart/index.tsx';
 import Favorite from './pages/common/Favorite/index.tsx';
 import Auth from './pages/common/Auth/index.tsx';
