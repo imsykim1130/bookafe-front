@@ -28,10 +28,6 @@ function AdminLanding() {
           </Link>
         </div>
       </div>
-      {/* 로그아웃 버튼 */}
-      <button className="w-[14rem] my-6 py-4 border-[1px] border-black border-opacity-20 rounded-md px-4 hover:bg-gray-100 duration-300">
-        로그아웃
-      </button>
     </main>
   );
 }
