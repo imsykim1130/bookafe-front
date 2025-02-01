@@ -1,4 +1,20 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import moment from 'moment';
+import { Dispatch, MutableRefObject } from 'react';
+import { BookDataAction, ReplyAction } from '../reducer';
+import {
+  BookDetailData,
+  CartBookData,
+  CommentItem,
+  CouponData,
+  FavoriteBookItem,
+  OrderInfoData,
+  PointLogItem,
+  RecommendBookItem,
+  TodayBookInterface,
+  Top10BookItem,
+  UserManagementItem,
+} from './item.ts';
 import {
   getSearchBookListRequestDto,
   PostCommentRequestDto,
@@ -14,22 +30,6 @@ import {
   ResponseDto,
   SignInResponseDto,
 } from './response.dto.ts';
-import { Dispatch, MutableRefObject } from 'react';
-import {
-  BookDetailData,
-  CartBookData,
-  CommentItem,
-  CouponData,
-  FavoriteBookItem,
-  OrderInfoData,
-  PointLogItem,
-  RecommendBookItem,
-  TodayBookInterface,
-  Top10BookItem,
-  UserManagementItem,
-} from './item.ts';
-import { BookDataAction, ReplyAction } from '../reducer';
-import moment from 'moment';
 
 const DOMAIN = 'http://localhost:8080/api/v1';
 const signInUrl = `${DOMAIN}/auth/sign-in`;
@@ -913,14 +913,21 @@ export const changeProfileImgRequest = async (jwt: string, imageFile: File) => {
     });
 };
 
+export interface GetRecommendBookResponseDto extends ResponseDto {
+  todayBook: TodayBookInterface;
+}
+
 // 추천 책 가져오기
-export const getRecommendBookRequest = async () => {
+export const getRecommendBookRequest = async (): Promise<GetRecommendBookResponseDto | ResponseDto | null> => {
   return await axios
     .get('http://localhost:8080/api/v1/book/recommend')
-    .then((res): TodayBookInterface => res.data)
-    .catch((err) => {
-      console.log(err.response.data);
-      return null;
+    .then((res): GetRecommendBookResponseDto => res.data)
+    .catch((err: AxiosError): ResponseDto | null => {
+      console.log(err.response);
+      if (!err.response) {
+        return null;
+      }
+      return err.response.data as ResponseDto;
     });
 };
 
