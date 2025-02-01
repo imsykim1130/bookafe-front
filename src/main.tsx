@@ -20,6 +20,7 @@ import OrderDetailPage from './pages/common/OrderDetailPage/OrderDetailPage.tsx'
 import Cart from './pages/common/Cart/index.tsx';
 import Favorite from './pages/common/Favorite/Favorite.tsx';
 import Auth from './pages/common/Auth/index.tsx';
+import ErrorPage from './pages/common/ErrorPage/ErrorPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
       {
         path: '/admin/user-management',
         element: <UserManagement />,
+      },
+      {
+        path: '/error/:code',
+        element: <ErrorPage />,
       },
     ],
   },
