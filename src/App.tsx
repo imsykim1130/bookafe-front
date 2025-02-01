@@ -1,10 +1,10 @@
-import './App.css';
-import { Outlet, useLocation } from 'react-router-dom';
-import Header from './layout/Header.tsx';
-import Footer from './layout/Footer.tsx';
-import { useCookies } from 'react-cookie';
 import { Dispatch, useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 import { useDispatch } from 'react-redux';
+import { Outlet, useLocation } from 'react-router-dom';
+import './App.css';
+import Footer from './layout/Footer.tsx';
+import Header from './layout/Header.tsx';
 
 import { UnknownAction } from '@reduxjs/toolkit';
 import { getUserRequest } from './api';
@@ -47,13 +47,11 @@ const App = () => {
   }, [pathname]);
 
   return (
-    <div>
+    <>
       <Header />
-      <div className={'min-h-[100vh]'}>
-        <Outlet />
-      </div>
+      <Outlet />
       <Footer />
-    </div>
+    </>
   );
 };
 
