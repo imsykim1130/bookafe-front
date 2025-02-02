@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 interface Props {
   searchWord: string;
   setSearchWord: React.Dispatch<React.SetStateAction<string>>;
+  onEnter?: () => void;
 }
 
 const SearchBox = (props: Props) => {
-  const { searchWord, setSearchWord } = props;
+  const { searchWord, setSearchWord, onEnter } = props;
   const navigate = useNavigate();
 
   return (
@@ -35,6 +36,9 @@ const SearchBox = (props: Props) => {
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
+            if(onEnter !== undefined) {
+              onEnter();
+            }
             navigate(`/search/${searchWord}`);
           }
         }}
