@@ -1,9 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useDebounce } from '@/hook';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { deleteUserRequest, searchUserRequest } from '../../api';
 import { UserManagementItem } from '../../api/item.ts';
-import PageTitle from '../../components/PageTitle.tsx';
 
 // const userListMock: UserManagementItem[] = [
 //   {
@@ -28,7 +28,7 @@ import PageTitle from '../../components/PageTitle.tsx';
 
 const UserManagement = () => {
   const [userList, setUserList] = useState<UserManagementItem[] | null>(null);
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const [reload, setReload] = useState<number>(0);
 
   // 유저 리스트 가져오기 요청
@@ -61,8 +61,7 @@ const UserManagement = () => {
   };
 
   return (
-    <main className={'flex flex-col items-center px-[5%]'}>
-      <PageTitle title={'유저 관리'} />
+    <main className={'flex flex-col items-center px-[5%] py-[5vh]'}>
       <SearchBox getUserList={getUserList} reload={reload} />
       <section className={'w-full max-w-[600px]'}>
         {/* 검색 전, 검색 오류 시*/}
