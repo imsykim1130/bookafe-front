@@ -1,10 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import SearchBox from '@/components/SearchBox.tsx';
+import { Dispatch, Reducer, useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Dispatch, Reducer, useEffect, useReducer, useRef } from 'react';
-import { BookPrevData } from '../api/item.ts';
-import BookPrev from '../components/BookPrev.tsx';
 import { getSearchBookRequest } from '../api';
+import { BookPrevData } from '../api/item.ts';
 import { getSearchBookListRequestDto } from '../api/request.dto.ts';
 import { getSearchBookListResponseDto } from '../api/response.dto.ts';
+import BookPrev from '../components/BookPrev.tsx';
 
 // index: interface
 // reducer state 타입
@@ -79,9 +81,9 @@ const getSearchBooks = async (params: getSearchBookListRequestDto, dispatch: Dis
     .then((response) => {
       // 책 데이터 받아오기 성공
       const { bookList, meta } = response.data as getSearchBookListResponseDto;
-      const { _end, total_count } = meta;
+      const { is_end, total_count } = meta;
 
-      if (_end) {
+      if (is_end) {
         dispatch({ type: 'last', payload: bookList, total: total_count });
       } else {
         dispatch({ type: 'success', payload: bookList, total: total_count });
@@ -98,6 +100,7 @@ const getSearchBooks = async (params: getSearchBookListRequestDto, dispatch: Dis
 const Search = () => {
   const { searchWord } = useParams();
   const observeRef = useRef(null);
+  const [newSearchWord, setNewSearchWord] = useState<string>('');
 
   const [books, dispatch] = useReducer<Reducer<BooksStateType, BooksActionType>>(bookReducer, {
     items: [],
@@ -150,6 +153,9 @@ const Search = () => {
     if (observeRef.current) {
       observer.observe(observeRef.current);
     }
+    // 검색어
+    setNewSearchWord(searchWord);
+
     return () => {
       if (observeRef.current) {
         observer.unobserve(observeRef.current);
@@ -160,6 +166,7 @@ const Search = () => {
   return (
     <section className="margin-sm md:margin-md mt-[60px] flex flex-col items-center">
       <div className="max-w-[850px] flex flex-col gap-[20px]">
+        <SearchBox searchWord={newSearchWord} setSearchWord={setNewSearchWord} />
         {/* 총 검색결과 개수*/}
         <div className="w-full">
           <p className="text-default-black text-md">
