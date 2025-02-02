@@ -1,12 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { BookPrevData, TodayBookInterface } from '../../../api/item.ts';
 import { useNavigate } from 'react-router-dom';
-import { getRecommendBookRequest, getSearchBookRequest } from '../../../api';
+import { getRecommendBookRequest, GetRecommendBookResponseDto, getSearchBookRequest } from '../../../api';
 import SearchBox from '@/components/SearchBox.tsx';
 import BookPrev from '@/components/BookPrev.tsx';
 import { useDebounce } from '@/hook';
 import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
-import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
+import { getSearchBookListResponseDto, ResponseDto } from '@/api/response.dto.ts';
 
 const RecommendBook = () => {
   const [recommendBook, setRecommendBook] = useState<TodayBookInterface | null>(null);
@@ -30,9 +31,21 @@ const RecommendBook = () => {
   const getRecommendBook = () => {
     getRecommendBookRequest().then((res) => {
       if (!res) {
-        window.alert('책 로딩 실패. 다시 시도해주세요');
+        // 네트워크 에러
+        navigate('/error/500', {state: {pathname: "/"}});
+        return;
       }
-      setRecommendBook(res);
+      const { code } = res as ResponseDto;
+      if(code === "ISE") {
+        // 서버 동작 에러
+        navigate('/error/500', {state: {pathname: "/"}});
+        return;
+      }
+
+      if(code === "SU") {
+        const { todayBook } = res as GetRecommendBookResponseDto;
+        setRecommendBook(todayBook);
+      }
     });
   };
 
@@ -69,7 +82,6 @@ const RecommendBook = () => {
       return;
     }
     searchBook();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearchWord]);
 
   return (
