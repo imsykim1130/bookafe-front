@@ -28,6 +28,10 @@ const Top10 = () => {
     getTop10BookList();
   }, []);
 
+  if (books === null || books.length === 0) {
+    return null;
+  }
+
   return (
     // top10 섹션 컨테이너
     <section className={'flex flex-col gap-[30px] py-[40px] min-[800px]:items-center bg-white'}>
