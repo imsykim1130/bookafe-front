@@ -19,7 +19,7 @@ import Landing from './pages/common/Landing/Landing.tsx';
 import OrderDetailPage from './pages/common/OrderDetailPage/OrderDetailPage.tsx';
 import Cart from './pages/common/Cart/index.tsx';
 import Favorite from './pages/common/Favorite/Favorite.tsx';
-import Auth from './pages/common/Auth/index.tsx';
+import Auth from './pages/common/Auth/Auth.tsx';
 import ErrorPage from './pages/common/ErrorPage/ErrorPage.tsx';
 
 const router = createBrowserRouter([
