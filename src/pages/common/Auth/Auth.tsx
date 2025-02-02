@@ -66,9 +66,9 @@ const Auth = () => {
     };
 
     signInRequest(requestDto).then((response) => {
-      // 응답이 없는 경우
+      // 네트워크 에러
       if (!response) {
-        window.alert('서버 에러');
+        window.alert('네트워크 에러. 관리자에게 문의하세요');
         return;
       }
 
@@ -204,7 +204,7 @@ const Auth = () => {
 
   // Render
   return (
-    <main className={'flex flex-col items-center mt-[100px] px-[5%]'}>
+    <main className={'flex flex-col items-center py-[100px] px-[5%]'}>
       {/* 페이지 이름 */}
       <h1 className={'text-xl font-bold'}>{authType === 'sign-in' ? '로그인' : '회원가입'}</h1>
 

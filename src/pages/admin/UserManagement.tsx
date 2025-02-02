@@ -1,9 +1,9 @@
-import PageTitle from '../../components/PageTitle.tsx';
-import { UserManagementItem } from '../../api/item.ts';
-import { useEffect, useState } from 'react';
-import { deleteUserRequest, searchUserRequest } from '../../api';
-import { useCookies } from 'react-cookie';
 import { useDebounce } from '@/hook';
+import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { deleteUserRequest, searchUserRequest } from '../../api';
+import { UserManagementItem } from '../../api/item.ts';
+import PageTitle from '../../components/PageTitle.tsx';
 
 // const userListMock: UserManagementItem[] = [
 //   {
@@ -61,10 +61,10 @@ const UserManagement = () => {
   };
 
   return (
-    <div>
+    <main className={'flex flex-col items-center px-[5%]'}>
       <PageTitle title={'유저 관리'} />
       <SearchBox getUserList={getUserList} reload={reload} />
-      <main className={'mx-[5%] md:mx-[10%] lg:mx-[15%]'}>
+      <section className={'w-full max-w-[600px]'}>
         {/* 검색 전, 검색 오류 시*/}
         {userList === null && (
           <div className={'flex justify-center items-center h-[70vh]'}>
@@ -88,8 +88,8 @@ const UserManagement = () => {
             ))}
           </div>
         )}
-      </main>
-    </div>
+      </section>
+    </main>
   );
 };
 
