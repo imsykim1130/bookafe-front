@@ -1,8 +1,11 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 function ErrorPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
+  const { state } = useLocation();
+  // 에러가 생긴 페이지 경로. 새로고침 시 이동할 페이지
+  const pathname = state ? state.pathname : null;
 
   const errors = {
     '404': '페이지를 찾을 수 없습니다.',
@@ -14,7 +17,7 @@ function ErrorPage() {
   };
 
   const refresh = () => {
-    window.location.reload();
+    navigate(pathname);
   };
 
   return (
