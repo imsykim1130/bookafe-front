@@ -10,7 +10,7 @@ export interface UserItem {
 export interface Meta {
   pageable_count: number;
   total_count: number;
-  _end: boolean;
+  is_end: boolean;
 }
 
 export interface BookPrevData {
