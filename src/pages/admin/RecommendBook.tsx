@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import PageTitle from '../../components/PageTitle.tsx';
 import { useEffect, useState } from 'react';
 import { RecommendBookItem } from '../../api/item.ts';
@@ -14,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 // };
 
 const RecommendBook = () => {
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const [recommentBookList, setRecommentBookList] = useState<RecommendBookItem[] | null>(null);
 
   const getAllRecommendBook = async () => {
@@ -82,7 +83,7 @@ const RecommendBookComp = ({
       </div>
       <div>
         <i
-          className="fi fi-rr-trash cursor-pointer text-default-black hover:text-opacity-40 duration-300"
+          className="duration-300 cursor-pointer fi fi-rr-trash text-default-black hover:text-opacity-40"
           onClick={() => deleteRecommendBook(isbn)}
         ></i>
       </div>
