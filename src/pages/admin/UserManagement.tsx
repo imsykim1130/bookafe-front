@@ -2,8 +2,8 @@
 import { useDebounce } from '@/hook';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { deleteUserRequest, searchUserRequest } from '../../api';
 import { UserManagementItem } from '../../api/item.ts';
+import { deleteUserRequest, searchUserRequest } from '../../api/request.ts';
 
 // const userListMock: UserManagementItem[] = [
 //   {

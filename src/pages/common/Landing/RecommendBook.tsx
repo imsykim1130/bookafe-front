@@ -2,8 +2,8 @@
 import { ResponseDto } from '@/api/response.dto.ts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRecommendBookRequest, GetRecommendBookResponseDto } from '../../../api';
 import { TodayBookInterface } from '../../../api/item.ts';
+import { getRecommendBookRequest, GetRecommendBookResponseDto } from '../../../api/request.ts';
 
 const RecommendBook = () => {
   const [recommendBook, setRecommendBook] = useState<TodayBookInterface | null>(null);
@@ -36,19 +36,13 @@ const RecommendBook = () => {
     });
   };
 
-  
-
   // effect: 추천 책 받아오기
   useEffect(() => {
     getRecommendBook();
   }, []);
 
-  
-
   return (
-    <section
-      className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh]"
-    >
+    <section className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh]">
       {recommendBook === null ? null : (
         <div className={'flex flex-col gap-[30px]'}>
           {/* 배경 이미지 */}
@@ -87,8 +81,6 @@ const RecommendBook = () => {
           </div>
         </div>
       )}
-
-      
     </section>
   );
 };

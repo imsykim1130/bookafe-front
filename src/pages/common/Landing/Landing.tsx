@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getSearchBookRequest } from '@/api/index.ts';
 import { BookPrevData } from '@/api/item.ts';
 import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
+import { getSearchBookRequest } from '@/api/request.ts';
 import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
 import BookPrev from '@/components/BookPrev.tsx';
 import SearchBox from '@/components/SearchBox.tsx';

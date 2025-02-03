@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import Recommend from './Recommend.tsx';
-import Favorite from './Favorite.tsx';
-import Cart from './Cart.tsx';
 import { BookDetailData } from '../../../../api/item.ts';
-import { getBookDetailRequest } from '../../../../api';
+import { getBookDetailRequest } from '../../../../api/request.ts';
+import Cart from './Cart.tsx';
+import Favorite from './Favorite.tsx';
+import Recommend from './Recommend.tsx';
 
 const BookSection = ({
   isbn,

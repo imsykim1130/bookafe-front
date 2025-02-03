@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 import {
   cancelCommentFavoriteRequest,
   getCommentFavoriteRequest,
   getIsCommentFavoriteRequest,
   putCommentFavoriteRequest,
-} from '../../../../api';
-import { useCookies } from 'react-cookie';
+} from '../../../../api/request';
 
 interface Props {
   commentId: number;

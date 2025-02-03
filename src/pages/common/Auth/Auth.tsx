@@ -1,13 +1,13 @@
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
-import { Input } from '@/components/ui/input.tsx';
-import { Button } from '@/components/ui/button.tsx';
-import moment from 'moment';
-import { signInRequest, signUpRequest } from '@/api';
+import { signInRequest, signUpRequest } from '@/api/request';
 import { SignInRequestDto, SignUpRequestDto } from '@/api/request.dto';
 import { ResponseDto, SignInResponseDto } from '@/api/response.dto';
+import { Button } from '@/components/ui/button.tsx';
+import { Input } from '@/components/ui/input.tsx';
 import { getRandomNickname } from '@/utils';
+import moment from 'moment';
+import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const Auth = () => {
   // index: top

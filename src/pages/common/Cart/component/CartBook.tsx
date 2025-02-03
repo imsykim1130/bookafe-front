@@ -1,5 +1,5 @@
-import { deleteCartBookRequest } from '@/api';
 import { CartBookData } from '@/api/item';
+import { deleteCartBookRequest } from '@/api/request';
 import { useMemo } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';

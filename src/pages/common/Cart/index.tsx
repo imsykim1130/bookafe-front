@@ -1,3 +1,4 @@
+import { BookPrevData, CartBookData, CouponData, OrderInfoData } from '@/api/item';
 import {
   changeCartBookCountRequest,
   createOrderRequest,
@@ -7,19 +8,18 @@ import {
   getSearchBookListRequest,
   getTotalPointRequest,
   putBookToCartRequest,
-} from '@/api/index.ts';
-import { BookPrevData, CartBookData, CouponData, OrderInfoData } from '@/api/item';
+} from '@/api/request';
 import { getSearchBookListRequestDto, PostOrderRequestDto } from '@/api/request.dto';
 import Button from '@/components/Button';
 import { Dispatch, forwardRef, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
 
+import { getSearchBookListResponseDto, ResponseDto } from '@/api/response.dto';
+import BookPrev from '@/components/BookPrev';
+import { useGSAP } from '@gsap/react';
+import { gsap } from 'gsap';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import CartBookComp from './component/CartBook';
-import BookPrev from '@/components/BookPrev';
-import { gsap } from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { getSearchBookListResponseDto, ResponseDto } from '@/api/response.dto';
 
 gsap.registerPlugin(useGSAP);
 

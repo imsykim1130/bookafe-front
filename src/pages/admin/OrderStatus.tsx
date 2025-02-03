@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { GetDeliveryStatusListResponseDto } from '@/api/response.dto.ts';
+import { getJwt } from '@/utils/index.ts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DeliveryStatus } from '../../api/item.ts';
-import { getDeliveryStatusListRequest } from '../../api';
-import OrderStatusComp from '../../components/OrderStatusComp.tsx';
-import { getJwt } from '@/utils/index.ts';
-import { GetDeliveryStatusListResponseDto } from '@/api/response.dto.ts';
-import Dropdown from '../common/OrderDetailPage/component/Dropdown.tsx';
+import { getDeliveryStatusListRequest } from '../../api/request.ts';
 import DateInput from '../../components/DateInput';
+import OrderStatusComp from '../../components/OrderStatusComp.tsx';
+import Dropdown from '../common/OrderDetailPage/component/Dropdown.tsx';
 
 // component
 const OrderStatus = () => {

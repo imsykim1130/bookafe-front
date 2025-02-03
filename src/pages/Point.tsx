@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import { getPointLogListRequest, getTotalPointRequest } from '../api';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { PointLogItem } from '../api/item.ts';
+import { getPointLogListRequest, getTotalPointRequest } from '../api/request.ts';
 import Dropdown from './common/OrderDetailPage/component/Dropdown.tsx';
 
 const Point = () => {

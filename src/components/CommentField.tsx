@@ -1,8 +1,8 @@
-import { Dispatch, forwardRef, useState } from 'react';
 import axios from 'axios';
-import { ResponseDto } from '../api/response.dto.ts';
-import { commentRequest, replyRequest } from '../api';
+import { Dispatch, forwardRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
+import { commentRequest, replyRequest } from '../api/request.ts';
+import { ResponseDto } from '../api/response.dto.ts';
 
 interface Props {
   isbn: string;

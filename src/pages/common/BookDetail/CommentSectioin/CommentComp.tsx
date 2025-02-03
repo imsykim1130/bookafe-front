@@ -1,11 +1,16 @@
-import { CommentItem, UserItem } from '../../../../api/item.ts';
-import { useSelector } from 'react-redux';
-import { useCookies } from 'react-cookie';
-import { useParams } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import { deleteCommentRequest, getReplyListRequest, modifyCommentRequest, postCommentRequest } from '../../../../api';
 import moment from 'moment/moment';
+import { useEffect, useRef, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { CommentItem, UserItem } from '../../../../api/item.ts';
 import { PostCommentRequestDto } from '../../../../api/request.dto.ts';
+import {
+  deleteCommentRequest,
+  getReplyListRequest,
+  modifyCommentRequest,
+  postCommentRequest,
+} from '../../../../api/request.ts';
 import FavoriteCount from './FavoriteCount.tsx';
 
 interface CommentCompProp {

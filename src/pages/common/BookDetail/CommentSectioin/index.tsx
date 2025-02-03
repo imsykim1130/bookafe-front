@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { CommentItem } from '../../../../api/item.ts';
-import { getCommentListRequest, postCommentRequest } from '../../../../api';
 import { PostCommentRequestDto } from '../../../../api/request.dto.ts';
+import { getCommentListRequest, postCommentRequest } from '../../../../api/request.ts';
 import CommentComp from './CommentComp.tsx';
 
 interface Props {

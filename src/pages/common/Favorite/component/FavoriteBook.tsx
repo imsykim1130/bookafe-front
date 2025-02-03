@@ -1,5 +1,5 @@
-import { moveFavoriteBookToCartRequest } from '@/api';
 import { FavoriteBookItem } from '@/api/item';
+import { moveFavoriteBookToCartRequest } from '@/api/request';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 

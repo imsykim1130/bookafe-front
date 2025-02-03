@@ -1,10 +1,10 @@
+import { getJwt, removeJwt } from '@/utils/index.ts';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { changeProfileImgRequest } from '../api/request.ts';
 import PageTitle from '../components/PageTitle.tsx';
-import { changeProfileImgRequest } from '../api';
 import { updateProfileImage, userState } from '../redux/userSlice.ts';
-import { getJwt, removeJwt } from '@/utils/index.ts';
 
 function orderDetailClickHandler(navigate: (path: string) => void) {
   navigate('/order/detail');

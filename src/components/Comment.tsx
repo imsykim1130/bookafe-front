@@ -1,11 +1,11 @@
 import React, { Reducer, useEffect, useReducer, useState } from 'react';
-import { CommentItem } from '../api/item';
 import { useCookies } from 'react-cookie';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import Reply from './Reply.tsx';
-import CommentField from './CommentField.tsx';
+import { CommentItem } from '../api/item';
+import { replyRequest } from '../api/request.ts';
 import { ReplyAction, ReplyState } from '../reducer';
-import { replyRequest } from '../api';
+import CommentField from './CommentField.tsx';
+import Reply from './Reply.tsx';
 
 interface Prop {
   comment: CommentItem;

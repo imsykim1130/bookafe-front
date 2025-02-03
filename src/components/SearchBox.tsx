@@ -4,10 +4,11 @@ interface Props {
   searchWord: string;
   setSearchWord: React.Dispatch<React.SetStateAction<string>>;
   onEnter?: () => void;
+  onBlur?: () => void;
 }
 
 const SearchBox = (props: Props) => {
-  const { searchWord, setSearchWord, onEnter } = props;
+  const { searchWord, setSearchWord, onEnter, onBlur } = props;
   const navigate = useNavigate();
 
   return (
@@ -42,6 +43,7 @@ const SearchBox = (props: Props) => {
             navigate(`/search/${searchWord}`);
           }
         }}
+        onBlur={onBlur}
       />
     </div>
   );
