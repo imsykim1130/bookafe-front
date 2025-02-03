@@ -111,6 +111,8 @@ const Search = () => {
     currentPage: 0,
   });
 
+  const size = 50;
+
   useEffect(() => {
     if (!books.loading || !searchWord) return;
 
@@ -119,30 +121,41 @@ const Search = () => {
         query: searchWord,
         sort: 'accuracy',
         page: books.currentPage + 1,
-        size: 50,
+        size: size,
         target: 'title',
       },
       dispatch,
     );
   }, [books.loading]); // 옵저버가 감지되면 loading 을 true 로 변경시켜서 책 데이터를 추가로 가지고 오게된다.
 
-  useEffect(() => {
-    // 검색어가 바뀌면 state 를 초기화 한다.
-    dispatch({ type: 'init' });
-  }, [searchWord]);
 
   useEffect(() => {
     if (!searchWord) return;
+
+    // 검색어가 바뀌면 state 를 초기화 한다.
+    dispatch({ type: 'init' });
+    
+    // 초기 데이터 가져오기
+    getSearchBooks(
+      {
+        query: searchWord,
+        sort: 'accuracy',
+        page: books.currentPage + 1,
+        size: size,
+        target: 'title',
+      },
+      dispatch,
+    );
+    
     // 옵저버
     const observer = new IntersectionObserver(
       (entries) => {
         // 옵저버의 관찰 대상이 하나이기 때문에 첫번째 엔트리만 확인하면 된다.
         if (entries[0].isIntersecting) {
-          // 초기에는 책 데이터가 아무것도 없기 때문에 옵저빙 하고자 하는 요소가 뷰포트에 걸려 데이터 요청이 실행되기 때문에
-          // 초기 데이터를 가져오는 요쳥을 따로 하지 않아도 된다.
           console.log('intersecting');
-          if (books.loading) return;
-          dispatch({ type: 'searching' });
+          // 데이터를 가져오는 중이거나 더이상 가져올 데이터가 없을 때 옵저버 무시
+          if (books.loading || books.isLast || books.items.length <= size) return;
+          dispatch({ type: 'searching' }); // books.loading 을 true 로 변경
         }
       },
       {
@@ -150,18 +163,20 @@ const Search = () => {
       },
     );
 
+    // 옵저버 설정
     if (observeRef.current) {
       observer.observe(observeRef.current);
     }
     // 검색어
     setNewSearchWord(searchWord);
 
+    // 옵저버 해제
     return () => {
       if (observeRef.current) {
         observer.unobserve(observeRef.current);
       }
     };
-  }, []);
+  }, [searchWord]);
 
   return (
     <section className="margin-sm md:margin-md mt-[60px] flex flex-col items-center">
@@ -174,7 +189,8 @@ const Search = () => {
           </p>
         </div>
         {/* 검색 결과 리스트 */}
-        <div className="grid grid-cols-3 md:grid-cols-5 gap-[30px] mb-[100px] text-md">
+        {/* 최소 높이를 스크린 높이로 하여 데이터가 없을 때 옵저버 인식 요소가 인식되지 않게 하여 추가 데이터 요청이 들어오지 않도록 함 */}
+        <div className="grid grid-cols-3 min-[800px]:grid-cols-4 min-[1100px]:grid-cols-5 gap-[30px] mb-[100px] text-md min-h-screen">
           {books.items.map((item, index) => (
             <BookPrev
               key={index}
