@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Dispatch, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import { useDispatch } from 'react-redux';
@@ -48,8 +49,10 @@ const App = () => {
 
   return (
     <>
-      <Header />
-      <Outlet />
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <Outlet />
+      </div>
       <Footer />
     </>
   );
