@@ -204,23 +204,23 @@ const Auth = () => {
 
   // Render
   return (
-    <main className={'flex flex-col items-center py-[100px] px-[5%]'}>
+    <main className={'flex flex-col items-center py-[10vh] px-[10%]'}>
       {/* 페이지 이름 */}
-      <h1 className={'text-xl font-bold'}>{authType === 'sign-in' ? '로그인' : '회원가입'}</h1>
+      <h1 className={'text-[1.1rem] font-black'}>{authType === 'sign-in' ? 'LogIn' : 'SignUp'}</h1>
 
-      <div className="flex items-center flex-col w-[350px]">
+      <div className="flex items-center flex-col w-full max-w-[350px]">
         {/* 로그인 관련 버튼 */}
         {authType === 'sign-in' && (
           <div className="w-full my-[40px] flex flex-col gap-9">
             {/* 이메일 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-envelope"></i>
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-envelope"></i>
                 <Input
                   ref={emailRef}
                   type={'email'}
                   placeholder={'이메일'}
-                  className={'px-5 py-6'}
+                  className={'pl-[3rem] pr-[1.25rem] py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, emailRegExp, setEmailErr);
                   }}
@@ -231,12 +231,12 @@ const Auth = () => {
             {/* 비밀번호 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-lock"></i>
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-lock"></i>
                 <Input
                   ref={passwordRef}
                   type={'password'}
                   placeholder={'비밀번호'}
-                  className={'px-5 py-6'}
+                  className={'pl-[3rem] pr-[1.25rem] py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, passwordRegExp, setPasswordErr);
                   }}
@@ -253,12 +253,12 @@ const Auth = () => {
             {/* 이메일 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-envelope"></i>
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-envelope"></i>
                 <Input
                   ref={emailRef}
                   type={'email'}
                   placeholder={'이메일'}
-                  className={'w-full px-5 py-6'}
+                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, emailRegExp, setEmailErr);
                   }}
@@ -269,12 +269,12 @@ const Auth = () => {
             {/* 비밀번호 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-lock"></i>
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-lock"></i>
                 <Input
                   ref={passwordRef}
                   type={'password'}
                   placeholder={'비밀번호'}
-                  className={'w-full px-5 py-6'}
+                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, passwordRegExp, setPasswordErr);
                   }}
@@ -285,23 +285,24 @@ const Auth = () => {
             {/* 닉네임 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-id-card-clip-alt"></i>
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-id-card-clip-alt"></i>
                 <Input
                   ref={nicknameRef}
                   type={'text'}
                   placeholder={'닉네임'}
-                  className={'w-full px-5 py-6'}
+                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, nicknameRegExp, setNicknameErr);
                   }}
                 />
               </div>
               {nicknameErr && <p className={'absolute left-0 top-14 text-red-600'}>닉네입은 8자 이상이어야 합니다</p>}
+              {/* 랜덤 닉네임 생성 버튼 */}
               <button
                 onClick={randomNicknameClickHandler}
                 onMouseEnter={() => setIsTooltipOpen(true)}
                 onMouseLeave={() => setIsTooltipOpen(false)}
-                className="absolute transition-all duration-300 -translate-y-1/2 bg-gray-200 rounded-full w-7 h-7 top-1/2 -right-10 hover:bg-gray-300"
+                className="absolute transition-all duration-300 -translate-y-1/2 bg-gray-200 rounded-full w-7 h-7 top-1/2 right-4 hover:bg-gray-300"
               >
                 <i className="flex items-start justify-center fi fi-rr-shuffle"></i>
                 {/* 툴팁 */}
@@ -315,12 +316,12 @@ const Auth = () => {
             {/* 주소 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-postal-address"></i>
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-postal-address"></i>
                 <Input
                   ref={addressRef}
                   type={'text'}
                   placeholder={'주소'}
-                  className={'w-full px-5 py-6'}
+                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
                   onChange={() => {
                     setAddressErr(false);
                   }}
@@ -331,19 +332,19 @@ const Auth = () => {
             {/* 상세주소 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-postal-address"></i>
-                <Input ref={addressDetailRef} type={'text'} placeholder={'상세주소'} className={'w-full px-5 py-6'} />
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-postal-address"></i>
+                <Input ref={addressDetailRef} type={'text'} placeholder={'상세주소'} className={'w-full pl-[3rem] pr-[1.25rem] py-6'} />
               </div>
             </div>
             {/* 휴대폰번호 */}
             <div className={'relative flex flex-col gap-5'}>
               <div>
-                <i className="absolute -translate-y-1/2 top-1/2 -left-7 fi fi-rr-mobile-notch"></i>
+                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-mobile-notch"></i>
                 <Input
                   ref={phoneNumberRef}
                   type={'text'}
                   placeholder={'휴대폰번호'}
-                  className={'w-full px-5 py-6'}
+                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
                   onChange={(e) => {
                     inputChangeHandler(e, phoneNumberRegExp, setPhoneNumberErr);
                   }}
