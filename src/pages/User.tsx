@@ -1,9 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { getJwt, removeJwt } from '@/utils/index.ts';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { changeProfileImgRequest } from '../api/request.ts';
-import PageTitle from '../components/PageTitle.tsx';
 import { updateProfileImage, userState } from '../redux/userSlice.ts';
 
 function orderDetailClickHandler(navigate: (path: string) => void) {
@@ -57,9 +57,7 @@ const User = () => {
 
   // Rendering
   return (
-    <div>
-      {/* 페이지 타이틀 */}
-      <PageTitle title={'내 정보'} />
+    <main className="py-[3rem]">
       {/* 개인정보 */}
       <section>
         {/* 프로필 */}
@@ -122,7 +120,7 @@ const User = () => {
           로그아웃
         </button>
       </section>
-    </div>
+    </main>
   );
 };
 
