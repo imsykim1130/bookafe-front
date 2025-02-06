@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
+import { getPointLogListRequest, getTotalPointRequest } from '../api/api.ts';
 import { PointLogItem } from '../api/item.ts';
-import { getPointLogListRequest, getTotalPointRequest } from '../api/request.ts';
 import Dropdown from './common/OrderDetailPage/component/Dropdown.tsx';
 
 const Point = () => {

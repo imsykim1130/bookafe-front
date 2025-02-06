@@ -5,7 +5,7 @@ import {
   getCommentFavoriteRequest,
   getIsCommentFavoriteRequest,
   putCommentFavoriteRequest,
-} from '../../../../api/request';
+} from '../../../../api/api';
 
 interface Props {
   commentId: number;

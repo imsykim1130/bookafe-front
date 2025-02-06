@@ -2,9 +2,9 @@
 import SearchBox from '@/components/SearchBox.tsx';
 import { Dispatch, Reducer, useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { getSearchBookRequest } from '../api/api.ts';
 import { BookPrevData } from '../api/item.ts';
 import { getSearchBookListRequestDto } from '../api/request.dto.ts';
-import { getSearchBookRequest } from '../api/request.ts';
 import { getSearchBookListResponseDto } from '../api/response.dto.ts';
 import BookPrev from '../components/BookPrev.tsx';
 
@@ -128,13 +128,12 @@ const Search = () => {
     );
   }, [books.loading]); // 옵저버가 감지되면 loading 을 true 로 변경시켜서 책 데이터를 추가로 가지고 오게된다.
 
-
   useEffect(() => {
     if (!searchWord) return;
 
     // 검색어가 바뀌면 state 를 초기화 한다.
     dispatch({ type: 'init' });
-    
+
     // 초기 데이터 가져오기
     getSearchBooks(
       {
@@ -146,7 +145,7 @@ const Search = () => {
       },
       dispatch,
     );
-    
+
     // 옵저버
     const observer = new IntersectionObserver(
       (entries) => {

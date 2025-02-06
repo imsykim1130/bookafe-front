@@ -1,5 +1,5 @@
+import { cancelFavoriteRequest, getFavoriteBookListRequest } from '@/api/api';
 import { FavoriteBookItem } from '@/api/item';
-import { cancelFavoriteRequest, getFavoriteBookListRequest } from '@/api/request';
 import { useEffect, useState } from 'react';
 
 import { useCookies } from 'react-cookie';

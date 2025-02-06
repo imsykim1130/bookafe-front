@@ -8,7 +8,7 @@ import Footer from './layout/Footer.tsx';
 import Header from './layout/Header.tsx';
 
 import { UnknownAction } from '@reduxjs/toolkit';
-import { getUserRequest } from './api/request.ts';
+import { getUserRequest } from './api/api.ts';
 import { GetUserResponseDto } from './api/response.dto.ts';
 import { error, loading, reset, update } from './redux/userSlice.ts';
 

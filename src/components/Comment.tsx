@@ -1,8 +1,8 @@
 import React, { Reducer, useEffect, useReducer, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { replyRequest } from '../api/api.ts';
 import { CommentItem } from '../api/item';
-import { replyRequest } from '../api/request.ts';
 import { ReplyAction, ReplyState } from '../reducer';
 import CommentField from './CommentField.tsx';
 import Reply from './Reply.tsx';

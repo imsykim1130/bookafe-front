@@ -2,11 +2,7 @@
 import { getJwt } from '@/utils';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  deleteRecommendBookRequest,
-  getRecommendedRequest,
-  registerRecommendBookRequest,
-} from '../../../../api/request';
+import { deleteRecommendBookRequest, getRecommendedRequest, registerRecommendBookRequest } from '../../../../api/api';
 
 const Recommend = ({ isbn }: { isbn: string | undefined }) => {
   const [isRecommended, setIsRecommended] = useState<boolean>(false);

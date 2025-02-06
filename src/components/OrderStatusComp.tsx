@@ -1,8 +1,8 @@
 import { getJwt } from '@/utils/cookie.ts';
 import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';
+import { changeDeliveryStatusRequest } from '../api/api.ts';
 import { DeliveryStatus } from '../api/item.ts';
-import { changeDeliveryStatusRequest } from '../api/request.ts';
 
 // function
 function getButtonName(name: 'READY' | 'DELIVERING' | 'DELIVERED' | string) {

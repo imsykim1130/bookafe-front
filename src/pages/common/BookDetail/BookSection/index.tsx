@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { getBookDetailRequest } from '../../../../api/api.ts';
 import { BookDetailData } from '../../../../api/item.ts';
-import { getBookDetailRequest } from '../../../../api/request.ts';
 import Cart from './Cart.tsx';
 import Favorite from './Favorite.tsx';
 import Recommend from './Recommend.tsx';

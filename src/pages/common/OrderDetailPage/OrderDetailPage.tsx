@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
+import { cancelOrderRequest, getOrderDetailListRequest } from '../../../api/api.ts';
 import { OrderDetail } from '../../../api/item.ts';
-import { cancelOrderRequest, getOrderDetailListRequest } from '../../../api/request.ts';
 import Dropdown from './component/Dropdown.tsx';
 import OrderDetailItem from './component/OrderDetailItem.tsx';
 

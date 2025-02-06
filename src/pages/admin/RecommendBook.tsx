@@ -7,13 +7,13 @@ import { getJwt } from '@/utils/cookie.ts';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { BookPrevData, RecommendBookItem } from '../../api/item.ts';
 import {
   deleteRecommendBookRequest,
   getAllRecommendBookRequest,
   getSearchBookRequest,
   registerRecommendBookRequest,
-} from '../../api/request.ts';
+} from '../../api/api.ts';
+import { BookPrevData, RecommendBookItem } from '../../api/item.ts';
 
 // const mock: RecommendBookItem = {
 //   title: 'hihi',

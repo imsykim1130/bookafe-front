@@ -1,4 +1,3 @@
-import { BookPrevData, CartBookData, CouponData, OrderInfoData } from '@/api/item';
 import {
   changeCartBookCountRequest,
   createOrderRequest,
@@ -8,7 +7,8 @@ import {
   getSearchBookListRequest,
   getTotalPointRequest,
   putBookToCartRequest,
-} from '@/api/request';
+} from '@/api/api';
+import { BookPrevData, CartBookData, CouponData, OrderInfoData } from '@/api/item';
 import { getSearchBookListRequestDto, PostOrderRequestDto } from '@/api/request.dto';
 import Button from '@/components/Button';
 import { Dispatch, forwardRef, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';

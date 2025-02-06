@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { deleteBookFromCartRequest, getIsCartRequest, putBookToCartRequest } from '../../../../api/request';
+import { deleteBookFromCartRequest, getIsCartRequest, putBookToCartRequest } from '../../../../api/api';
 
 const Cart = ({ isbn }: { isbn: string | undefined }) => {
   const [isCart, setIsCart] = useState<boolean>(false);

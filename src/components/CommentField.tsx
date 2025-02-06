@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Dispatch, forwardRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { commentRequest, replyRequest } from '../api/request.ts';
+import { commentRequest, replyRequest } from '../api/api.ts';
 import { ResponseDto } from '../api/response.dto.ts';
 
 interface Props {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { deleteBookFromFavoriteRequest, getIsFavoriteRequest, putBookToFavoriteRequest } from '../../../../api/request';
+import { deleteBookFromFavoriteRequest, getIsFavoriteRequest, putBookToFavoriteRequest } from '../../../../api/api';
 
 const Favorite = ({ isbn }: { isbn: string | undefined }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);

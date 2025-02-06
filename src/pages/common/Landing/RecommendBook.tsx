@@ -2,8 +2,8 @@
 import { ResponseDto } from '@/api/response.dto.ts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getRecommendBookRequest, GetRecommendBookResponseDto } from '../../../api/api.ts';
 import { TodayBookInterface } from '../../../api/item.ts';
-import { getRecommendBookRequest, GetRecommendBookResponseDto } from '../../../api/request.ts';
 
 const RecommendBook = () => {
   const [recommendBook, setRecommendBook] = useState<TodayBookInterface | null>(null);

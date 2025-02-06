@@ -1,4 +1,4 @@
-import { signInRequest, signUpRequest } from '@/api/request';
+import { signInRequest, signUpRequest } from '@/api/api';
 import { SignInRequestDto, SignUpRequestDto } from '@/api/request.dto';
 import { ResponseDto, SignInResponseDto } from '@/api/response.dto';
 import { Button } from '@/components/ui/button.tsx';
@@ -333,7 +333,12 @@ const Auth = () => {
             <div className={'relative flex flex-col gap-5'}>
               <div>
                 <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-postal-address"></i>
-                <Input ref={addressDetailRef} type={'text'} placeholder={'상세주소'} className={'w-full pl-[3rem] pr-[1.25rem] py-6'} />
+                <Input
+                  ref={addressDetailRef}
+                  type={'text'}
+                  placeholder={'상세주소'}
+                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
+                />
               </div>
             </div>
             {/* 휴대폰번호 */}

@@ -3,7 +3,7 @@ import { getJwt, removeJwt } from '@/utils/index.ts';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { changeProfileImgRequest } from '../api/request.ts';
+import { changeProfileImgRequest } from '../api/api.ts';
 import { updateProfileImage, userState } from '../redux/userSlice.ts';
 
 function orderDetailClickHandler(navigate: (path: string) => void) {
