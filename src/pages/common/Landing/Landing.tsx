@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { getSearchBookRequest } from '@/api/api.ts';
-import { BookPrevData } from '@/api/item.ts';
+import { BookSearchItem } from '@/api/item.ts';
 import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
 import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
 import BookPrev from '@/components/BookPrev.tsx';
@@ -17,7 +17,7 @@ const Landing = () => {
   const { role } = useSelector((state: { user: userState }) => state.user);
   const [searchWord, setSearchWord] = useState<string>('');
   const debouncedSearchWord = useDebounce(searchWord, 500);
-  const [searchBookList, setSearchBookList] = useState<BookPrevData[]>([]);
+  const [searchBookList, setSearchBookList] = useState<BookSearchItem[]>([]);
 
   // handler: 빈 화면 클릭 시 책 검색 지우기
   const emptyClickHandler = () => {

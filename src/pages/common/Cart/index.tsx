@@ -8,7 +8,7 @@ import {
   getTotalPointRequest,
   putBookToCartRequest,
 } from '@/api/api';
-import { BookPrevData, CartBookData, CouponData, OrderInfoData } from '@/api/item';
+import { BookSearchItem, CartBookData, CouponData, OrderInfoData } from '@/api/item';
 import { getSearchBookListRequestDto, PostOrderRequestDto } from '@/api/request.dto';
 import Button from '@/components/Button';
 import { Dispatch, forwardRef, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
@@ -29,7 +29,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const [cartBookList, setCartBookList] = useState<CartBookData[] | null>(null);
   const [keywordList, setKeywordList] = useState<string[]>([]);
-  const [keywordBookList, setKeywordBookList] = useState<BookPrevData[] | null>(null);
+  const [keywordBookList, setKeywordBookList] = useState<BookSearchItem[] | null>(null);
   const [keywordIndex, setKeywordIndex] = useState<number | null>(null);
 
   // gsap
