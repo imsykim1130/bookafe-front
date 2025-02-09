@@ -911,10 +911,10 @@ export interface GetRecommendBookResponseDto extends ResponseDto {
   todayBook: TodayBookInterface;
 }
 
-// 추천 책 가져오기
+// 오늘의 책 가져오기
 export const getRecommendBookRequest = async (): Promise<GetRecommendBookResponseDto | ResponseDto | null> => {
   return await axios
-    .get('http://localhost:8080/api/v1/book/recommend')
+    .get('http://localhost:8080/api/v1/book/today')
     .then((res): GetRecommendBookResponseDto => res.data)
     .catch((err: AxiosError): ResponseDto | null => {
       console.log(err.response);
