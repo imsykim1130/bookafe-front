@@ -3,7 +3,7 @@ import SearchBox from '@/components/SearchBox.tsx';
 import { Dispatch, Reducer, useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getSearchBookRequest } from '../api/api.ts';
-import { BookPrevData } from '../api/item.ts';
+import { BookSearchItem } from '../api/item.ts';
 import { getSearchBookListRequestDto } from '../api/request.dto.ts';
 import { getSearchBookListResponseDto } from '../api/response.dto.ts';
 import BookPrev from '../components/BookPrev.tsx';
@@ -11,7 +11,7 @@ import BookPrev from '../components/BookPrev.tsx';
 // index: interface
 // reducer state 타입
 interface BooksStateType {
-  items: BookPrevData[];
+  items: BookSearchItem[];
   loading: boolean;
   error: boolean;
   isLast: boolean;
@@ -22,7 +22,7 @@ interface BooksStateType {
 // reducer action 타입
 interface BooksActionType {
   type: string;
-  payload?: BookPrevData[];
+  payload?: BookSearchItem[];
   total?: number;
   targetPage?: number;
 }
@@ -52,7 +52,7 @@ const bookReducer: Reducer<BooksStateType, BooksActionType> = (state, action) =>
     console.log(state.currentPage);
     return {
       ...state,
-      items: [...state.items, ...(action.payload as BookPrevData[])], // 기존의 값에 추가로 불러온 값 합치기
+      items: [...state.items, ...(action.payload as BookSearchItem[])], // 기존의 값에 추가로 불러온 값 합치기
       loading: false,
       error: false,
       total: action.total,
@@ -69,7 +69,7 @@ const bookReducer: Reducer<BooksStateType, BooksActionType> = (state, action) =>
       ...state,
       isLast: true,
       total: action.total,
-      items: [...state.items, ...(action.payload as BookPrevData[])],
+      items: [...state.items, ...(action.payload as BookSearchItem[])],
     } as BooksStateType;
   }
 

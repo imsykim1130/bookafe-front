@@ -1,4 +1,4 @@
-import { BookDetailData, BookPrevData, CommentItem, DeliveryStatus, Meta, OrderDetail, UserItem } from './item.ts';
+import { BookDetailData, BookSearchItem, CommentItem, DeliveryStatus, Meta, OrderDetail, UserItem } from './item.ts';
 
 export interface ResponseDto {
   code: string;
@@ -17,7 +17,7 @@ export interface GetUserResponseDto extends ResponseDto {
 
 export interface getSearchBookListResponseDto extends ResponseDto {
   meta: Meta;
-  bookList: BookPrevData[];
+  bookList: BookSearchItem[];
 }
 
 export interface GetBookResponseDto extends ResponseDto {

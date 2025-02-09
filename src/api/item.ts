@@ -22,6 +22,14 @@ export interface BookPrevData {
   discountPercent: number;
 }
 
+export interface BookSearchItem {
+  isbn: string;
+  bookImg: string;
+  title: string;
+  author: string;
+  price: string;
+}
+
 export interface FavoriteBookItem {
   id: number;
   isbn: string;
