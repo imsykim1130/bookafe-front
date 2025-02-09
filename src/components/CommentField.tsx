@@ -14,7 +14,7 @@ interface Props {
 const CommentField = forwardRef<HTMLTextAreaElement, Props>((props, ref) => {
   const [comment, setComment] = useState<string>('');
   const { dispatch, isbn, commentId, placeholder } = props;
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const emojiList = ['😀', '🥲', '😍', '🤯', '😱'];
   const [emojiIndex, setEmojiIndex] = useState<number>(0);
 

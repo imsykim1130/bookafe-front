@@ -3,7 +3,6 @@ import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
 import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
 import SearchBox from '@/components/SearchBox.tsx';
 import { useDebounce } from '@/hook/index.ts';
-import { getJwt } from '@/utils/cookie.ts';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +12,7 @@ import {
   getSearchBookRequest,
   registerRecommendBookRequest,
 } from '../../api/api.ts';
-import { BookPrevData, RecommendBookItem } from '../../api/item.ts';
+import { BookSearchItem, RecommendBookItem } from '../../api/item.ts';
 
 // const mock: RecommendBookItem = {
 //   title: 'hihi',
@@ -26,7 +25,7 @@ import { BookPrevData, RecommendBookItem } from '../../api/item.ts';
 const RecommendBook = () => {
   const [cookies] = useCookies(['jwt']);
   const [recommentBookList, setRecommentBookList] = useState<RecommendBookItem[] | null>(null);
-  const [searchBookList, setSearchBookList] = useState<BookPrevData[] | null>(null);
+  const [searchBookList, setSearchBookList] = useState<BookSearchItem[] | null>(null);
   const [searchWord, setSearchWord] = useState<string>('');
   const debouncedSearchWord = useDebounce(searchWord, 400);
   const [isMouseInSerchSection, setIsMouseInSerchSection] = useState<boolean>(false);
@@ -41,7 +40,7 @@ const RecommendBook = () => {
   // 추천 책 추가
   const registerRecommendBook = (isbn: string) => {
     console.log('recommend');
-    registerRecommendBookRequest(getJwt(), isbn).then((res) => {
+    registerRecommendBookRequest(cookies.jwt, isbn).then((res) => {
       if (res !== true) {
         window.alert(res);
         return;
@@ -136,7 +135,7 @@ const RecommendBook = () => {
           <div className="shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-[10px]">
             {/* 검색결과 있을 때 */}
             {searchBookList && searchBookList.length > 0
-              ? searchBookList.map((book: BookPrevData) => (
+              ? searchBookList.map((book: BookSearchItem) => (
                   <div
                     key={book.isbn}
                     className="flex items-start justify-between px-4 py-4 hover:bg-gray-100 rounded-[10px] border-b-[1px] border-gray-100"

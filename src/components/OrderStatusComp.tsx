@@ -1,6 +1,6 @@
-import { getJwt } from '@/utils/cookie.ts';
 import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';
+import { useCookies } from 'react-cookie';
 import { changeDeliveryStatusRequest } from '../api/api.ts';
 import { DeliveryStatus } from '../api/item.ts';
 
@@ -83,6 +83,8 @@ const OrderStatusComp = ({
   renderKey: number;
   setRenderKey: Dispatch<SetStateAction<number>>;
 }) => {
+  const [cookies] = useCookies(['jwt']);
+
   return (
     <div className={'flex flex-col gap-[30px] border-b-[1px] border-black border-opacity-10 py-[30px]'}>
       {/* top */}
@@ -98,7 +100,7 @@ const OrderStatusComp = ({
         <button
           className={buttonShape(item.orderStatus)}
           onClick={() =>
-            deliveryStatusChangeButtonClickHandler(item.orderId, item.orderStatus, getJwt(), renderKey, setRenderKey)
+            deliveryStatusChangeButtonClickHandler(item.orderId, item.orderStatus, cookies.jwt, renderKey, setRenderKey)
           }
         >
           {getButtonName(item.orderStatus) ? getButtonName(item.orderStatus) : null}

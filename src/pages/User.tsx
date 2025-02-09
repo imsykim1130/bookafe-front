@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getJwt, removeJwt } from '@/utils/index.ts';
+import { useUserStore } from '@/zustand/userStore.ts';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { changeProfileImgRequest } from '../api/api.ts';
-import { updateProfileImage, userState } from '../redux/userSlice.ts';
 
 function orderDetailClickHandler(navigate: (path: string) => void) {
   navigate('/order/detail');
@@ -15,14 +14,13 @@ function pointClickHandler(navigate: (path: string) => void) {
 }
 
 function logoutClickHandler(navigate: (path: string) => void) {
-  removeJwt();
   navigate('/auth/sign-in');
 }
 
 const User = () => {
-  const { email, profileImg, createDate } = useSelector((state: { user: userState }) => state.user);
+  const { user, loading, error, updateProfileImg } = useUserStore();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [cookies] = useCookies(['jwt']);
 
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
 
@@ -36,24 +34,19 @@ const User = () => {
 
   // Effect
   useEffect(() => {
-    changeProfileImageUrl(profileImg);
-  }, [profileImg]);
+    if (!user || error || loading) return;
+    changeProfileImageUrl(user.profileImg);
+  }, [user?.profileImg]);
 
   const changeProfileImage = (file: File) => {
-    changeProfileImgRequest(getJwt(), file).then((result) => {
+    changeProfileImgRequest(cookies.jwt, file).then((result) => {
       if (!result) {
         window.alert('프로필 이미지 변경 실패! 다시 시도해주세요');
         return;
       }
-      dispatch(updateProfileImage(result));
+      updateProfileImg(result);
     });
   };
-
-  useEffect(() => {
-    if (!getJwt()) {
-      navigate('/auth/sign-in');
-    }
-  }, []);
 
   // Rendering
   return (
@@ -89,9 +82,9 @@ const User = () => {
           </label>
         </div>
         <div className={'mt-[20px] flex flex-col items-center gap-[5px]'}>
-          <p className={'text-md'}>{email ? email : '이메일 정보를 보기 위해서 로그인이 필요합니다'}</p>
+          <p className={'text-md'}>{user && user.email ? user.email : '이메일 정보를 보기 위해서 로그인이 필요합니다'}</p>
           <p className={'text-md text-light-black'}>
-            {createDate ? '가입일 ' + createDate : '가입일을 보기 위해서 로그인이 필요합니다'}
+            {user && user.createDate ? '가입일 ' + user.createDate : '가입일을 보기 위해서 로그인이 필요합니다'}
           </p>
         </div>
       </section>

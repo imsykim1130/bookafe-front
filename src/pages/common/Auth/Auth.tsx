@@ -13,9 +13,9 @@ const Auth = () => {
   // index: top
   const { authType } = useParams();
   const navigate = useNavigate();
-  const [, setCookies] = useCookies(['jwt']);
   const { state } = useLocation();
   const pathname = state ? state.pathname : null;
+  const [,setCookie] = useCookies(['jwt']);
 
   // Ref
   const emailRef = useRef<HTMLInputElement>(null);
@@ -49,14 +49,6 @@ const Auth = () => {
     }
   }
 
-  // function: 토큰 쿠키에 넣기
-  const saveJwtToCookie = (jwt: string) => {
-    const now = Date.now();
-    const after = moment(now).add(1, 'hour').toDate();
-    const expires = after; // 1시간
-    setCookies('jwt', jwt, { expires, path: '/' });
-  };
-
   // function: 로그인
   const signIn = () => {
     if (!emailRef.current || !passwordRef.current || emailErr || passwordErr) return;
@@ -82,14 +74,15 @@ const Auth = () => {
 
       // 로그인 성공
       const { jwt } = response as SignInResponseDto;
-      saveJwtToCookie(jwt);
+      const expire = moment().add(1, "m").toDate(); // 유효시간 1시간
+      setCookie("jwt", jwt, {path: "/", expires : expire});
 
       // 페이지 이동
       if (pathname) {
         navigate(pathname);
         return;
       }
-      navigate('/');
+      navigate("/");
     });
   };
 

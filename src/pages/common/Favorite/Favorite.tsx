@@ -1,20 +1,18 @@
 import { cancelFavoriteRequest, getFavoriteBookListRequest } from '@/api/api';
 import { FavoriteBookItem } from '@/api/item';
 import { useEffect, useState } from 'react';
-
 import { useCookies } from 'react-cookie';
-
 import { useNavigate } from 'react-router-dom';
 import FavoriteBook from './component/FavoriteBook';
 
 const Favorite = () => {
-  const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const [favoriteBookList, setFavoriteBookList] = useState<FavoriteBookItem[] | null>(null);
+  const [cookie] = useCookies(['jwt']);
 
   // 초기 렌더링에 필요한 데이터 가져오기
   useEffect(() => {
-    if (!cookies.jwt) {
+    if (!cookie.jwt) {
       window.alert('로그인이 필요합니다');
       navigate('/auth/sign-in', {
         state: { pathname: '/favorite' },
@@ -27,7 +25,7 @@ const Favorite = () => {
 
   // 좋아요 책 정보 가져오기
   const getFavoriteBookList = () => {
-    getFavoriteBookListRequest(cookies.jwt).then((result) => {
+    getFavoriteBookListRequest(cookie.jwt).then((result) => {
       if (result) {
         setFavoriteBookList(result);
         return;
@@ -37,7 +35,7 @@ const Favorite = () => {
 
   // 좋아요 책 삭제 버튼 클릭 핸들러
   const deleteFavoriteBook = (isbn: string) => {
-    cancelFavoriteRequest(cookies.jwt, isbn).then((result) => {
+    cancelFavoriteRequest(cookie.jwt, isbn).then((result) => {
       if (result) {
         getFavoriteBookList();
       }

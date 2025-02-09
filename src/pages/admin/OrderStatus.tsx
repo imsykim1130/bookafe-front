@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { GetDeliveryStatusListResponseDto } from '@/api/response.dto.ts';
-import { getJwt } from '@/utils/index.ts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDeliveryStatusListRequest } from '../../api/api.ts';
@@ -8,10 +7,12 @@ import { DeliveryStatus } from '../../api/item.ts';
 import DateInput from '../../components/DateInput';
 import OrderStatusComp from '../../components/OrderStatusComp.tsx';
 import Dropdown from '../common/OrderDetailPage/component/Dropdown.tsx';
+import { useCookies } from 'react-cookie';
 
 // component
 const OrderStatus = () => {
   const navigate = useNavigate();
+  const [cookies] = useCookies(['jwt']);
 
   const now = new Date();
 
@@ -27,7 +28,7 @@ const OrderStatus = () => {
   const orderStatusList = ['전체', '배송준비중', '배송중', '배송완료'];
 
   const getDeliveryStatusList = () => {
-    getDeliveryStatusListRequest(orderStatus, date, getJwt(), page).then((response) => {
+    getDeliveryStatusListRequest(orderStatus, date, cookies.jwt, page).then((response) => {
       const { isFirst, isLast, deliveryStatusViewList } = response as GetDeliveryStatusListResponseDto;
       setOrderStatusItemList(deliveryStatusViewList);
       setIsFirst(isFirst);
@@ -37,7 +38,7 @@ const OrderStatus = () => {
 
   useEffect(() => {
     // 토큰 검증
-    if (!getJwt()) {
+    if (!cookies.jwt) {
       navigate('/auth/sign-in');
     }
     getDeliveryStatusList();

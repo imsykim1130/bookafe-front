@@ -1,7 +1,6 @@
 import moment from 'moment/moment';
 import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import {
   deleteCommentRequest,
@@ -9,9 +8,10 @@ import {
   modifyCommentRequest,
   postCommentRequest,
 } from '../../../../api/api.ts';
-import { CommentItem, UserItem } from '../../../../api/item.ts';
+import { CommentItem } from '../../../../api/item.ts';
 import { PostCommentRequestDto } from '../../../../api/request.dto.ts';
 import FavoriteCount from './FavoriteCount.tsx';
+import { useUserStore } from '@/zustand/userStore.ts';
 
 interface CommentCompProp {
   comment: CommentItem;
@@ -19,8 +19,8 @@ interface CommentCompProp {
 }
 
 const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
-  const { nickname } = useSelector((state: { user: UserItem }) => state.user);
-  const [cookies, _] = useCookies();
+  const nickname = useUserStore(state => state.user ? state.user.nickname : null);
+  const [cookies] = useCookies(['jwt']);
   const { isbn } = useParams();
 
   const [content, setContent] = useState<string>('');
@@ -104,7 +104,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
           <img src={getProfileImageUrl(comment.profileImg)} alt="profile image" />
         ) : (
           <div className={'flex justify-center items-center w-full h-full bg-black bg-opacity-5'}>
-            <i className="fi fi-br-user text-black text-opacity-20"></i>
+            <i className="text-black fi fi-br-user text-opacity-20"></i>
           </div>
         )}
       </div>

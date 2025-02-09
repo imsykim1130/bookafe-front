@@ -1,20 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getJwt } from '@/utils';
 import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { deleteRecommendBookRequest, getRecommendedRequest, registerRecommendBookRequest } from '../../../../api/api';
 
 const Recommend = ({ isbn }: { isbn: string | undefined }) => {
   const [isRecommended, setIsRecommended] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [cookies] = useCookies(['jwt']);
 
   // 추천 책 여부 가져오기
   const getRecommended = async () => {
-    if (!getJwt()) {
+    if (!cookies.jwt) {
       return;
     }
     if (!isbn) return;
-    getRecommendedRequest(getJwt(), isbn).then((res) => {
+    getRecommendedRequest(cookies.jwt, isbn).then((res) => {
       if (res === null) {
         window.alert('오류가 발생했습니다 다시 시도해주세요');
         return;
@@ -25,7 +26,7 @@ const Recommend = ({ isbn }: { isbn: string | undefined }) => {
 
   // 추천 책 추가
   const registerRecommendBook = () => {
-    if (!getJwt()) {
+    if (!cookies.jwt) {
       window.alert('로그인이 필요합니다.');
       navigate('/auth/sign-in', {
         state: {
@@ -35,7 +36,7 @@ const Recommend = ({ isbn }: { isbn: string | undefined }) => {
       return;
     }
     if (!isbn) return;
-    registerRecommendBookRequest(getJwt(), isbn).then((res) => {
+    registerRecommendBookRequest(cookies.jwt, isbn).then((res) => {
       if (res !== true) {
         window.alert(res);
         return;
@@ -46,7 +47,7 @@ const Recommend = ({ isbn }: { isbn: string | undefined }) => {
 
   // 추천 책 삭제
   const deleteRecommendBook = () => {
-    if (!getJwt()) {
+    if (!cookies.jwt) {
       window.alert('로그인이 필요합니다.');
       navigate('/auth/sign-in', {
         state: {
@@ -56,7 +57,7 @@ const Recommend = ({ isbn }: { isbn: string | undefined }) => {
       return;
     }
     if (!isbn) return;
-    deleteRecommendBookRequest(getJwt(), isbn).then((res) => {
+    deleteRecommendBookRequest(cookies.jwt, isbn).then((res) => {
       if (res === null) {
         window.alert('오류가 발생했습니다 다시 시도해주세요');
         return;

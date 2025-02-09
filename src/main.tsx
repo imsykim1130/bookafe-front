@@ -1,11 +1,10 @@
 import { createRoot } from 'react-dom/client';
-import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import './index.css';
 
 import App from './App.tsx';
-import User from './pages/User.tsx';
-import { Provider } from 'react-redux';
 import Search from './pages/Search.tsx';
+import User from './pages/User.tsx';
 
 import OrderSuccess from './pages/OrderSuccess.tsx';
 import Point from './pages/Point.tsx';
@@ -13,14 +12,14 @@ import OrderStatus from './pages/admin/OrderStatus.tsx';
 import RecommendBook from './pages/admin/RecommendBook.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
 
-import { store } from './redux';
+import { CookiesProvider } from 'react-cookie';
+import Auth from './pages/common/Auth/Auth.tsx';
 import BookDetail from './pages/common/BookDetail';
+import Cart from './pages/common/Cart/index.tsx';
+import ErrorPage from './pages/common/ErrorPage/ErrorPage.tsx';
+import Favorite from './pages/common/Favorite/Favorite.tsx';
 import Landing from './pages/common/Landing/Landing.tsx';
 import OrderDetailPage from './pages/common/OrderDetailPage/OrderDetailPage.tsx';
-import Cart from './pages/common/Cart/index.tsx';
-import Favorite from './pages/common/Favorite/Favorite.tsx';
-import Auth from './pages/common/Auth/Auth.tsx';
-import ErrorPage from './pages/common/ErrorPage/ErrorPage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -88,7 +87,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
+  <CookiesProvider>
     <RouterProvider router={router} />
-  </Provider>,
+  </CookiesProvider>,
 );

@@ -6,18 +6,18 @@ import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
 import BookPrev from '@/components/BookPrev.tsx';
 import SearchBox from '@/components/SearchBox.tsx';
 import { useDebounce } from '@/hook/index.ts';
-import { userState } from '@/redux/userSlice.ts';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import AdminLanding from './AdminLanding.tsx';
 import RecommendBook from './RecommendBook.tsx';
 import Top10 from './Top10.tsx';
+import { useUserStore } from '@/zustand/userStore.ts';
 
 const Landing = () => {
-  const { role } = useSelector((state: { user: userState }) => state.user);
   const [searchWord, setSearchWord] = useState<string>('');
   const debouncedSearchWord = useDebounce(searchWord, 500);
   const [searchBookList, setSearchBookList] = useState<BookSearchItem[]>([]);
+  const {user} = useUserStore();
+  const role = user ? user.role : "ROLE_USER";
 
   // handler: 빈 화면 클릭 시 책 검색 지우기
   const emptyClickHandler = () => {

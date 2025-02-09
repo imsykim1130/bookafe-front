@@ -1,43 +1,29 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Dispatch, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import Footer from './layout/Footer.tsx';
 import Header from './layout/Header.tsx';
 
-import { UnknownAction } from '@reduxjs/toolkit';
+import { useCookies } from 'react-cookie';
 import { getUserRequest } from './api/api.ts';
 import { GetUserResponseDto, ResponseDto } from './api/response.dto.ts';
-import { error, loading, reset, update } from './redux/userSlice.ts';
-import { getJwt } from './utils/cookie.ts';
 import { useUserStore } from './zustand/userStore.ts';
 
 const App = () => {
-  const dispatch = useDispatch();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [cookies] = useCookies(['jwt']);
+  const { user, loadingUser, errorUser, updateUser, resetUser } = useUserStore();
 
-  const { loadingUser, errorUser, updateUser, resetUser } = useUserStore();
-
-  const getUser = async (dispatch: Dispatch<UnknownAction>, jwt: string) => {
-    dispatch(loading());
-    await getUserRequest(jwt)
-      .then((response) => {
-        const { user } = response.data as GetUserResponseDto;
-        dispatch(update(user));
-      })
-      .catch(() => {
-        dispatch(error());
-      });
-  };
-
-  // zustand userStore 에 유저 정보 가져오기
+  // function: zustand userStore 에 유저 정보 가져오기
   const zustandGetUserStore = () => {
     // 로딩 표시
     loadingUser();
-    getUserRequest(getJwt())
+    getUserRequest(cookies.jwt)
       .then((res) => {
         // 성공
+        console.log('zustand user 정보 가져오기 성공');
         const { user, totalPoint } = res.data as GetUserResponseDto;
         updateUser(user, totalPoint);
       })
@@ -56,24 +42,26 @@ const App = () => {
       });
   };
 
+  // effect: 쿠키 변경 시 jwt 가 없으면 userStore 비우기
+  // jwt 가 있으면 새로운 user 값 useStore 로 가져오기
   useEffect(() => {
-    // 새로고침 되어도 유저 정보를 받아오게끔 하는 역할
-    // jwt 확인
-    // 있으면 유저정보 가져오기
-    // 없으면 유저정보 초기화
-    if (!getJwt()) {
-      dispatch(reset());
-      sessionStorage.clear();
+    if (!cookies.jwt && user) {
+      resetUser();
+      navigate('/auth/sign-in');
       return;
     }
-    getUser(dispatch, getJwt());
-  }, [getJwt()]);
+    
+    if(cookies.jwt && !user) {
+      zustandGetUserStore();
+    }
+  }, [cookies]);
 
-  // 페이지 이동 시 스크롤 맨 위로 이동
+  // effect: 페이지 이동 시 스크롤 맨 위로 이동
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  // render
   return (
     <>
       <div className="flex flex-col min-h-screen">
