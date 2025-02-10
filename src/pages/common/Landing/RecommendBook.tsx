@@ -71,10 +71,11 @@ const RecommendBook = () => {
             </div>
             <div className={'w-[120px]'}>
               {recommendBook ? (
+                // 책 이미지
                 <img
                   src={recommendBook.bookImg}
                   alt="book cover image"
-                  className={'w-full rounded-[10px] shadow-[6px_6px_10px_rgba(0,0,0,0.6)]'}
+                  className={'w-full rounded-[10px] shadow-[6px_6px_15px_rgba(0,0,0,0.4)]'}
                 />
               ) : null}
             </div>
