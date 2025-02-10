@@ -16,7 +16,7 @@ const Auth = () => {
   const { state } = useLocation();
   const pathname = state ? state.pathname : null;
   const [,setCookie] = useCookies(['jwt']);
-
+  
   // Ref
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -74,7 +74,7 @@ const Auth = () => {
 
       // 로그인 성공
       const { jwt } = response as SignInResponseDto;
-      const expire = moment().add(1, "m").toDate(); // 유효시간 1시간
+      const expire = moment().add(1, "hour").toDate(); // 유효시간 1시간
       setCookie("jwt", jwt, {path: "/", expires : expire});
 
       // 페이지 이동
