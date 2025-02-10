@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useUserStore } from '@/zustand/userStore.ts';
 import moment from 'moment/moment';
 import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -12,7 +13,6 @@ import {
 import { CommentItem } from '../../../../api/item.ts';
 import { PostCommentRequestDto } from '../../../../api/request.dto.ts';
 import FavoriteCount from './FavoriteCount.tsx';
-import { useUserStore } from '@/zustand/userStore.ts';
 
 interface CommentCompProp {
   comment: CommentItem;
@@ -20,7 +20,7 @@ interface CommentCompProp {
 }
 
 const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
-  const nickname = useUserStore(state => state.user ? state.user.nickname : null);
+  const nickname = useUserStore((state) => (state.user ? state.user.nickname : null));
   const [cookies] = useCookies(['jwt']);
   const { isbn } = useParams();
 
@@ -50,14 +50,13 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
 
   // effect: 리뷰 수정 모드로 변경시 리뷰 작성창에 자동으로 포커스 주기
   useEffect(() => {
-    if(!isModify || !reviewRef.current) return;
+    if (!isModify || !reviewRef.current) return;
     reviewRef.current.focus();
     // reviewRef.current.setSelectionRange(content.length, content.length);
     reviewRef.current.value = '';
     reviewRef.current.value = content;
+  }, [isModify]);
 
-  }, [isModify])
-  
   // function: 댓글 수정 요청
   const modifyComment = () => {
     modifyCommentRequest(cookies.jwt, comment.id, content).then((res) => {
@@ -90,6 +89,14 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
       }
       setReplyList(res);
     });
+  };
+
+  // function: 댓글 보기 버튼 클릭 핸들러
+  const viewCommentBtnClickHandler = () => {
+    setIsReplyOpen(!isReplyOpen);
+    if (!isReplyOpen) {
+      getReplyList();
+    }
   };
 
   // function: 리뷰 수정 취소 버튼 클릭 핸들러
@@ -181,7 +188,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
       <div className={'flex flex-col gap-[20px]'}>
         {replyList.map((item) => (
           // 리플
-          <div key={item.id} className={'flex flex-col gap-[10px] p-[20px] rounded-[5px] bg-black bg-opacity-10'}>
+          <div key={item.id} className={'flex flex-col gap-[10px] p-[20px] rounded-[5px] bg-black bg-opacity-5'}>
             <div className={'flex items-center gap-[10px]'}>
               <span>{`re : ${item.nickname}`}</span>
               <span className={'text-black text-opacity-60'}>{moment(item.writeDate).format('YYYY.MM.DD')}</span>
@@ -219,15 +226,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
       </div>
       <div className={'mb-[30px] flex gap-[20px] justify-end'}>
         {/* 리플 개수 표시 */}
-        <div
-          className={'flex gap-[5px] items-center cursor-pointer'}
-          onClick={() => {
-            setIsReplyOpen(!isReplyOpen);
-            if (!isReplyOpen) {
-              getReplyList();
-            }
-          }}
-        >
+        <div className={'flex gap-[5px] items-center cursor-pointer'} onClick={viewCommentBtnClickHandler}>
           <span>💬</span>
           <span>{replyCount}</span>
         </div>
@@ -238,7 +237,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
       {isReplyOpen && (
         <div className={'pl-[30px] flex flex-col gap-[30px]'}>
           {/* 리플 리스트 */}
-          {replyList && replyList.length ? replyListRender() : null}
+          {replyList && replyList.length ? replyListRender() : <p className="px-4 text-gray-500">댓글이 없어요. 첫 댓글을 남겨보세요 👍</p>}
           {/* 리플 작성창 */}
           {cookies.jwt && !comment.isDeleted && replyContentRender()}
         </div>
