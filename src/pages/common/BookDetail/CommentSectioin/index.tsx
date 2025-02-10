@@ -7,6 +7,8 @@ import { PostCommentRequestDto } from '../../../../api/request.dto.ts';
 import CommentComp from './CommentComp.tsx';
 
 interface Props {
+  // 책이 db 에 있지 않아 카카오 api 에서 받아와야 할 때가 있다.
+  // api 에서 데이터를 받고난 뒤 리뷰를 불러오기 위한 prop
   bookLoading: boolean;
 }
 
@@ -21,6 +23,8 @@ const CommentSection = ({ bookLoading }: Props) => {
   const [emojiIndex, setEmojiIndex] = useState<number>(0);
   const emojiList = ['😀', '🥲', '🤯', '😱'];
 
+
+  // function: 리뷰 가져오기
   const getCommentList = () => {
     if (!isbn) return;
     getCommentListRequest(isbn).then((result) => {
@@ -31,6 +35,7 @@ const CommentSection = ({ bookLoading }: Props) => {
     });
   };
 
+  // function: 리뷰 작성
   const postComment = async (requestDto: PostCommentRequestDto) => {
     return await postCommentRequest(cookies.jwt, requestDto).then((res) => {
       if (!res) {
@@ -41,11 +46,13 @@ const CommentSection = ({ bookLoading }: Props) => {
     });
   };
 
+  // effect: 화면 로딩 시 리뷰 불러오기
   useEffect(() => {
     if (!bookLoading) return;
     getCommentList();
   }, [bookLoading]);
 
+  // render
   return (
     <section className={'flex justify-center mt-[60px] mx-[5%] text-[14px]'}>
       <div className={'w-full max-w-[700px]'}>
