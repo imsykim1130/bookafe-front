@@ -202,7 +202,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
   // render //
   return (
     // 리뷰
-    <article className={'flex flex-col pt-[20px] border-b-[1px] border-black border-opacity-20'}>
+    <article className={'flex flex-col pt-[20px] border-b-[1px] border-black border-opacity-10'}>
       <div>
         <div className={'flex justify-between items-center'}>
           {/* 리뷰 관련 정보 */}
