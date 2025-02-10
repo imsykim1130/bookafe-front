@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import moment from 'moment/moment';
 import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -23,6 +24,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
   const [cookies] = useCookies(['jwt']);
   const { isbn } = useParams();
 
+  const reviewRef = useRef<HTMLTextAreaElement>(null);
   const [content, setContent] = useState<string>('');
   const [isModify, setIsModify] = useState<boolean>(false);
   const originalContent = useRef<string>('');
@@ -32,12 +34,13 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
   const [replyContent, setReplyContent] = useState<string>('');
   const [replyCount, setReplyCount] = useState<number>(0);
 
-  // effect
+  // effect: 로딩 시 리뷰와 해당 리뷰에 달린 댓글의 개수 가져오기
   useEffect(() => {
     setContent(comment.content);
     setReplyCount(comment.replyCount);
   }, []);
 
+  // effect: 리뷰의 댓글에 변경이 생기면 댓글 개수도 변경
   useEffect(() => {
     if (!replyList) {
       return;
@@ -45,8 +48,17 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
     setReplyCount(replyList.length);
   }, [replyList]);
 
-  // request
-  /* 댓글 수정 요청 */
+  // effect: 리뷰 수정 모드로 변경시 리뷰 작성창에 자동으로 포커스 주기
+  useEffect(() => {
+    if(!isModify || !reviewRef.current) return;
+    reviewRef.current.focus();
+    // reviewRef.current.setSelectionRange(content.length, content.length);
+    reviewRef.current.value = '';
+    reviewRef.current.value = content;
+
+  }, [isModify])
+  
+  // function: 댓글 수정 요청
   const modifyComment = () => {
     modifyCommentRequest(cookies.jwt, comment.id, content).then((res) => {
       if (!res) {
@@ -58,7 +70,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
     });
   };
 
-  /* 댓글 삭제 요청 */
+  // function: 댓글 삭제 요청
   const deleteComment = () => {
     deleteCommentRequest(cookies.jwt, comment.id).then((res) => {
       if (!res) {
@@ -69,7 +81,7 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
     });
   };
 
-  /* 리플 가져오기 요청 */
+  // function: 리플 가져오기 요청
   const getReplyList = () => {
     getReplyListRequest(comment.id).then((res) => {
       if (!res) {
@@ -80,23 +92,24 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
     });
   };
 
-  // handler
+  // function: 리뷰 수정 취소 버튼 클릭 핸들러
   const commentModifyCancelBtnClickHandler = () => {
     setIsModify(false);
     setContent(originalContent.current);
   };
 
+  // function: 리뷰 수정 버튼 클릭 핸들러
   const commentModifyBtnClickHandler = () => {
-    setIsModify(true);
     originalContent.current = content;
+    setIsModify(true);
   };
 
-  // function
+  // function : 이미지 이름으로 이미지를 가져올 수 있는 url 주소로 변경
   const getProfileImageUrl = (fileName: string) => {
     return `http://localhost:8080/image/${fileName}`;
   };
 
-  // render 함수
+  // render
   const commentInfoRender = () => (
     <div className={'flex gap-[10px] items-center'}>
       <div className={'w-[30px] h-[30px] rounded-full overflow-hidden flex justify-center items-center'}>
@@ -194,8 +207,9 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
         <div className={'pl-[40px] mt-[10px]'}>
           {isModify ? (
             <textarea
+              ref={reviewRef}
               value={content}
-              className={'outline-none resize-none w-full'}
+              className={`outline-none resize-none w-full`}
               onChange={(e) => setContent(e.target.value)}
             />
           ) : (
