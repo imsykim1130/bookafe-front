@@ -24,6 +24,7 @@ import {
 } from './request.dto.ts';
 import {
   GetCommentListResponse,
+  getCouponListResponseDto,
   GetDeliveryStatusListResponseDto,
   GetOrderDetailListResponseDto,
   getSearchBookListResponseDto,
@@ -358,8 +359,9 @@ export const getCouponListRequest = async (token: string) => {
         Authorization: `Bearer ${token}`,
       },
     })
-    .then((res): CouponData[] => {
-      return res.data;
+    .then((res) : CouponData[] => {
+      const {userCouponViewList} = res.data as getCouponListResponseDto;
+      return userCouponViewList;
     })
     .catch((err) => {
       console.log(err.response.data);

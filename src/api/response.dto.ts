@@ -1,4 +1,4 @@
-import { BookDetailData, BookSearchItem, CommentItem, DeliveryStatus, Meta, OrderDetail, UserItem } from './item.ts';
+import { BookDetailData, BookSearchItem, CommentItem, CouponData, DeliveryStatus, Meta, OrderDetail, UserItem } from './item.ts';
 
 export interface ResponseDto {
   code: string;
@@ -46,4 +46,8 @@ export interface GetDeliveryStatusListResponseDto {
   isFirst: boolean;
   isLast: boolean;
   deliveryStatusViewList: DeliveryStatus[];
+}
+
+export interface getCouponListResponseDto extends ResponseDto{
+  userCouponViewList: CouponData[];
 }
