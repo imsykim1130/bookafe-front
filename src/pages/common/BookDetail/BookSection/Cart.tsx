@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
@@ -5,7 +6,7 @@ import { deleteBookFromCartRequest, getIsCartRequest, putBookToCartRequest } fro
 
 const Cart = ({ isbn }: { isbn: string | undefined }) => {
   const [isCart, setIsCart] = useState<boolean>(false);
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
 
   // 장바구니 여부
