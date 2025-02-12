@@ -153,3 +153,12 @@ export interface Top10BookItem {
   author: string;
   favoriteCount: number;
 }
+
+export interface DeliveryInfoItem {
+  name: string;
+  isDefault: boolean;
+  receiver: string;
+  receiverPhoneNumber: string;
+  address: string;
+  addressDetail: string;
+}

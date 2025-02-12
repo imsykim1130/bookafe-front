@@ -15,11 +15,11 @@ import UserManagement from './pages/admin/UserManagement.tsx';
 import { CookiesProvider } from 'react-cookie';
 import Auth from './pages/common/Auth/Auth.tsx';
 import BookDetail from './pages/common/BookDetail';
-import Cart from './pages/common/Cart/Cart.tsx';
 import ErrorPage from './pages/common/ErrorPage/ErrorPage.tsx';
 import Favorite from './pages/common/Favorite/Favorite.tsx';
 import Landing from './pages/common/Landing/Landing.tsx';
 import OrderDetailPage from './pages/common/OrderDetailPage/OrderDetailPage.tsx';
+import CartFix from '@/pages/common/Cart/CartFix.tsx';
 
 const router = createBrowserRouter([
   {
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/cart',
-        element: <Cart />,
+        element: <CartFix />,
       },
       {
         path: '/book/detail/:isbn',
