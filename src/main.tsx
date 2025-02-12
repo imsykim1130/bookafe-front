@@ -15,7 +15,7 @@ import UserManagement from './pages/admin/UserManagement.tsx';
 import { CookiesProvider } from 'react-cookie';
 import Auth from './pages/common/Auth/Auth.tsx';
 import BookDetail from './pages/common/BookDetail';
-import Cart from './pages/common/Cart/index.tsx';
+import Cart from './pages/common/Cart/Cart.tsx';
 import ErrorPage from './pages/common/ErrorPage/ErrorPage.tsx';
 import Favorite from './pages/common/Favorite/Favorite.tsx';
 import Landing from './pages/common/Landing/Landing.tsx';
