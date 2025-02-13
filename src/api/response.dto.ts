@@ -1,4 +1,5 @@
 import { BookDetailData, BookSearchItem, CommentItem, CouponData, DeliveryStatus, Meta, OrderDetail, UserItem } from './item.ts';
+import { DeliveryInfoItem } from '@/api/item.ts';
 
 export interface ResponseDto {
   code: string;
@@ -50,4 +51,8 @@ export interface GetDeliveryStatusListResponseDto {
 
 export interface getCouponListResponseDto extends ResponseDto{
   userCouponViewList: CouponData[];
+}
+
+export interface GetDeliveryInfoResponseDto extends ResponseDto{
+  userDeliveryInfo: DeliveryInfoItem;
 }

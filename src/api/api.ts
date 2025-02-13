@@ -359,8 +359,8 @@ export const getCouponListRequest = async (token: string) => {
         Authorization: `Bearer ${token}`,
       },
     })
-    .then((res) : CouponData[] => {
-      const {userCouponViewList} = res.data as getCouponListResponseDto;
+    .then((res): CouponData[] => {
+      const { userCouponViewList } = res.data as getCouponListResponseDto;
       return userCouponViewList;
     })
     .catch((err) => {
@@ -992,4 +992,9 @@ export const getTop10BookListRequest = async () => {
       console.log(err.response.data);
       return null;
     });
+};
+
+// 유저 기본 배송정보 가져오기
+export const getDeliveryInfoRequest = async () => {
+  return await axios.get('http://localhost:8080/api/v1/user/delivery-info');
 };

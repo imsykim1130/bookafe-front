@@ -1,22 +1,43 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { getDeliveryInfoRequest } from '@/api/api';
 import { DeliveryInfoItem } from '@/api/item.ts';
+import { GetDeliveryInfoResponseDto, ResponseDto } from '@/api/response.dto';
 import { useEffect, useState } from 'react';
 
 const CartDeliveryInfo = () => {
-  const deliveryInfoMock: DeliveryInfoItem = {
-    name: '집',
-    isDefault: true,
-    receiver: '김소영',
-    receiverPhoneNumber: '010-4053-8553',
-    address: '창원시 마산회원구 봉암북3길 8',
-    addressDetail: '202 호',
+  // const deliveryInfoMock: DeliveryInfoItem = {
+  //   name: '집',
+  //   isDefault: true,
+  //   receiver: '김소영',
+  //   receiverPhoneNumber: '010-4053-8553',
+  //   address: '창원시 마산회원구 봉암북3길 8',
+  //   addressDetail: '202 호',
+  // };
+
+  const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfoItem>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  // function: 배송정보 가져오기 요청
+  const getDeliveryInfo = () => {
+    setError(false);
+    getDeliveryInfoRequest()
+      .then((response) => {
+        const { userDeliveryInfo } = response.data as GetDeliveryInfoResponseDto;
+        setDeliveryInfo(userDeliveryInfo);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        setError(true);
+        const { message } = err.response.data as ResponseDto;
+        console.log(message);
+      });
   };
-  const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfoItem | null>(null);
 
   // effect: 로딩 시 배송지 정보 가져오기
   useEffect(() => {
-    // setDeliveryInfo(null);
-    setDeliveryInfo(deliveryInfoMock);
+    getDeliveryInfo();
   }, []);
 
   return (
@@ -24,7 +45,14 @@ const CartDeliveryInfo = () => {
       {/* 배송지 정보*/}
       <div className="flex">
         <p className={'min-w-[7rem] font-bold'}>배송지 정보</p>
-        {deliveryInfo ? (
+        {/* 데이터 로딩중 */}
+        {loading ? (
+          <div className="flex-1">
+            <p>로딩중</p>
+          </div>
+        ) : null}
+        {/* 데이터 가져오기 성공 */}
+        {!loading && deliveryInfo ? (
           <div className={'flex-1 flex flex-col gap-[0.4rem]'}>
             {/* 배송지 */}
             <div className={'flex gap-[1rem] items-center'}>
@@ -49,11 +77,21 @@ const CartDeliveryInfo = () => {
             {/* 주소 */}
             <div className={'text-black/60 text-sm'}>{`${deliveryInfo.address} ${deliveryInfo.addressDetail}`}</div>
           </div>
-        ) : (
-          <div className={'flex-1 flex items-center'}>
-            <p className={'text-black/60 font-semibold'}>배송지 정보 가져오기 실패</p>
+        ) : null}
+        {/* 설정된 기본 배송지가 없을 때 */}
+        {!loading && deliveryInfo === null ? (
+          <div className={'flex-1'}>
+            <button className="p-[0.5rem] border-[0.08rem] border-black/20 rounded-[0.4rem] text-sm">
+              배송지 추가하기
+            </button>
           </div>
-        )}
+        ) : null}
+        {/* 데이터 가져오기 실패 */}
+        {!loading && error ? (
+          <div className={'flex-1 flex items-center'}>
+            <p className={'text-black/60 text-xs'}>배송지 정보 가져오기 실패</p>
+          </div>
+        ) : null}
       </div>
       {/* 배송 요청사항 */}
       <div className="flex items-center">
