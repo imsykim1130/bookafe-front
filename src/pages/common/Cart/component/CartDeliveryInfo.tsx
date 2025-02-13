@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { getDeliveryInfoRequest } from '@/api/api';
+ import { getDeliveryInfoRequest } from '@/api/api';
 import { DeliveryInfoItem } from '@/api/item.ts';
 import { GetDeliveryInfoResponseDto, ResponseDto } from '@/api/response.dto';
 import { useEffect, useState } from 'react';
