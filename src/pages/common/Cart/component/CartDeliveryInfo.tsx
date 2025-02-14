@@ -1,9 +1,17 @@
- import { getDeliveryInfoRequest } from '@/api/api';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { getDeliveryInfoRequest } from '@/api/api';
 import { DeliveryInfoItem } from '@/api/item.ts';
 import { GetDeliveryInfoResponseDto, ResponseDto } from '@/api/response.dto';
 import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 
-const CartDeliveryInfo = () => {
+interface Props {
+  deliveryRequest: string;
+  setDeliveryRequest: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const CartDeliveryInfo = (props: Props) => {
+  const { deliveryRequest, setDeliveryRequest } = props;
   // const deliveryInfoMock: DeliveryInfoItem = {
   //   name: '집',
   //   isDefault: true,
@@ -13,14 +21,15 @@ const CartDeliveryInfo = () => {
   //   addressDetail: '202 호',
   // };
 
-  const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfoItem>();
+  const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfoItem | null>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [cookies] = useCookies(['jwt']);
 
   // function: 배송정보 가져오기 요청
   const getDeliveryInfo = () => {
     setError(false);
-    getDeliveryInfoRequest()
+    getDeliveryInfoRequest(cookies.jwt)
       .then((response) => {
         const { userDeliveryInfo } = response.data as GetDeliveryInfoResponseDto;
         setDeliveryInfo(userDeliveryInfo);
@@ -47,7 +56,7 @@ const CartDeliveryInfo = () => {
         {/* 데이터 로딩중 */}
         {loading ? (
           <div className="flex-1">
-            <p>로딩중</p>
+            <p className="text-sm text-black/40">로딩중...</p>
           </div>
         ) : null}
         {/* 데이터 가져오기 성공 */}
@@ -100,6 +109,8 @@ const CartDeliveryInfo = () => {
           <input
             type="text"
             placeholder="배송시 요청사항을 입력해주세요"
+            value={deliveryRequest}
+            onChange={(e) => setDeliveryRequest(e.target.value)}
             className="w-full text-sm px-[0.8rem] py-[0.6rem] border-[0.08rem] border-gray/20 rounded-lg"
           />
         </div>

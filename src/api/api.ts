@@ -995,6 +995,10 @@ export const getTop10BookListRequest = async () => {
 };
 
 // 유저 기본 배송정보 가져오기
-export const getDeliveryInfoRequest = async () => {
-  return await axios.get('http://localhost:8080/api/v1/user/delivery-info');
+export const getDeliveryInfoRequest = async (jwt: string) => {
+  return await axios.get('http://localhost:8080/api/v1/user/delivery-info', {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  })
 };
