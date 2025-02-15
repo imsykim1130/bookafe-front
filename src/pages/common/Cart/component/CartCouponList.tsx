@@ -47,7 +47,7 @@ const CartCouponList = ({
   }, []);
 
   return (
-    <section className="flex flex-col gap-[1.1rem] w-full max-w-[37.5rem] p-[1rem] border-[0.1rem] border-black/10 rounded-[0.6rem]">
+    <section className="cart-section">
       {/* 로딩중 일 때 */}
       {couponList.loading && <p>로딩중입니다</p>}
 

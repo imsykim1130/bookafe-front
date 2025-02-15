@@ -39,7 +39,7 @@ const CartBookList = () => {
 
   // render
   return (
-    <section className="w-full max-w-[37.5rem] p-[1rem] border-[0.1rem] border-black/10 rounded-[0.6rem]">
+    <section className="cart-section">
       <div className="mb-[1rem] flex flex-col gap-[0.2rem]">
         <p className="font-bold">{data?.data.length === 0 ? '장바구니 책이 없습니다' : '장바구니 책'}</p>
         <p className="text-sm text-black/60">
