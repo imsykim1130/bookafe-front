@@ -13,7 +13,7 @@ import { getSearchBookListRequestDto, PostOrderRequestDto } from '@/api/request.
 import Button from '@/components/Button';
 import { Dispatch, forwardRef, RefObject, SetStateAction, useEffect, useRef, useState } from 'react';
 
-import { getSearchBookListResponseDto, ResponseDto } from '@/api/response.dto';
+import { GetSearchBookListResponseDto, ResponseDto } from '@/api/response.dto';
 import BookPrev from '@/components/BookPrev';
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
@@ -94,7 +94,7 @@ const Cart = () => {
       }
 
       // 응답 성공
-      const { bookList } = response as getSearchBookListResponseDto;
+      const { bookList } = response as GetSearchBookListResponseDto;
       setKeywordBookList(bookList);
       setKeywordIndex(keywordIndex);
     });

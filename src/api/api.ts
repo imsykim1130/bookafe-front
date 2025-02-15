@@ -27,7 +27,9 @@ import {
   getCouponListResponseDto,
   GetDeliveryStatusListResponseDto,
   GetOrderDetailListResponseDto,
-  getSearchBookListResponseDto,
+
+  GetSearchBookListResponseDto,
+
   ResponseDto,
   SignInResponseDto,
 } from './response.dto.ts';
@@ -82,7 +84,7 @@ export const getSearchBookListRequest = async (requestParams: getSearchBookListR
     .get(getSearchBookUrl, {
       params: requestParams,
     })
-    .then((res): getSearchBookListResponseDto => {
+    .then((res): GetSearchBookListResponseDto => {
       // 응답 데이터 반환
       return res.data;
     })

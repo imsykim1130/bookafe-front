@@ -1,30 +1,46 @@
-import { deleteCartBookRequest } from '@/api/api';
+import { changeCartBookCountRequest, deleteCartBookRequest } from '@/api/api';
 import { CartBookData } from '@/api/item';
 import { useMemo } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 
-const CartBookComp = ({
-  book,
-  changeCount,
-  getCartBookList,
-}: {
-  book: CartBookData;
-  changeCount: (changeCount: number, isbn: string) => void;
-  getCartBookList: () => void;
-}) => {
+const CartBookComp = ({ book, refetchCartBookList }: { book: CartBookData,  refetchCartBookList: () => void }) => {
   const navigate = useNavigate();
   const [cookies] = useCookies(['jwt']);
   const discounted = (book.price * (100 - book.discountPercent)) / 100;
 
+  // function: 장바구니 책 삭제 요청
   const deleteCartBook = () => {
     deleteCartBookRequest(cookies.jwt, book.isbn).then((response) => {
+      // 실패
       if (!response) {
         window.alert('장바구니 삭제 실패. 다시 시도해주세요');
         return;
       }
-      getCartBookList();
+      // 성공
+      refetchCartBookList();
     });
+  };
+
+  // function: 장바구니 수량 감소 요청
+  const changeCount = (changeCount: number, isbn: string) => {
+    // 1보다 작은 수량으로 변경 불가
+    if (changeCount < 1) {
+      window.alert('주문 수량은 최소 1개입니다');
+      return;
+    }
+    console.log('장바구니 수량 변경');
+    // 수량 변경 요청
+    changeCartBookCountRequest(cookies.jwt, isbn, changeCount)
+    .then(result => {
+      // 수량 변경 실패
+      if(!result) {
+        window.alert("다시 시도해주세요");
+        return;
+      }
+      // 수량 변경 성공
+      refetchCartBookList();
+    })
   };
 
   const cartBookDeleteBtnClickHandler = () => {
@@ -33,7 +49,7 @@ const CartBookComp = ({
 
   return useMemo(
     () => (
-      <article key={book.id} className={'flex gap-[20px] py-[30px] border-b-[1px] border-black border-opacity-10'}>
+      <article key={book.id} className={'flex gap-[20px] py-[30px] border-t-[1px] border-black border-opacity-10'}>
         {/* 왼쪽 */}
         <div
           className={

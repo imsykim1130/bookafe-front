@@ -1,5 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query'
+import {ReactQueryDevtools} from 'react-query/devtools';
 import './index.css';
 
 import App from './App.tsx';
@@ -20,6 +22,8 @@ import Favorite from './pages/common/Favorite/Favorite.tsx';
 import Landing from './pages/common/Landing/Landing.tsx';
 import OrderDetailPage from './pages/common/OrderDetailPage/OrderDetailPage.tsx';
 import CartFix from '@/pages/common/Cart/CartFix.tsx';
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -87,7 +91,11 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')!).render(
-  <CookiesProvider>
-    <RouterProvider router={router} />
-  </CookiesProvider>,
+  <QueryClientProvider client={queryClient}>
+    <CookiesProvider>
+      <RouterProvider router={router} />
+    </CookiesProvider>
+    <ReactQueryDevtools initialIsOpen={false} position='bottom-right' />
+  </QueryClientProvider>
+  
 );

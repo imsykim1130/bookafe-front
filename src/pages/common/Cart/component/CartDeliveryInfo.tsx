@@ -49,7 +49,7 @@ const CartDeliveryInfo = (props: Props) => {
   }, []);
 
   return (
-    <section className="w-full max-w-[600px] flex flex-col gap-6 p-4 border-[0.1rem] border-black/10 rounded-[10px]">
+    <section className="w-full max-w-[600px] flex flex-col gap-6 p-4 border-[0.1rem] border-black/10 rounded-[0.6rem]">
       {/* 배송지 정보*/}
       <div className="flex">
         <p className={'min-w-[7rem] font-bold'}>배송지 정보</p>

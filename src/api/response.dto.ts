@@ -1,5 +1,13 @@
-import { BookDetailData, BookSearchItem, CommentItem, CouponData, DeliveryStatus, Meta, OrderDetail, UserItem } from './item.ts';
 import { DeliveryInfoItem } from '@/api/item.ts';
+import {
+  BookDetailData,
+  BookSearchItem,
+  CommentItem,
+  CouponData,
+  DeliveryStatus,
+  OrderDetail,
+  UserItem,
+} from './item.ts';
 
 export interface ResponseDto {
   code: string;
@@ -16,8 +24,10 @@ export interface GetUserResponseDto extends ResponseDto {
   totalPoint: number;
 }
 
-export interface getSearchBookListResponseDto extends ResponseDto {
-  meta: Meta;
+export interface GetSearchBookListResponseDto extends ResponseDto {
+  isEnd: boolean;
+  pageableCount: number;
+  totalCount: number;
   bookList: BookSearchItem[];
 }
 
@@ -49,10 +59,10 @@ export interface GetDeliveryStatusListResponseDto {
   deliveryStatusViewList: DeliveryStatus[];
 }
 
-export interface getCouponListResponseDto extends ResponseDto{
+export interface getCouponListResponseDto extends ResponseDto {
   userCouponViewList: CouponData[];
 }
 
-export interface GetDeliveryInfoResponseDto extends ResponseDto{
+export interface GetDeliveryInfoResponseDto extends ResponseDto {
   userDeliveryInfo: DeliveryInfoItem | null;
 }
