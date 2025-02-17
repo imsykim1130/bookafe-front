@@ -15,28 +15,22 @@ const Auth = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const pathname = state ? state.pathname : null;
-  const [,setCookie] = useCookies(['jwt']);
-  
+  const [, setCookie] = useCookies(['jwt']);
+
   // Ref
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const nicknameRef = useRef<HTMLInputElement>(null);
-  const addressRef = useRef<HTMLInputElement>(null);
-  const addressDetailRef = useRef<HTMLInputElement>(null);
-  const phoneNumberRef = useRef<HTMLInputElement>(null);
 
   // RegExp
   const emailRegExp = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
   const passwordRegExp = new RegExp('^.{8,20}$');
   const nicknameRegExp = new RegExp('^.{8,20}$');
-  const phoneNumberRegExp = new RegExp('^01[0-9]([0-9]{3,4})([0-9]{4})$');
 
   // Error state
   const [emailErr, setEmailErr] = useState<boolean>(false);
   const [passwordErr, setPasswordErr] = useState<boolean>(false);
   const [nicknameErr, setNicknameErr] = useState<boolean>(false);
-  const [addressErr, setAddressErr] = useState<boolean>(false);
-  const [phoneNumberErr, setPhoneNumberErr] = useState<boolean>(false);
 
   const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
 
@@ -74,15 +68,15 @@ const Auth = () => {
 
       // 로그인 성공
       const { jwt } = response as SignInResponseDto;
-      const expire = moment().add(1, "hour").toDate(); // 유효시간 1시간
-      setCookie("jwt", jwt, {path: "/", expires : expire});
+      const expire = moment().add(1, 'hour').toDate(); // 유효시간 1시간
+      setCookie('jwt', jwt, { path: '/', expires: expire });
 
       // 페이지 이동
       if (pathname) {
         navigate(pathname);
         return;
       }
-      navigate("/");
+      navigate('/');
     });
   };
 
@@ -91,58 +85,47 @@ const Auth = () => {
     return regExp.test(item);
   };
 
-  // function: 회원가입
-  function signUp() {
+  // function: 회원가입 전 데이터 검증
+  function signUpValidation() {
+    let isError = false;
+
     // ref 여부 검증
-    if (
-      !emailRef.current ||
-      !passwordRef.current ||
-      !nicknameRef.current ||
-      !addressRef.current ||
-      !addressDetailRef.current ||
-      !phoneNumberRef.current
-    ) {
+    if (!emailRef.current || !passwordRef.current || !nicknameRef.current) {
       return;
     }
 
     // 에러가 하나라도 있으면 회원가입 불가
-    if (addressRef.current.value === '') {
-      setAddressErr(true);
-    }
-
     if (emailRef.current.value === '') {
       setEmailErr(true);
+      isError = true;
     }
 
     if (passwordRef.current.value === '') {
       setPasswordErr(true);
+      isError = true;
     }
     if (nicknameRef.current.value === '') {
       setNicknameErr(true);
+      isError = true;
     }
+    return isError;
+  }
 
-    if (phoneNumberRef.current.value === '') {
-      setPhoneNumberErr(true);
-    }
+  // function: 회원가입
+  function signUp() {
+    const isError = signUpValidation();
 
-    if (
-      addressRef.current.value === '' ||
-      emailRef.current.value === '' ||
-      nicknameRef.current.value === '' ||
-      phoneNumberRef.current.value === ''
-    ) {
+    if (isError) {
       return;
     }
 
     const requestDto: SignUpRequestDto = {
-      email: emailRef.current.value,
-      password: passwordRef.current.value,
-      nickname: nicknameRef.current.value,
-      address: addressRef.current.value,
-      addressDetail: addressDetailRef.current.value,
-      phoneNumber: phoneNumberRef.current.value,
+      email: emailRef.current?.value as string,
+      password: passwordRef.current?.value as string,
+      nickname: nicknameRef.current?.value as string,
       role: 'user',
     };
+
     signUpRequest(requestDto).then((response) => {
       if (!response) {
         window.alert('서버 에러');
@@ -305,50 +288,6 @@ const Auth = () => {
                   랜덤 닉네임을 추천해드려요
                 </span>
               </button>
-            </div>
-            {/* 주소 */}
-            <div className={'relative flex flex-col gap-5'}>
-              <div>
-                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-postal-address"></i>
-                <Input
-                  ref={addressRef}
-                  type={'text'}
-                  placeholder={'주소'}
-                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
-                  onChange={() => {
-                    setAddressErr(false);
-                  }}
-                />
-              </div>
-              {addressErr && <p className={'absolute left-0 top-14 text-red-600'}>주소는 필수 입력사항입니다</p>}
-            </div>
-            {/* 상세주소 */}
-            <div className={'relative flex flex-col gap-5'}>
-              <div>
-                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-postal-address"></i>
-                <Input
-                  ref={addressDetailRef}
-                  type={'text'}
-                  placeholder={'상세주소'}
-                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
-                />
-              </div>
-            </div>
-            {/* 휴대폰번호 */}
-            <div className={'relative flex flex-col gap-5'}>
-              <div>
-                <i className="absolute flex items-center justify-center -translate-y-1/2 top-1/2 left-5 fi fi-rr-mobile-notch"></i>
-                <Input
-                  ref={phoneNumberRef}
-                  type={'text'}
-                  placeholder={'휴대폰번호'}
-                  className={'w-full pl-[3rem] pr-[1.25rem] py-6'}
-                  onChange={(e) => {
-                    inputChangeHandler(e, phoneNumberRegExp, setPhoneNumberErr);
-                  }}
-                />
-              </div>
-              {phoneNumberErr && <p className={'absolute left-0 top-14 text-red-600'}>정확한 번호를 입력해주세요</p>}
             </div>
           </div>
         )}

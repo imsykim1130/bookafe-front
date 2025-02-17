@@ -7,9 +7,6 @@ export interface SignUpRequestDto {
   email: string;
   password: string;
   nickname: string;
-  address: string;
-  addressDetail: string | null;
-  phoneNumber: string;
   role: 'user' | 'admin';
 }
 
