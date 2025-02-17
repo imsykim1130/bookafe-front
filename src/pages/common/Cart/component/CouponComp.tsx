@@ -12,7 +12,7 @@ const CouponComp = ({ name, discountPercent, selected }: Props) => {
   }, [selected]);
   return (
     <button
-      className={`flex items-center border-[0.1rem] p-[1rem] border-black/15 rounded-[0.6rem] ${selected ? 'bg-black/15' : 'bg-black/5'} w-full`}
+      className={`flex items-center border-[0.1rem] p-[1rem] border-black/15 rounded-[0.6rem] ${selected ? 'bg-black/15' : ''} w-full`}
     >
       <p className="flex-1 text-start">{name}</p>
       <div>

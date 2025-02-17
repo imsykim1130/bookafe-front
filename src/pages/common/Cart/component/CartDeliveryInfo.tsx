@@ -1,17 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getDeliveryInfoRequest } from '@/api/api';
 import { DeliveryInfoItem } from '@/api/item.ts';
-import { GetDeliveryInfoResponseDto, ResponseDto } from '@/api/response.dto';
-import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import { useState } from 'react';
+import DeliveryInfoList from '@/pages/common/Cart/component/DeliveryInfoList.tsx';
 
 interface Props {
   deliveryRequest: string;
   setDeliveryRequest: React.Dispatch<React.SetStateAction<string>>;
+  deliveryInfo: DeliveryInfoItem | null;
+  loading: boolean;
+  error: boolean;
+  changeDeliveryInfo: (deliveryInfo: DeliveryInfoItem | null) => void;
 }
 
 const CartDeliveryInfo = (props: Props) => {
-  const { deliveryRequest, setDeliveryRequest } = props;
+  const { deliveryRequest, setDeliveryRequest, deliveryInfo, loading, error, changeDeliveryInfo } = props;
   // const deliveryInfoMock: DeliveryInfoItem = {
   //   name: '집',
   //   isDefault: true,
@@ -21,32 +23,12 @@ const CartDeliveryInfo = (props: Props) => {
   //   addressDetail: '202 호',
   // };
 
-  const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfoItem | null>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
-  const [cookies] = useCookies(['jwt']);
+  const [deliveryInfoListPopup, setDeliveryInfoListPopup] = useState<boolean>(false);
 
-  // function: 배송정보 가져오기 요청
-  const getDeliveryInfo = () => {
-    setError(false);
-    getDeliveryInfoRequest(cookies.jwt)
-      .then((response) => {
-        const { userDeliveryInfo } = response.data as GetDeliveryInfoResponseDto;
-        setDeliveryInfo(userDeliveryInfo);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(true);
-        const { message } = err.response.data as ResponseDto;
-        console.log(message);
-      });
+  // function: 배송지 정보 변경 버튼 클릭
+  const changeDeliveryInfoBtnClickHandler = () => {
+    setDeliveryInfoListPopup(true);
   };
-
-  // effect: 로딩 시 배송지 정보 가져오기
-  useEffect(() => {
-    getDeliveryInfo();
-  }, []);
 
   return (
     <section className="cart-section">
@@ -70,11 +52,18 @@ const CartDeliveryInfo = (props: Props) => {
                 <span className={'font-semibold text-base'}>{deliveryInfo.name}</span>
               </div>
               {/* 기본배송지 배지 */}
-              <span className={'p-[0.3rem] border-[0.1rem] border-black rounded-full text-xs font-semibold'}>
-                기본배송지
-              </span>
+              {deliveryInfo.isDefault && (
+                <span className={'p-[0.3rem] border-[0.1rem] border-black rounded-full text-xs font-semibold'}>
+                  기본배송지
+                </span>
+              )}
               {/* 배송지 변경 버튼*/}
-              <button className={'p-[0.4rem] border-[0.08rem] border-gray/20 rounded-lg text-xs'}>변경</button>
+              <button
+                className={'p-[0.4rem] border-[0.08rem] border-gray/20 rounded-lg text-xs'}
+                onClick={changeDeliveryInfoBtnClickHandler}
+              >
+                변경
+              </button>
             </div>
             {/* 수신인 정보*/}
             <div className={'text-sm flex items-center gap-2 font-semibold'}>
@@ -115,6 +104,13 @@ const CartDeliveryInfo = (props: Props) => {
           />
         </div>
       </div>
+      {deliveryInfoListPopup && (
+        <DeliveryInfoList
+          setDeliveryInfoListPopup={setDeliveryInfoListPopup}
+          selectedDeliveryInfoId={deliveryInfo ? deliveryInfo.id : null}
+          changeDeliveryInfo={changeDeliveryInfo}
+        />
+      )}
     </section>
   );
 };

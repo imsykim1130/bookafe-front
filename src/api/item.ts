@@ -155,6 +155,7 @@ export interface Top10BookItem {
 }
 
 export interface DeliveryInfoItem {
+  id: number;
   name: string;
   isDefault: boolean;
   receiver: string;

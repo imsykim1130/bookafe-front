@@ -66,3 +66,6 @@ export interface getCouponListResponseDto extends ResponseDto {
 export interface GetDeliveryInfoResponseDto extends ResponseDto {
   userDeliveryInfo: DeliveryInfoItem | null;
 }
+export interface GetAllDeliveryInfoResponseDto extends ResponseDto {
+  userDeliveryInfoList: DeliveryInfoItem[];
+}

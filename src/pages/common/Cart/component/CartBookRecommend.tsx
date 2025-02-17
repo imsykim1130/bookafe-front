@@ -10,7 +10,7 @@ import { useCookies } from 'react-cookie';
 
 gsap.registerPlugin(useGSAP);
 
-const CartBookRecomend = ({ refetchCartBookList }: { refetchCartBookList: () => void }) => {
+const CartBookRecommend = ({ refetchCartBookList }: { refetchCartBookList: () => void }) => {
   const [cookies] = useCookies(['jwt']);
   // 추천 키워드 중 선택한 키워드의 인덱스
   const [keywordIndex, setKeywordIndex] = useState<number | null>(null);
@@ -121,4 +121,4 @@ const CartBookRecomend = ({ refetchCartBookList }: { refetchCartBookList: () => 
   );
 };
 
-export default CartBookRecomend;
+export default CartBookRecommend;

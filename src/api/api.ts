@@ -23,13 +23,12 @@ import {
   SignUpRequestDto,
 } from './request.dto.ts';
 import {
+  GetAllDeliveryInfoResponseDto,
   GetCommentListResponse,
   getCouponListResponseDto,
   GetDeliveryStatusListResponseDto,
   GetOrderDetailListResponseDto,
-
   GetSearchBookListResponseDto,
-
   ResponseDto,
   SignInResponseDto,
 } from './response.dto.ts';
@@ -332,7 +331,7 @@ export const createOrderRequest = async (jwt: string, requestDto: PostOrderReque
     })
     .catch((err) => {
       console.log(err.response.data);
-      return err.response.data;
+      return false;
     });
 };
 
@@ -1002,5 +1001,23 @@ export const getDeliveryInfoRequest = async (jwt: string) => {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
-  })
+  });
+};
+
+// 유저 배송정보 모두 가져오기
+export const getAllDeliveryInfoRequest = async (jwt: string) => {
+  return await axios
+    .get('http://localhost:8080/api/v1/user/delivery-info/all', {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+    .then((res) => {
+      const { userDeliveryInfoList } = res.data as GetAllDeliveryInfoResponseDto;
+      return userDeliveryInfoList;
+    })
+    .catch((err) => {
+      console.log(err.response.data.message);
+      return null;
+    });
 };

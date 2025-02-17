@@ -9,11 +9,13 @@ import couponListReducer from '../reducer/couponListReducer';
 import CouponComp from './CouponComp';
 
 const CartCouponList = ({
-  usingCouponId,
-  changeUsingCouponId,
+  usingCoupon,
+  changeUsingCoupon,
+  isPossible,
 }: {
-  usingCouponId: number | null;
-  changeUsingCouponId: (couponId: number) => void;
+  usingCoupon: CouponData | null;
+  changeUsingCoupon: (coupon: CouponData) => void;
+  isPossible: boolean; // 쿠폰 사용 가능 여부
 }) => {
   const [cookies] = useCookies(['jwt']);
   const [couponList, couponListDispatcher] = useReducer(couponListReducer, {
@@ -37,8 +39,12 @@ const CartCouponList = ({
     });
   };
 
-  const couponClickHandler = (couponId: number) => {
-    changeUsingCouponId(couponId);
+  const couponClickHandler = (coupon: CouponData) => {
+    if (!isPossible) {
+      window.alert('포인트 사용 시 쿠폰 사용이 불가합니다.');
+      return;
+    }
+    changeUsingCoupon(coupon);
   };
 
   // effect: 첫 마운트 시 쿠폰 가져오기
@@ -63,12 +69,12 @@ const CartCouponList = ({
             // 쿠폰이 존재할 때
             <div className="flex flex-col gap-2 font-semibold">
               {couponList.data.map((item: CouponData) => (
-                <div onClick={() => couponClickHandler(item.id)}>
+                <div key={item.id} onClick={() => couponClickHandler(item)}>
                   <CouponComp
                     key={item.id}
                     name={item.name}
                     discountPercent={item.discountPercent}
-                    selected={usingCouponId === item.id}
+                    selected={usingCoupon?.id === item.id}
                   />
                 </div>
               ))}
