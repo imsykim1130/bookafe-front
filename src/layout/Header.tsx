@@ -12,7 +12,7 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
-  const [,,removeCookie] = useCookies(['jwt']);
+  const [, , removeCookie] = useCookies(['jwt']);
 
   // function: 이미지 url 생성
   const changeProfileImage = (changeImage: string) => {
@@ -25,7 +25,7 @@ const Header = () => {
 
   // function: 로그아웃 버튼 클릭 핸들러
   function logoutClickHandler() {
-    removeCookie("jwt", {path: "/"});
+    removeCookie('jwt', { path: '/' });
   }
 
   // function: 로그인 버튼 클릭 핸들러
@@ -57,7 +57,7 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky z-40 top-0 w-full flex justify-between items-center px-[5%] md:px-[10%] lg:px-[15%] py-5 bg-white shadow-[0_0_4px_rgba(0,0,0,0.1)]`}
+      className={`sticky z-40 top-0 w-full flex justify-between items-center px-[5%] md:px-[10%] lg:px-[15%] py-5 bg-white shadow-[0_0_4px_rgba(0,0,0,0.1)] text-xs`}
     >
       {/*로고*/}
       <Link to="/" className="w-[30px] h-[30px] flex justify-center items-center">
