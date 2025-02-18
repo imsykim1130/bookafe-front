@@ -78,7 +78,10 @@ const CartDeliveryInfo = (props: Props) => {
         {/* 설정된 기본 배송지가 없을 때 */}
         {!loading && deliveryInfo === null ? (
           <div className={'flex-1'}>
-            <button className="p-[0.5rem] border-[0.08rem] border-black/20 rounded-[0.4rem] text-sm">
+            <button
+              onClick={changeDeliveryInfoBtnClickHandler}
+              className="p-[0.5rem] border-[0.08rem] border-black/20 rounded-[0.4rem] text-sm"
+            >
               배송지 추가하기
             </button>
           </div>

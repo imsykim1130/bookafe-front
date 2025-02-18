@@ -36,3 +36,12 @@ export interface PostCommentRequestDto {
   content: string;
   emoji: string | null;
 }
+
+export interface PostDeliveryInfoRequestDto {
+  name: string;
+  address: string;
+  addressDetail: string | null;
+  receiver: string;
+  receiverPhoneNumber: string;
+  isDefault: boolean;
+}
