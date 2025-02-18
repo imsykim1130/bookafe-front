@@ -11,13 +11,18 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   setDeliveryInfoListPopup: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedDeliveryInfoId: number | null;
+  selectedDeliveryInfo: DeliveryInfoItem | null;
   changeDeliveryInfo: (deliveryInfo: DeliveryInfoItem) => void;
 }
-const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfoId, changeDeliveryInfo }: Props) => {
+const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfo, changeDeliveryInfo }: Props) => {
   const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const [addDeliveryInfoModal, setAddDeliveryInfoModal] = useState<boolean>(false);
+
+  // state: 변경할 배송지
+  const [selectDeliveryInfo, setSelectDeliveryInfo] = useState<DeliveryInfoItem | null>(null);
 
   // query: 배송지 리스트
   const {
@@ -36,14 +41,11 @@ const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfoId, ch
         },
       });
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries(allDeliveryInfoKey).then(() => {
-        window.alert('배송지 삭제 성공');
-      });
+    onSuccess: () => {
+      window.alert('배송지 삭제 성공');
+      queryClient.invalidateQueries(allDeliveryInfoKey);
     },
   });
-
-  const [addDeliveryInfoModal, setAddDeliveryInfoModal] = useState<boolean>(false);
 
   // function: 닫기 버튼 클릭
   const closeBtnClickHandler = () => {
@@ -53,12 +55,14 @@ const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfoId, ch
   // function: 배송지 선택 링 클릭
   const deliveryInfoClickHandler = (deliveryInfo: DeliveryInfoItem) => {
     // 이미 선택된 배송지를 클릭하면 아무것도 일어나지 않음
-    if (selectedDeliveryInfoId === deliveryInfo.id) return;
-    changeDeliveryInfo(deliveryInfo);
+    if (selectDeliveryInfo?.id === deliveryInfo.id) return;
+    setSelectDeliveryInfo(deliveryInfo);
   };
 
   // function: 배송지 선택 버튼 클릭
   const selectBtnClickHandler = () => {
+    if (!selectDeliveryInfo) return;
+    changeDeliveryInfo(selectDeliveryInfo);
     setDeliveryInfoListPopup(false);
   };
 
@@ -83,6 +87,8 @@ const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfoId, ch
     if (!deliveryInfoList) {
       deliveryInfoListRefetch();
     }
+    // 모달을 열기 전 선택된 배송지 정보 반영
+    setSelectDeliveryInfo(selectedDeliveryInfo);
 
     return () => {
       window.document.body.style.overflowY = 'auto';
@@ -124,7 +130,7 @@ const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfoId, ch
               <div className={'flex flex-col gap-[2rem]'}>
                 {deliveryInfoList?.length === 0 && <p className={'text-xs text-black/60'}>등록된 배송지가 없습니다</p>}
                 {deliveryInfoList?.map((item) => (
-                  <div className={'flex gap-[0.5rem]'}>
+                  <div key={item.id} className={'flex gap-[0.5rem]'}>
                     {/* 배송지 선택 버튼*/}
                     <button
                       className={
@@ -136,7 +142,7 @@ const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfoId, ch
                     >
                       {
                         <span
-                          className={`w-[0.7rem] h-[0.7rem] rounded-full bg-black ${selectedDeliveryInfoId === item.id ? 'opacity-100' : 'opacity-0'}`}
+                          className={`w-[0.7rem] h-[0.7rem] rounded-full bg-black ${selectDeliveryInfo?.id === item.id ? 'opacity-100' : 'opacity-0'}`}
                         ></span>
                       }
                     </button>

@@ -110,7 +110,7 @@ const CartDeliveryInfo = (props: Props) => {
       {deliveryInfoListPopup && (
         <DeliveryInfoList
           setDeliveryInfoListPopup={setDeliveryInfoListPopup}
-          selectedDeliveryInfoId={deliveryInfo ? deliveryInfo.id : null}
+          selectedDeliveryInfo={deliveryInfo ? deliveryInfo : null}
           changeDeliveryInfo={changeDeliveryInfo}
         />
       )}
