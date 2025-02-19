@@ -12,9 +12,9 @@ import { useNavigate } from 'react-router-dom';
 interface Props {
   setDeliveryInfoListPopup: React.Dispatch<React.SetStateAction<boolean>>;
   selectedDeliveryInfo: DeliveryInfoItem | null;
-  changeDeliveryInfo: (deliveryInfo: DeliveryInfoItem) => void;
+  changeDeliveryInfo: (deliveryInfo: DeliveryInfoItem | null) => void;
 }
-const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfo, changeDeliveryInfo }: Props) => {
+const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInfo, changeDeliveryInfo }: Props) => {
   const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -35,15 +35,19 @@ const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfo, chan
   // mutation: 배송지 삭제
   const { mutate } = useMutation({
     mutationFn: async (deliveryInfoId: number) => {
-      return await axios.delete(DOMAIN + '/user/delivery-info/' + deliveryInfoId, {
-        headers: {
-          Authorization: `Bearer ${cookies.jwt}`,
-        },
-      });
-    },
-    onSuccess: () => {
-      window.alert('배송지 삭제 성공');
-      queryClient.invalidateQueries(allDeliveryInfoKey);
+      return await axios
+        .delete(DOMAIN + '/user/delivery-info/' + deliveryInfoId, {
+          headers: {
+            Authorization: `Bearer ${cookies.jwt}`,
+          },
+        })
+        .then(() => {
+          window.alert('배송지 삭제 성공');
+          if (deliveryInfoId === selectedDeliveryInfo?.id) {
+            changeDeliveryInfo(null);
+          }
+          queryClient.invalidateQueries(allDeliveryInfoKey);
+        });
     },
   });
 
@@ -197,4 +201,4 @@ const DeliveryInfoList = ({ setDeliveryInfoListPopup, selectedDeliveryInfo, chan
   );
 };
 
-export default DeliveryInfoList;
+export default ChangeDeliveryInfoModal;

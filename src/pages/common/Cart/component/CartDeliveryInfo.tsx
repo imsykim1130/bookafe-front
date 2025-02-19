@@ -1,19 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { DeliveryInfoItem } from '@/api/item.ts';
 import { useState } from 'react';
-import DeliveryInfoList from '@/pages/common/Cart/component/DeliveryInfoList.tsx';
+import ChangeDeliveryInfoModal from '@/pages/common/Cart/component/ChangeDeliveryInfoModal.tsx';
 
 interface Props {
   deliveryRequest: string;
   setDeliveryRequest: React.Dispatch<React.SetStateAction<string>>;
-  deliveryInfo: DeliveryInfoItem | null;
+  deliveryInfoView: DeliveryInfoItem | null;
   loading: boolean;
   error: boolean;
-  changeDeliveryInfo: (deliveryInfo: DeliveryInfoItem | null) => void;
+  changeDeliveryInfoView: (deliveryInfo: DeliveryInfoItem | null) => void;
 }
 
 const CartDeliveryInfo = (props: Props) => {
-  const { deliveryRequest, setDeliveryRequest, deliveryInfo, loading, error, changeDeliveryInfo } = props;
+  const { deliveryRequest, setDeliveryRequest, deliveryInfoView, loading, error, changeDeliveryInfoView } = props;
   // const deliveryInfoMock: DeliveryInfoItem = {
   //   name: '집',
   //   isDefault: true,
@@ -42,17 +42,17 @@ const CartDeliveryInfo = (props: Props) => {
           </div>
         ) : null}
         {/* 데이터 가져오기 성공 */}
-        {!loading && deliveryInfo ? (
+        {!loading && deliveryInfoView ? (
           <div className={'flex-1 flex flex-col gap-[0.4rem]'}>
             {/* 배송지 */}
             <div className={'flex gap-[1rem] items-center'}>
               {/* 배송지 이름 */}
               <div className="flex items-center gap-1">
                 <i className="flex justify-center fi fi-sr-marker iems-center"></i>
-                <span className={'font-semibold text-base'}>{deliveryInfo.name}</span>
+                <span className={'font-semibold text-base'}>{deliveryInfoView.name}</span>
               </div>
               {/* 기본배송지 배지 */}
-              {deliveryInfo.isDefault && (
+              {deliveryInfoView.isDefault && (
                 <span className={'p-[0.3rem] border-[0.1rem] border-black rounded-full text-xs font-semibold'}>
                   기본배송지
                 </span>
@@ -67,16 +67,18 @@ const CartDeliveryInfo = (props: Props) => {
             </div>
             {/* 수신인 정보*/}
             <div className={'text-sm flex items-center gap-2 font-semibold'}>
-              <span>{deliveryInfo.receiver}</span>
+              <span>{deliveryInfoView.receiver}</span>
               <span>{'|'}</span>
-              <span>{deliveryInfo.receiverPhoneNumber}</span>
+              <span>{deliveryInfoView.receiverPhoneNumber}</span>
             </div>
             {/* 주소 */}
-            <div className={'text-black/60 text-sm'}>{`${deliveryInfo.address} ${deliveryInfo.addressDetail}`}</div>
+            <div
+              className={'text-black/60 text-sm'}
+            >{`${deliveryInfoView.address} ${deliveryInfoView.addressDetail}`}</div>
           </div>
         ) : null}
         {/* 설정된 기본 배송지가 없을 때 */}
-        {!loading && deliveryInfo === null ? (
+        {!loading && deliveryInfoView === null ? (
           <div className={'flex-1'}>
             <button
               onClick={changeDeliveryInfoBtnClickHandler}
@@ -107,11 +109,12 @@ const CartDeliveryInfo = (props: Props) => {
           />
         </div>
       </div>
+      {/* 배송지 변경 팝업 */}
       {deliveryInfoListPopup && (
-        <DeliveryInfoList
+        <ChangeDeliveryInfoModal
           setDeliveryInfoListPopup={setDeliveryInfoListPopup}
-          selectedDeliveryInfo={deliveryInfo ? deliveryInfo : null}
-          changeDeliveryInfo={changeDeliveryInfo}
+          selectedDeliveryInfo={deliveryInfoView ? deliveryInfoView : null}
+          changeDeliveryInfo={changeDeliveryInfoView}
         />
       )}
     </section>
