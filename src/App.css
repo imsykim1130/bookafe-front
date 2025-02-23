@@ -1,3 +1,7 @@
 .cart-section {
-    @apply flex flex-col gap-[1.1rem] w-full max-w-[37.5rem] p-[1rem] border-[0.1rem] border-black/10 rounded-[0.6rem]
+  @apply flex flex-col gap-[1.1rem] w-full max-w-[37.5rem] p-[1rem] border-[0.1rem] border-black/10 rounded-[0.6rem];
+}
+
+.nav {
+  @apply flex absolute right-0 min-w-[10rem] p-[1.25rem] flex-col top-[3rem] rounded-[1rem] border-[0.0625rem] md:static md:flex-row md:min-w-0 md:p-0 md:border-0 md:opacity-100;
 }
