@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 interface Props {
   name: string;
   discountPercent: number;
@@ -7,9 +5,7 @@ interface Props {
 }
 
 const CouponComp = ({ name, discountPercent, selected }: Props) => {
-  useEffect(() => {
-    console.log(selected);
-  }, [selected]);
+
   return (
     <button
       className={`flex items-center border-[0.1rem] p-[1rem] border-black/15 rounded-[0.6rem] ${selected ? 'bg-black/15' : ''} w-full`}

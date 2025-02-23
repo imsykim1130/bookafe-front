@@ -1,5 +1,5 @@
 import { DeliveryInfoItem } from '@/api/item.ts';
-import { deliveryInfoKey, useAllDeliveryInfoQuery } from '@/api/query.ts';
+import { useAllDeliveryInfoQuery } from '@/api/query.ts';
 import { Button } from '@/components/ui/button.tsx';
 import AddDeliveryInfoModal from '@/pages/common/Cart/component/AddDeliveryInfoModal.tsx';
 import { useEffect, useState } from 'react';
@@ -47,7 +47,7 @@ const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInf
             changeDeliveryInfo(null);
           }
           queryClient.invalidateQueries({
-            queryKey: deliveryInfoKey,
+            queryKey: deliveryInfoList,
           });
         });
     },

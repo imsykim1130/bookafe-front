@@ -1,15 +1,15 @@
 // /cart
+import { createOrderRequest } from '@/api/api.ts';
+import { CartBookData, CouponData, DeliveryInfoItem } from '@/api/item.ts';
+import { useAllCartBookQuery, useDeliveryInfoQuery } from '@/api/query.ts';
 import CartDeliveryInfo from '@/pages/common/Cart/component/CartDeliveryInfo.tsx';
-import { useEffect, useMemo, useState } from 'react';
-import CartBookList from './component/CartBookList';
-import CartCouponList from './component/CartCouponList';
 import CartPointComp from '@/pages/common/Cart/component/CartPointComp.tsx';
 import CartTotalPriceComp from '@/pages/common/Cart/component/CartTotalPriceComp.tsx';
-import { CartBookData, CouponData, DeliveryInfoItem } from '@/api/item.ts';
-import { createOrderRequest } from '@/api/api.ts';
+import { useEffect, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { useAllCartBookQuery, useDeliveryInfoQuery } from '@/api/query.ts';
+import CartBookList from './component/CartBookList';
+import CartCouponList from './component/CartCouponList';
 
 function Cart() {
   const [cookies] = useCookies(['jwt']);
@@ -20,11 +20,7 @@ function Cart() {
     isLoading: deliveryInfoLoading,
     isError: deliveryInfoError,
     data: deliveryInfo,
-  } = useDeliveryInfoQuery(cookies.jwt, {
-    onSuccess: (deliveryInfo) => {
-      setDeliveryInfoView(deliveryInfo);
-    },
-  });
+  } = useDeliveryInfoQuery(cookies.jwt);
   const [deliveryInfoView, setDeliveryInfoView] = useState<DeliveryInfoItem | null>(null);
   const [deliveryRequest, setDeliveryRequest] = useState<string>(''); // 배송 요청사항
   const [usingCoupon, setUsingCoupon] = useState<CouponData | null>(null); // 사용 쿠폰
@@ -41,23 +37,20 @@ function Cart() {
     isError,
     data: cartBookList,
     refetch: cartBookListRefetch,
-  } = useAllCartBookQuery<CartBookData[]>(cookies.jwt, {
-    enabled: false,
-    staleTime: Infinity,
-    onError: (error) => {
-      console.log(error.response?.data);
-    },
-    onSuccess: (cartBookList: CartBookData[]) => {
-      // 장바구니 책 가져오기 성공 시 책의 총 가격 계산
-      let price = 0;
-      cartBookList.forEach((item) => {
-        const bookPrice = item.price - (item.price * item.discountPercent) / 100;
-        price = price + bookPrice * item.count;
-      });
-      changePrice(price);
-    },
-  });
+  } = useAllCartBookQuery(cookies.jwt);
+
   const allDataReady = !isLoading && !isError && !deliveryInfoLoading && !deliveryInfoError;
+
+
+  // function: 장바구니 책 가져오기 성공 시 책의 총 가격 계산
+  const calculateBookTotalPrice = () => {
+    let price = 0;
+    cartBookList?.forEach((item) => {
+      const bookPrice = item.price - (item.price * item.discountPercent) / 100;
+      price = price + bookPrice * item.count;
+    });
+    changePrice(price);
+  };
 
   // function: 사용 쿠폰 아이디 변경
   const changeUsingCoupon = (coupon: CouponData) => {
@@ -114,11 +107,15 @@ function Cart() {
 
   // effect: 첫 마운트
   useEffect(() => {
-    if (cartBookList) {
-      return;
-    }
-    cartBookListRefetch();
-  }, []);
+    if(!cartBookList) return;
+    calculateBookTotalPrice();
+  }, [cartBookList]);
+
+  // effect: 첫 마운트 시 기본 배송정보 있는지 가져오기
+  useEffect(()=>{
+    if(deliveryInfo === undefined) return;
+    setDeliveryInfoView(deliveryInfo);
+  }, [deliveryInfo])
 
   // render
   if (!allDataReady) {
