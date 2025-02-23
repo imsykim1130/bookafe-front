@@ -1,78 +1,75 @@
-import { useQuery, UseQueryOptions } from 'react-query';
-import axios, { AxiosError, AxiosResponse } from 'axios';
 import { DOMAIN } from '@/utils';
-import { GetAllDeliveryInfoResponseDto, GetDeliveryInfoResponseDto } from '@/api/response.dto.ts';
-import { DeliveryInfoItem } from '@/api/item.ts';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { GetAllDeliveryInfoResponseDto, GetDeliveryInfoResponseDto } from '@/api/response.dto';
+import { CartBookData } from './item';
 
-export const deliveryInfoKey = 'deliveryInfo';
-export const useDeliveryInfoQuery = (
-  jwt: string,
-  opt?: UseQueryOptions<AxiosResponse, AxiosError, DeliveryInfoItem | null, typeof deliveryInfoKey>,
-) => {
-  return useQuery(
-    deliveryInfoKey,
-    async () => {
+// 기본 배송정보 가져오기
+export const deliveryInfoKey = ['deliveryInfo'];
+export const useDeliveryInfoQuery = (jwt: string) => {
+  return useQuery({
+    queryKey: deliveryInfoKey,
+    queryFn: async () => {
+      console.log("기본 배송정보 가져오기")
       return await axios.get(DOMAIN + '/user/delivery-info', {
         headers: {
           Authorization: `Bearer ${jwt}`,
         },
-      });
-    },
-    {
-      staleTime: Infinity,
-      select: (response) => {
-        const { userDeliveryInfo } = response.data as GetDeliveryInfoResponseDto;
+      }).then((response) => {
+        // 성공
+        const {userDeliveryInfo} = response.data as GetDeliveryInfoResponseDto;
         return userDeliveryInfo;
-      },
-      ...opt,
+      }).catch(err => {
+        // 실패
+        throw err;
+      })
     },
-  );
+    staleTime: Infinity
+  });
 };
-
-export const allCartBookKey = 'allCartBook';
-export const useAllCartBookQuery = <T>(
-  jwt: string,
-  opt?: UseQueryOptions<AxiosResponse, AxiosError, T, typeof allCartBookKey>,
-) => {
-  return useQuery(
-    allCartBookKey,
-    async () => {
-      return await axios.get(DOMAIN + '/cart/list', {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-    },
-    {
-      select: (result): T => {
-        return result.data;
-      },
-      ...opt,
-    },
-  );
-};
-
+// 모든 배송 정보 가져오기
 export const allDeliveryInfoKey = ['allDeliveryInfo'];
-export const useAllDeliveryInfoQuery = (
-  jwt: string,
-  opt?: UseQueryOptions<AxiosResponse, AxiosError, DeliveryInfoItem[], typeof allDeliveryInfoKey>,
-) => {
-  return useQuery(
-    allDeliveryInfoKey,
-    async () => {
+export const useAllDeliveryInfoQuery = (jwt: string) => {
+  return useQuery({
+    queryKey: allDeliveryInfoKey,
+    queryFn: async () => {
+      console.log("모든 배송정보 가져오기")
       return await axios.get(DOMAIN + '/user/delivery-info/all', {
         headers: {
           Authorization: `Bearer ${jwt}`,
         },
-      });
-    },
-    {
-      select: (response) => {
-        const { userDeliveryInfoList } = response.data as GetAllDeliveryInfoResponseDto;
+      }).then(response => {
+        // 성공
+        const {userDeliveryInfoList} = response.data as GetAllDeliveryInfoResponseDto;
         return userDeliveryInfoList;
-      },
-      staleTime: Infinity,
-      ...opt,
+      }).catch(err => {
+        // 실패
+        throw err;
+      })
     },
-  );
+    staleTime: Infinity,
+  });
+};
+
+// 장바구니 책 가져오기
+export const allCartBookKey = ['allCartBook'];
+export const useAllCartBookQuery = (jwt: string) => {
+  return useQuery({
+    queryKey: allCartBookKey,
+    queryFn: async () => {
+      console.log("장바구니 책 가져오기");
+      return await axios.get(DOMAIN + '/cart/list', {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }).then(response => {
+        // 성공
+        return response.data as CartBookData[];
+      }).catch(err=>{
+        // 실패
+        throw err;
+      })
+    },
+    staleTime: Infinity,
+  });
 };

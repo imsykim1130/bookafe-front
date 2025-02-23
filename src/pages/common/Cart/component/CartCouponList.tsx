@@ -35,7 +35,6 @@ const CartCouponList = ({
       }
       // 성공
       couponListDispatcher({ type: 'success', payload: result });
-      console.log(result);
     });
   };
 

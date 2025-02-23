@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { DeliveryInfoItem } from '@/api/item.ts';
+import { deliveryInfoKey, useAllDeliveryInfoQuery } from '@/api/query.ts';
 import { Button } from '@/components/ui/button.tsx';
 import AddDeliveryInfoModal from '@/pages/common/Cart/component/AddDeliveryInfoModal.tsx';
-import { allDeliveryInfoKey, useAllDeliveryInfoQuery } from '@/api/query.ts';
-import { useMutation, useQueryClient } from 'react-query';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+
 import { DOMAIN } from '@/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -28,8 +29,7 @@ const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInf
   const {
     isLoading,
     isError,
-    data: deliveryInfoList,
-    refetch: deliveryInfoListRefetch,
+    data: deliveryInfoList
   } = useAllDeliveryInfoQuery(cookies.jwt);
 
   // mutation: 배송지 삭제
@@ -46,7 +46,9 @@ const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInf
           if (deliveryInfoId === selectedDeliveryInfo?.id) {
             changeDeliveryInfo(null);
           }
-          queryClient.invalidateQueries(allDeliveryInfoKey);
+          queryClient.invalidateQueries({
+            queryKey: deliveryInfoKey,
+          });
         });
     },
   });
@@ -87,10 +89,7 @@ const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInf
     }
     // 모달창 열림 시 스크롤 방지
     window.document.body.style.overflowY = 'hidden';
-    // 데이터 가져오기
-    if (!deliveryInfoList) {
-      deliveryInfoListRefetch();
-    }
+  
     // 모달을 열기 전 선택된 배송지 정보 반영
     setSelectDeliveryInfo(selectedDeliveryInfo);
 
@@ -111,7 +110,7 @@ const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInf
         <div className={'flex items-center justify-between pb-[1rem]'}>
           <p className={'font-semibold'}>배송지 변경</p>
           <i
-            className="fi fi-br-cross-small flex items-center justify-center cursor-pointer"
+            className="flex items-center justify-center cursor-pointer fi fi-br-cross-small"
             onClick={closeBtnClickHandler}
           ></i>
         </div>

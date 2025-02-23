@@ -1,11 +1,11 @@
-import { useMutation, useQueryClient } from 'react-query';
-import axios from 'axios';
-import { DOMAIN } from '@/utils';
-import { useCookies } from 'react-cookie';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button.tsx';
-import { PostDeliveryInfoRequestDto } from '@/api/request.dto.ts';
 import { allDeliveryInfoKey } from '@/api/query.ts';
+import { PostDeliveryInfoRequestDto } from '@/api/request.dto.ts';
+import { Button } from '@/components/ui/button.tsx';
+import { DOMAIN } from '@/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { useState } from 'react';
+import { useCookies } from 'react-cookie';
 
 interface Props {
   changeAddDeliveryInfoModalStatus: () => void;
@@ -30,7 +30,9 @@ const AddDeliveryInfoModal = ({ changeAddDeliveryInfoModalStatus }: Props) => {
     },
     onSuccess: async () => {
       window.alert('배송지 추가 성공');
-      await queryClient.invalidateQueries(allDeliveryInfoKey).then(() => {
+      await queryClient.invalidateQueries({
+        queryKey: allDeliveryInfoKey
+      }).then(() => {
         if (isDefault) {
           // todo: 기본배송지 추가 시 배송지 정보 다시 가져오기
         }
@@ -98,7 +100,7 @@ const AddDeliveryInfoModal = ({ changeAddDeliveryInfoModalStatus }: Props) => {
       >
         <p className={'font-bold'}>배송지 추가</p>
         <i
-          className="fi fi-br-cross-small flex items-center justify-center cursor-pointer"
+          className="flex items-center justify-center cursor-pointer fi fi-br-cross-small"
           onClick={changeAddDeliveryInfoModalStatus}
         ></i>
       </div>

@@ -1,7 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
+
 import './index.css';
 
 import App from './App.tsx';
@@ -14,6 +13,8 @@ import OrderStatus from './pages/admin/OrderStatus.tsx';
 import RecommendBook from './pages/admin/RecommendBook.tsx';
 import UserManagement from './pages/admin/UserManagement.tsx';
 
+import Cart from '@/pages/common/Cart/Cart.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CookiesProvider } from 'react-cookie';
 import Auth from './pages/common/Auth/Auth.tsx';
 import BookDetail from './pages/common/BookDetail';
@@ -21,9 +22,8 @@ import ErrorPage from './pages/common/ErrorPage/ErrorPage.tsx';
 import Favorite from './pages/common/Favorite/Favorite.tsx';
 import Landing from './pages/common/Landing/Landing.tsx';
 import OrderDetailPage from './pages/common/OrderDetailPage/OrderDetailPage.tsx';
-import Cart from '@/pages/common/Cart/Cart.tsx';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({});
 
 const router = createBrowserRouter([
   {
@@ -95,6 +95,5 @@ createRoot(document.getElementById('root')!).render(
     <CookiesProvider>
       <RouterProvider router={router} />
     </CookiesProvider>
-    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
   </QueryClientProvider>,
 );

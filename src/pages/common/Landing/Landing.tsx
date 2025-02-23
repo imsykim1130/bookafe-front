@@ -2,7 +2,7 @@
 import { getSearchBookRequest } from '@/api/api.ts';
 import { BookSearchItem } from '@/api/item.ts';
 import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
-import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
+import { GetSearchBookListResponseDto } from '@/api/response.dto.ts';
 import BookPrev from '@/components/BookPrev.tsx';
 import SearchBox from '@/components/SearchBox.tsx';
 import { useDebounce } from '@/hook/index.ts';
@@ -36,7 +36,7 @@ const Landing = () => {
     getSearchBookRequest(requestDto)
       .then((response) => {
         // 책 데이터 받아오기 성공
-        const { bookList } = response.data as getSearchBookListResponseDto;
+        const { bookList } = response.data as GetSearchBookListResponseDto;
         setSearchBookList(bookList);
       })
       .catch((error) => {
@@ -54,11 +54,12 @@ const Landing = () => {
     searchBook();
   }, [debouncedSearchWord]);
 
-  // 관리자 페이지
+  // render: 관리자 페이지
   if (role === 'ROLE_ADMIN') {
     return <AdminLanding />;
   }
 
+  // render: 일반 랜딩 페이지
   return (
     <main className={'flex flex-col overflow-y-hidden'} onClick={emptyClickHandler}>
       {/* 추천 책 */}
