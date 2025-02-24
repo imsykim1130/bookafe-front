@@ -9,3 +9,7 @@
 .icon-btn {
   @apply transition-all duration-300 hover:opacity-70;
 }
+
+.landing-container-layout {
+  @apply grid grid-rows-[50rem_1.25rem_30rem] xl:grid-cols-[3fr_1.25rem_7fr] xl:grid-rows-1 xl:max-w-[100vw] xl:min-h-[100vh];
+}

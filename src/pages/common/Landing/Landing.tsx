@@ -6,18 +6,18 @@ import { GetSearchBookListResponseDto } from '@/api/response.dto.ts';
 import BookPrev from '@/components/BookPrev.tsx';
 import SearchBox from '@/components/SearchBox.tsx';
 import { useDebounce } from '@/hook/index.ts';
+import { useUserStore } from '@/zustand/userStore.ts';
 import { useEffect, useState } from 'react';
 import AdminLanding from './AdminLanding.tsx';
 import RecommendBook from './RecommendBook.tsx';
 import Top10 from './Top10.tsx';
-import { useUserStore } from '@/zustand/userStore.ts';
 
 const Landing = () => {
   const [searchWord, setSearchWord] = useState<string>('');
   const debouncedSearchWord = useDebounce(searchWord, 500);
   const [searchBookList, setSearchBookList] = useState<BookSearchItem[]>([]);
-  const {user} = useUserStore();
-  const role = user ? user.role : "ROLE_USER";
+  const { user } = useUserStore();
+  const role = user ? user.role : 'ROLE_USER';
 
   // handler: 빈 화면 클릭 시 책 검색 지우기
   const emptyClickHandler = () => {
@@ -61,9 +61,13 @@ const Landing = () => {
 
   // render: 일반 랜딩 페이지
   return (
-    <main className={'flex flex-col overflow-y-hidden'} onClick={emptyClickHandler}>
+    <main className={'landing-container-layout'} onClick={emptyClickHandler}>
       {/* 추천 책 */}
       <RecommendBook />
+      {/* 구분 */}
+      <span className="w-full bg-black/5"></span>
+      {/* top 10 */}
+      <Top10 />
       {/* 검색 */}
       <div className={'absolute flex flex-col w-full items-center top-[120px] px-[5%]'}>
         <div className={'w-full max-w-[25rem]'}>
@@ -98,8 +102,6 @@ const Landing = () => {
           ) : null}
         </div>
       </div>
-      {/* top 10 */}
-      <Top10 />
     </main>
   );
 };

@@ -34,7 +34,7 @@ const Top10 = () => {
 
   return (
     // top10 섹션 컨테이너
-    <section className={'flex flex-col gap-[30px] py-[40px] min-[800px]:items-center bg-white'}>
+    <section className={'flex flex-col justify-center gap-[30px] min-[800px]:items-center bg-white'}>
       {/* 타이틀 컨테이너 */}
       <div className={'flex flex-col items-center gap-[5px]'}>
         <h1 className="font-bold text-dark-black md:text-center text-[1.5em]">이런 책은 어떠세요?</h1>

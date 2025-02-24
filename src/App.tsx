@@ -50,8 +50,8 @@ const App = () => {
       navigate('/auth/sign-in');
       return;
     }
-    
-    if(cookies.jwt && !user) {
+
+    if (cookies.jwt && !user) {
       zustandGetUserStore();
     }
   }, [cookies]);
@@ -64,7 +64,7 @@ const App = () => {
   // render
   return (
     <>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col">
         <Header />
         <Outlet />
       </div>

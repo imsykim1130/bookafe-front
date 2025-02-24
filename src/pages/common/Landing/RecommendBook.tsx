@@ -42,15 +42,9 @@ const RecommendBook = () => {
   }, []);
 
   return (
-    <section className="relative flex flex-col gap-[60px] justify-center items-center pt-[20vh] pb-[15vh]">
+    <section className="relative flex flex-col gap-[60px] justify-center items-center">
       {recommendBook === null ? null : (
         <div className={'flex flex-col gap-[30px]'}>
-          {/* 배경 이미지 */}
-          <div className={'absolute top-0 left-0 w-full -z-10 blur-2xl'}>
-            {recommendBook && (
-              <img src={recommendBook.bookImg} alt="book background image" className={`w-[100%] opacity-10`} />
-            )}
-          </div>
           <div className="flex flex-col md:flex-row-reverse items-center md:items-start gap-[40px]">
             {/* 타이틀, 후기, 책 정보 이동 버튼 */}
             <div className={'flex flex-col items-center md:items-start gap-[20px]'}>
