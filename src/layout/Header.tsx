@@ -72,14 +72,14 @@ const Header = () => {
       {/*네비게이션*/}
       <nav className="relative flex gap-[2rem] md:gap-[3rem] items-center">
         {/* 알림 버튼 */}
-        <button className="relative">
+        <button className="relative icon-btn ">
           <i className="flex items-center justify-center text-base fi fi-ss-bell"></i>
           {isAlarm && (
             <span className="absolute block -translate-x-1/2 bg-red-500 rounded-full size-[0.3125rem] top-5 left-1/2"></span>
           )}
         </button>
         {/* 메뉴 버튼 */}
-        <button className="md:hidden" onClick={toggleNav}>
+        <button className="md:hidden icon-btn" onClick={toggleNav}>
           <i className="flex items-center justify-center text-base fi fi-br-grid"></i>
         </button>
 
@@ -88,10 +88,10 @@ const Header = () => {
             <>
               {/* 로그인 안되어 있을 때 */}
               {/* 로그인, 로그아웃 */}
-              <Link to={'/auth/sign-in'} className="text-nowrap hover:opacity-70" onClick={signInClickHandler}>
+              <Link to={'/auth/sign-in'} className="text-nowrap icon-btn" onClick={signInClickHandler}>
                 로그인
               </Link>
-              <Link to={'/auth/sign-up'} className="text-nowrap hover:opacity-70">
+              <Link to={'/auth/sign-up'} className="text-nowrap icon-btn">
                 회원가입
               </Link>
             </>
@@ -99,9 +99,14 @@ const Header = () => {
             <>
               {/* 로그인 되어 있을 때 */}
               {/* 좋아요, 내 정보, 로그아웃 */}
-              <Link to={'/favorite'}>좋아요</Link>
-              <Link to={'/user'}>내 정보</Link>
+              <Link to={'/favorite'} className="icon-btn ">
+                좋아요
+              </Link>
+              <Link to={'/user'} className="icon-btn ">
+                내 정보
+              </Link>
               <button
+                className="icon-btn "
                 onClick={() => {
                   logoutClickHandler();
                 }}

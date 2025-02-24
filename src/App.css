@@ -3,5 +3,13 @@
 }
 
 .nav {
-  @apply flex absolute right-0 min-w-[10rem] p-[1.25rem] flex-col top-[3rem] rounded-[1rem] border-[0.0625rem] md:static md:flex-row md:min-w-0 md:p-0 md:border-0 md:opacity-100;
+  @apply flex absolute right-0 min-w-[10rem] p-[1.25rem] flex-col top-[3rem] rounded-[1rem] border-[0.0625rem] md:static md:flex-row md:min-w-0 md:p-0 md:border-0 md:opacity-100 bg-white;
+}
+
+.icon-btn {
+  @apply transition-all duration-300 hover:opacity-70;
+}
+
+.landing-container-layout {
+  @apply grid grid-rows-[50rem_1.25rem_30rem] xl:grid-cols-[3fr_1.25rem_7fr] xl:grid-rows-1 xl:max-w-[100vw] xl:min-h-[100vh];
 }
