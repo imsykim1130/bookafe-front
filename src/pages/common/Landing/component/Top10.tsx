@@ -52,7 +52,7 @@ const Top10 = () => {
       >
         {/* 좌측 화살표 */}
         <span
-          className={`cursor-pointer absolute flex items-center justify-center left-0 z-30 w-10 h-10 bg-black rounded-full bg-opacity-30 top-1/2 transition-opacity duration-300 ${!firstInView && isMouseInside ? 'opacity-1' : 'opacity-0'} xl:hidden`}
+          className={`cursor-pointer absolute flex items-center justify-center left-0 z-30 w-10 h-10 bg-black rounded-full bg-opacity-30 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${!firstInView && isMouseInside ? 'opacity-1' : 'opacity-0'}`}
           onClick={() => {
             if (!bookListRef.current) return;
             bookListRef.current.scrollLeft -= 120;
@@ -62,7 +62,7 @@ const Top10 = () => {
         </span>
         {/* 우측 화살표 */}
         <span
-          className={`cursor-pointer flex items-center justify-center absolute right-0 z-30 w-10 h-10 bg-black rounded-full bg-opacity-30 top-1/2 transition-opacity duration-300 ${!lastInView && isMouseInside ? 'opacity-1' : 'opacity-0'} xl:hidden`}
+          className={`cursor-pointer flex items-center justify-center absolute right-0 z-30 w-10 h-10 bg-black rounded-full bg-opacity-30 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${!lastInView && isMouseInside ? 'opacity-1' : 'opacity-0'}`}
           onClick={() => {
             if (!bookListRef.current) return;
             bookListRef.current.scrollLeft += 120;
