@@ -1,8 +1,8 @@
+import { getTop10BookListRequest } from '@/api/api';
+import { Top10BookItem } from '@/api/item';
+import BookPrev from '@/components/BookPrev';
 import { useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { getTop10BookListRequest } from '../../../api/api.ts';
-import { Top10BookItem } from '../../../api/item.ts';
-import BookPrev from '../../../components/BookPrev.tsx';
 
 const Top10 = () => {
   const [books, setBooks] = useState<Top10BookItem[] | null>(null);

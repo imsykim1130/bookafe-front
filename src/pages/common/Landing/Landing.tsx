@@ -3,14 +3,13 @@ import { getSearchBookRequest } from '@/api/api.ts';
 import { BookSearchItem } from '@/api/item.ts';
 import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
 import { GetSearchBookListResponseDto } from '@/api/response.dto.ts';
-import BookPrev from '@/components/BookPrev.tsx';
-import SearchBox from '@/components/SearchBox.tsx';
 import { useDebounce } from '@/hook/index.ts';
 import { useUserStore } from '@/zustand/userStore.ts';
 import { useEffect, useState } from 'react';
 import AdminLanding from './AdminLanding.tsx';
-import RecommendBook from './RecommendBook.tsx';
-import Top10 from './Top10.tsx';
+import LandingSearchPart from './component/LandingSearchPart.tsx';
+import RecommendBook from './component/RecommendBook.tsx';
+import Top10 from './component/Top10.tsx';
 
 const Landing = () => {
   const [searchWord, setSearchWord] = useState<string>('');
@@ -66,41 +65,11 @@ const Landing = () => {
       <RecommendBook />
       {/* 구분 */}
       <span className="w-full bg-black/5"></span>
-      {/* top 10 */}
-      <Top10 />
-      {/* 검색 */}
-      <div className={'absolute flex flex-col w-full items-center top-[120px] px-[5%]'}>
-        <div className={'w-full max-w-[25rem]'}>
-          <SearchBox searchWord={searchWord} setSearchWord={setSearchWord} />
-          {/* 검색 미리보기 */}
-          {searchBookList.length ? (
-            <div
-              className={
-                'mt-[1rem] z-50 w-full h-[400px] p-[5px] flex flex-col bg-white rounded-[10px] drop-shadow-md overflow-scroll scroll-smooth'
-              }
-            >
-              {searchBookList.map((book) => (
-                <div
-                  key={book.isbn}
-                  className={'rounded-[10px] p-[15px] hover:bg-black hover:bg-opacity-5 duration-200'}
-                >
-                  <div className={'w-[100px]'}>
-                    <BookPrev
-                      bookImg={book.bookImg}
-                      author={book.author}
-                      title={book.title}
-                      isbn={book.isbn}
-                      imgSize={3}
-                    />
-                  </div>
-                </div>
-              ))}
-              <button className={'font-semibold py-[10px] hover:bg-black hover:bg-opacity-5 rounded-[10px]'}>
-                검색결과 더보기
-              </button>
-            </div>
-          ) : null}
-        </div>
+      <div className="flex flex-col justify-center lg:relative">
+        {/* top 10 */}
+        <Top10 />
+        {/* 검색 */}
+        <LandingSearchPart searchWord={searchWord} setSearchWord={setSearchWord} searchBookList={searchBookList} />
       </div>
     </main>
   );
