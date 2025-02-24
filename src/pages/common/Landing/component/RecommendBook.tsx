@@ -1,11 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { ResponseDto } from '@/api/response.dto.ts';
+import { useUserStore } from '@/zustand/userStore.ts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getRecommendBookRequest, GetRecommendBookResponseDto } from '../../../../api/api.ts';
 import { TodayBookInterface } from '../../../../api/item.ts';
 
 const RecommendBook = () => {
+  const { user } = useUserStore();
   const [recommendBook, setRecommendBook] = useState<TodayBookInterface | null>(null);
   const navigate = useNavigate();
 
@@ -44,34 +46,44 @@ const RecommendBook = () => {
   return (
     <section className="relative flex flex-col gap-[60px] justify-center items-center">
       {recommendBook === null ? null : (
-        <div className={'flex flex-col gap-[30px]'}>
-          <div className="flex flex-col md:flex-row-reverse items-center md:items-start gap-[40px]">
-            {/* 타이틀, 후기, 책 정보 이동 버튼 */}
-            <div className={'flex flex-col items-center md:items-start gap-[20px]'}>
-              <div className={'flex flex-col items-center md:items-start gap-[5px]'}>
-                {/* 타이틀 */}
-                <h1 className={'opacity-90 font-extrabold text-[1.8rem]'}>
-                  {recommendBook ? recommendBook.title : ''}
-                </h1>
-                {/* 후기 */}
-                <p className={'text-black text-opacity-40'}>{recommendBook ? recommendBook.favoriteComment : ''}</p>
-              </div>
-              <button
-                className={' border-[1px] border-black border-opacity-60 rounded-[5px] p-[5px]'}
-                onClick={bookClickHandler}
-              >
-                자세히 보기
-              </button>
-            </div>
-            <div className={'w-[120px]'}>
-              {recommendBook ? (
-                // 책 이미지
+        <div className={'flex flex-col gap-[3.125rem]'}>
+          {/* 환영문구 */}
+          <div className="text-3xl text-center leading-[150%]">
+            {user ? (
+              // 로그인이 되어있으면 환영인사
+              <p>
+                환영합니다
+                <br />
+                <span className="font-bold">{user.nickname}</span> 님!
+              </p>
+            ) : (
+              // 로그인이 되어있지 않으면 책 추천 문구
+              <p>
+                이런 책은
+                <br />
+                어떠세요?
+              </p>
+            )}
+          </div>
+          {/* 구분선 */}
+          <span className="w-full border-b-[0.01rem] border-black/20"></span>
+          {/* 오늘의 책 */}
+          <div className="flex flex-col items-center gap-[1.25rem]">
+            <p className="text-xl font-semibold">오늘의 책</p>
+            <div className="flex flex-col items-center gap-[0.9375rem]">
+              {/* 책 이미지 */}
+              <div className={'w-[120px]'} onClick={bookClickHandler}>
                 <img
                   src={recommendBook.bookImg}
                   alt="book cover image"
                   className={'w-full rounded-[10px] shadow-[6px_6px_15px_rgba(0,0,0,0.4)]'}
                 />
-              ) : null}
+              </div>
+              {/* 책 제목, 작가 */}
+              <div className="flex flex-col items-center gap-[0.3125rem]">
+                <p className="font-semibold">{recommendBook.title}</p>
+                <p className="opacity-60">{recommendBook.author}</p>
+              </div>
             </div>
           </div>
         </div>

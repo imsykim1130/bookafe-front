@@ -60,12 +60,12 @@ const Landing = () => {
 
   // render: 일반 랜딩 페이지
   return (
-    <main className={'landing-container-layout'} onClick={emptyClickHandler}>
+    <main className="landing-container-layout" onClick={emptyClickHandler}>
       {/* 추천 책 */}
       <RecommendBook />
       {/* 구분 */}
-      <span className="w-full bg-black/5"></span>
-      <div className="flex flex-col justify-center lg:relative">
+      <span className="w-full bg-black bg-opacity-[2%]"></span>
+      <div className="flex flex-col justify-center xl:relative">
         {/* top 10 */}
         <Top10 />
         {/* 검색 */}
