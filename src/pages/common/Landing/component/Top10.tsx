@@ -39,8 +39,8 @@ const Top10 = () => {
     >
       {/* 타이틀 컨테이너 */}
       <div className={'flex flex-col items-center gap-[5px] xl:items-start'}>
-        <h1 className="font-bold text-dark-black md:text-center text-[1.5em]">Top 10</h1>
-        <p className={'text-black text-opacity-60'}>사람들의 좋아요가 많아요</p>
+        <h1 className="font-semibold md:text-center text-[1.5em]">인기가 많은 책이에요 🔥</h1>
+        <p className={'opacity-60'}>사람들의 좋아요가 많아요</p>
       </div>
       <div
         onMouseEnter={() => {
@@ -71,10 +71,7 @@ const Top10 = () => {
           <i className="fi fi-rr-angle-small-right text-white text-[1.5em] flex items-center justify-center"></i>
         </span>
         {/* 책 리스트 컨테이너 */}
-        <div
-          ref={bookListRef}
-          className="flex w-[90%] xl:w-full gap-4 mx-auto overflow-x-scroll scrollbar-hidden"
-        >
+        <div ref={bookListRef} className="flex w-[90%] xl:w-full gap-4 mx-auto overflow-x-scroll scrollbar-hidden">
           {/* 책 리스트 */}
           <span ref={firstRef}></span>
           {books
