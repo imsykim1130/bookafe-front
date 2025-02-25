@@ -1,7 +1,6 @@
+import { getBookDetailRequest } from '@/api/api.ts';
+import { BookDetailData } from '@/api/item.ts';
 import { useEffect, useState } from 'react';
-import { getBookDetailRequest } from '../../../../api/api.ts';
-import { BookDetailData } from '../../../../api/item.ts';
-import Cart from './Cart.tsx';
 import Favorite from './Favorite.tsx';
 import Recommend from './Recommend.tsx';
 
@@ -63,8 +62,6 @@ const BookSection = ({
             {role === 'ROLE_ADMIN' && <Recommend isbn={isbn} />}
             {/* 좋아요 */}
             <Favorite isbn={isbn} />
-            {/* 장바구니*/}
-            <Cart isbn={isbn} />
           </div>
         </div>
         {/* 아래 */}
