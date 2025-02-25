@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { deleteBookFromFavoriteRequest, getIsFavoriteRequest, putBookToFavoriteRequest } from '../../../../api/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { allFavoriteBookkey } from '@/api/query';
 
 const Favorite = ({ isbn }: { isbn: string | undefined }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
-  const [cookies, _] = useCookies();
+  const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  // 좋아요 여부
+  // function: 좋아요 여부
   const getIsFavorite = () => {
     if (!cookies.jwt) {
       return;
@@ -23,7 +26,7 @@ const Favorite = ({ isbn }: { isbn: string | undefined }) => {
     });
   };
 
-  // 좋아요 누르기
+  // function: 좋아요 누르기
   const putBookToFavorite = () => {
     if (!cookies.jwt) {
       window.alert('로그인이 필요합니다.');
@@ -35,15 +38,20 @@ const Favorite = ({ isbn }: { isbn: string | undefined }) => {
       return;
     }
     if (!isbn) return;
+    setIsFavorite(true);
     putBookToFavoriteRequest(cookies.jwt, isbn).then((res) => {
       if (!res) {
         window.alert('좋아요 추가 실패');
       }
       getIsFavorite();
+      // 좋아요 책 모두 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: [allFavoriteBookkey]
+      })
     });
   };
 
-  // 좋아요 해제
+  // function: 좋아요 해제
   const deleteBookFromFavorite = () => {
     if (!cookies.jwt) {
       window.alert('로그인이 필요합니다.');
@@ -56,14 +64,20 @@ const Favorite = ({ isbn }: { isbn: string | undefined }) => {
     }
 
     if (!isbn) return;
+    setIsFavorite(false);
     deleteBookFromFavoriteRequest(cookies.jwt, isbn).then((res) => {
       if (!res) {
         window.alert('좋아요 삭제 실패');
       }
       getIsFavorite();
+      // 좋아요 책 모두 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: [allFavoriteBookkey]
+      })
     });
   };
 
+  // effect
   useEffect(() => {
     getIsFavorite();
   }, []);
