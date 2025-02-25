@@ -31,14 +31,12 @@ export interface BookSearchItem {
 }
 
 export interface FavoriteBookItem {
-  id: number;
   isbn: string;
   bookImg: string;
   title: string;
   author: string;
   price: number;
   discountPercent: number;
-  isCart: boolean;
 }
 
 export interface BookDetailData {

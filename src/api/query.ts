@@ -108,6 +108,7 @@ export const useAllSearchBookQuery = (searchWord: string, page: number, requestD
         });
     },
     staleTime: Infinity,
+    // gcTime: 기본 5분
   });
 };
 
@@ -133,7 +134,7 @@ export const useUserInfoQuery = (jwt: string) => {
         });
     },
     staleTime: Infinity,
-    gcTime: 1000 * 60 * 60, // 1시간
+    gcTime: 1000 * 60 * 30, // 30분동안 캐시에 저장
     enabled: false,
   });
 };
@@ -141,6 +142,7 @@ export const useUserInfoQuery = (jwt: string) => {
 // 좋아요 책 리스트
 export const allFavoriteBookkey = 'allFavoriteBook';
 export const useAllFavoriteBookQuery = (jwt: string, page: number) => {
+  console.log('좋아요 책 리스트 ' + page + ' 가져오기');
   return useQuery({
     queryKey: [allFavoriteBookkey, page],
     queryFn: async () => {
@@ -150,8 +152,8 @@ export const useAllFavoriteBookQuery = (jwt: string, page: number) => {
             Authorization: `Bearer ${jwt}`,
           },
           params: {
-            page
-          }
+            page,
+          },
         })
         .then((res) => {
           return res.data as GetAllFavoriteBookResponseDto;
@@ -161,6 +163,6 @@ export const useAllFavoriteBookQuery = (jwt: string, page: number) => {
         });
     },
     staleTime: Infinity,
-    gcTime: 1000 * 60 * 60, // 1시간
+    gcTime: 1000 * 60 * 30, // 30분동안 캐시에 저장
   });
 };

@@ -785,6 +785,25 @@ export const deleteBookFromFavoriteRequest = async (jwt: string, isbn: string) =
     });
 };
 
+// 좋아요 일괄 취소
+export const deleteFavoriteBookListRequest = async (jwt: string, isbnList: string[]) => {
+  console.log('좋아요 일괄 취소 요청')
+  return await axios
+    .delete(DOMAIN + '/favorite/list', {
+      data: {
+        isbnList,
+      },
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+    .then(() => true)
+    .catch((err) => {
+      console.log(err.response.data.message);
+      return false;
+    });
+};
+
 // 좋아요 책 가져오기
 export const getFavoriteBookListRequest = async (jwt: string) => {
   return await axios

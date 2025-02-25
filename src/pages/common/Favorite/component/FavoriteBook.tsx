@@ -1,44 +1,28 @@
-import { moveFavoriteBookToCartRequest } from '@/api/api';
 import { FavoriteBookItem } from '@/api/item';
-import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Props {
   book: FavoriteBookItem;
   deleteFavoriteBook: (isbn: string) => void;
+  checkedBookIsbnList: string[];
+  checkBook: (isbn: string) => void;
 }
 
-function FavoriteBook(props: Props) {
-  const { book, deleteFavoriteBook } = props;
+function FavoriteBook({ book, deleteFavoriteBook, checkedBookIsbnList, checkBook }: Props) {
   const discounted = book.price - (book.price * book.discountPercent) / 100;
-  const [isCart, setIsCart] = useState<boolean>(book.isCart);
-
-  const [cookies] = useCookies(['jwt']);
-
-  // 장바구니 담기 요청
-  const moveFavoriteBookToCart = (isbn: string) => {
-    moveFavoriteBookToCartRequest(cookies.jwt, isbn).then((result) => {
-      if (!result) {
-        return;
-      }
-      setIsCart(true);
-    });
-  };
-
-  useEffect(() => {
-    setIsCart(book.isCart);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
-    <article key={book.id} className={'flex gap-[20px] py-[30px] border-b-[1px] border-black border-opacity-10'}>
-      {/* 왼쪽 */}
+    <article
+      key={book.isbn}
+      className={'relative flex gap-[1.5rem] py-[1.5rem] border-b-[0.025rem] border-black border-opacity-10'}
+    >
+      {/* 책 이미지 */}
       <div
         className={
-          'w-[120px] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.4)] transition-all duration-300 ease hover:drop-shadow-[2px_2px_5px_rgba(0,0,0,0.8)] cursor-pointer'
+          'max-w-[8rem] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.4)] transition-all duration-300 ease hover:drop-shadow-[2px_2px_5px_rgba(0,0,0,0.8)] cursor-pointer'
         }
       >
-        <img src={book.bookImg} alt="book cover image" className={'rounded-[5px]'} />
+        <img src={book.bookImg} alt="book cover image" className={'rounded-[0.625rem]'} />
       </div>
 
       {/* 오른쪽 */}
@@ -59,24 +43,23 @@ function FavoriteBook(props: Props) {
             </div>
           </div>
         </div>
-        {/* 아래 */}
-        <div className={'flex gap-[30px] items-center'}>
-          {/* 장바구니 */}
-          {isCart ? (
-            <i className="fi fi-sr-shopping-cart flex justify-center items-center text-[16px]"></i>
-          ) : (
-            <i
-              className="fi fi-rr-shopping-cart cursor-pointer flex justify-center items-center text-[16px]"
-              onClick={() => moveFavoriteBookToCart(book.isbn)}
-            ></i>
-          )}
+        <div className="absolute bottom-[1.5rem] right-[1.5rem]">
           {/* 휴지통 */}
           <i
-            className="fi fi-rr-trash text-[16px] cursor-pointer flex justify-center items-center"
+            className="fi fi-rr-trash text-[16px] cursor-pointer flex   justify-center items-center icon-btn"
             onClick={() => {
               deleteFavoriteBook(book.isbn);
             }}
           ></i>
+        </div>
+        {/* 체크박스 */}
+        <div className="absolute top-[1.5rem] right-[1.5rem]">
+          <Checkbox
+            onClick={() => {
+              checkBook(book.isbn);
+            }}
+            checked={checkedBookIsbnList.indexOf(book.isbn) >= 0}
+          ></Checkbox>
         </div>
       </div>
     </article>
