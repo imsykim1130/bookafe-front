@@ -80,7 +80,7 @@ const Top10 = () => {
           {books
             ? books.map((book, index) => {
                 return (
-                  <div className="max-w-[120px] flex-shrink-0">
+                  <div key={book.isbn} className="max-w-[120px] flex-shrink-0">
                     <BookPrev
                       key={index}
                       bookImg={book.bookImg}
