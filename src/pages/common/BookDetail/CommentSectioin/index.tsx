@@ -9,7 +9,8 @@ import CommentComp from './CommentComp.tsx';
 
 interface Props {
   // 책이 db 에 있지 않아 카카오 api 에서 받아와야 할 때가 있다.
-  // api 에서 데이터를 받고난 뒤 리뷰를 불러오기 위한 prop
+  // 이 때 리뷰를 불러오면 책 데이터가 db 에 없어 에러가 나기 때문에
+  // api 에서 데이터를 받고난 뒤 db 에 저장하고 리뷰를 불러오기 위한 prop
   bookLoading: boolean;
 }
 
