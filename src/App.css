@@ -3,7 +3,7 @@
 }
 
 .nav {
-  @apply flex absolute right-0 min-w-[10rem] p-[1.25rem] flex-col top-[3rem] rounded-[1rem] border-[0.0625rem] md:static md:flex-row md:min-w-0 md:p-0 md:border-0 md:opacity-100 bg-white;
+  @apply absolute right-0 min-w-[10rem] p-[1.25rem] flex-col top-[3rem] rounded-[1rem] border-[0.0625rem] md:static md:flex-row md:min-w-0 md:p-0 md:border-0 bg-white;
 }
 
 .icon-btn {

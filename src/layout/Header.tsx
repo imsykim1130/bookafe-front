@@ -60,6 +60,11 @@ const Header = () => {
     setIsLoggedIn(true);
   }, [user]);
 
+  // effect: 페이지 이동마다 메뉴 네비게이션 드롭다운 닫기
+  useEffect(() => {
+    setIsNavOpened(false);
+  }, [pathname]);
+
   return (
     <header
       className={`sticky z-40 top-0 w-full flex justify-between items-center px-[5vw] md:px-[10vw] py-5 bg-white shadow-[0_0_4px_rgba(0,0,0,0.1)] text-xs`}
@@ -83,7 +88,8 @@ const Header = () => {
           <i className="flex items-center justify-center text-base fi fi-br-grid"></i>
         </button>
 
-        <div className={`items-start gap-[1.875rem] nav ${isNavOpened ? 'opacity-100' : 'opacity-0'}`}>
+        {/* 드롭다운 */}
+        <div className={`items-start gap-[1.875rem] nav ${isNavOpened ? 'flex' : 'hidden md:flex'}`}>
           {!isLoggedIn ? (
             <>
               {/* 로그인 안되어 있을 때 */}
