@@ -142,10 +142,10 @@ export const useUserInfoQuery = (jwt: string) => {
 // 좋아요 책 리스트
 export const allFavoriteBookkey = 'allFavoriteBook';
 export const useAllFavoriteBookQuery = (jwt: string, page: number) => {
-  console.log('좋아요 책 리스트 ' + page + ' 가져오기');
   return useQuery({
     queryKey: [allFavoriteBookkey, page],
     queryFn: async () => {
+      console.log('좋아요 책 리스트 ' + page + ' 가져오기');
       return await axios
         .get(DOMAIN + '/favorite/list', {
           headers: {
