@@ -1,4 +1,4 @@
-import { DeliveryInfoItem } from '@/api/item.ts';
+import { DeliveryInfoItem, FavoriteBookItem } from '@/api/item.ts';
 import {
   BookDetailData,
   BookSearchItem,
@@ -33,6 +33,12 @@ export interface GetSearchBookListResponseDto extends ResponseDto {
 
 export interface GetBookResponseDto extends ResponseDto {
   book: BookDetailData;
+}
+
+export interface GetAllFavoriteBookResponseDto extends ResponseDto {
+  favoriteBookList: FavoriteBookItem[];
+  isEnd: boolean;
+  totalPages: number;
 }
 
 export interface GetBookFavoriteUserIdListResponseDto extends ResponseDto {
