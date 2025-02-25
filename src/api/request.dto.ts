@@ -12,10 +12,10 @@ export interface SignUpRequestDto {
 
 export interface getSearchBookListRequestDto {
   query: string;
-  sort: 'accuracy' | 'latest';
-  page: number;
-  size: number;
-  target: 'title' | 'isbn' | 'publisher' | 'person';
+  sort?: 'accuracy' | 'latest';
+  page?: number;
+  size?: number;
+  target?: 'title' | 'isbn' | 'publisher' | 'person';
 }
 
 export interface getBookRequestDto {

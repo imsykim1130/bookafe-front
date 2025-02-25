@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { getSearchBookRequest } from '../api/api.ts';
 import { BookSearchItem } from '../api/item.ts';
 import { getSearchBookListRequestDto } from '../api/request.dto.ts';
-import { getSearchBookListResponseDto } from '../api/response.dto.ts';
+import { GetSearchBookListResponseDto } from '../api/response.dto.ts';
 import BookPrev from '../components/BookPrev.tsx';
 
 // index: interface
@@ -67,9 +67,12 @@ const bookReducer: Reducer<BooksStateType, BooksActionType> = (state, action) =>
   if (action.type === 'last') {
     return {
       ...state,
+      items: [...state.items, ...(action.payload as BookSearchItem[])],
+      loading: false,
+      error: false,
       isLast: true,
       total: action.total,
-      items: [...state.items, ...(action.payload as BookSearchItem[])],
+      currentPage: state.currentPage + 1,
     } as BooksStateType;
   }
 
@@ -80,13 +83,12 @@ const getSearchBooks = async (params: getSearchBookListRequestDto, dispatch: Dis
   await getSearchBookRequest(params)
     .then((response) => {
       // 책 데이터 받아오기 성공
-      const { bookList, meta } = response.data as getSearchBookListResponseDto;
-      const { is_end, total_count } = meta;
+      const { bookList, isEnd, totalCount } = response.data as GetSearchBookListResponseDto;
 
-      if (is_end) {
-        dispatch({ type: 'last', payload: bookList, total: total_count });
+      if (isEnd) {
+        dispatch({ type: 'last', payload: bookList, total: totalCount });
       } else {
-        dispatch({ type: 'success', payload: bookList, total: total_count });
+        dispatch({ type: 'success', payload: bookList, total: totalCount });
       }
     })
     .catch((error) => {
@@ -151,9 +153,8 @@ const Search = () => {
       (entries) => {
         // 옵저버의 관찰 대상이 하나이기 때문에 첫번째 엔트리만 확인하면 된다.
         if (entries[0].isIntersecting) {
-          console.log('intersecting');
           // 데이터를 가져오는 중이거나 더이상 가져올 데이터가 없을 때 옵저버 무시
-          if (books.loading || books.isLast || books.items.length <= size) return;
+          if (books.loading || books.isLast) return;
           dispatch({ type: 'searching' }); // books.loading 을 true 로 변경
         }
       },
@@ -178,12 +179,12 @@ const Search = () => {
   }, [searchWord]);
 
   return (
-    <section className="margin-sm md:margin-md mt-[60px] flex flex-col items-center">
-      <div className="max-w-[850px] flex flex-col gap-[20px]">
+    <section className="margin-sm md:margin-md mt-[3rem] flex flex-col items-center">
+      <div className="max-w-[850px] flex flex-col gap-[1.2rem]">
         <SearchBox searchWord={newSearchWord} setSearchWord={setNewSearchWord} />
         {/* 총 검색결과 개수*/}
         <div className="w-full">
-          <p className="text-default-black text-md">
+          <p className="text-base font-semibold">
             검색결과 총 <span>{books.total}</span>개
           </p>
         </div>
