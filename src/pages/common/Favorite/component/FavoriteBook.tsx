@@ -1,5 +1,6 @@
 import { FavoriteBookItem } from '@/api/item';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   book: FavoriteBookItem;
@@ -10,6 +11,7 @@ interface Props {
 
 function FavoriteBook({ book, deleteFavoriteBook, checkedBookIsbnList, checkBook }: Props) {
   const discounted = book.price - (book.price * book.discountPercent) / 100;
+  const navigate = useNavigate();
 
   return (
     <article
@@ -21,6 +23,9 @@ function FavoriteBook({ book, deleteFavoriteBook, checkedBookIsbnList, checkBook
         className={
           'max-w-[8rem] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.4)] transition-all duration-300 ease hover:drop-shadow-[2px_2px_5px_rgba(0,0,0,0.8)] cursor-pointer'
         }
+        onClick={() => {
+          navigate("/book/detail/" + book.isbn);
+        }}
       >
         <img src={book.bookImg} alt="book cover image" className={'rounded-[0.625rem]'} />
       </div>
