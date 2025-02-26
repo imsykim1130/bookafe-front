@@ -57,7 +57,7 @@ const CommentSection = ({ bookLoading }: Props) => {
   // render
   return (
     <section className={'flex justify-center mt-[60px] mx-[5%] text-[14px]'}>
-      <div className={'w-full max-w-[700px]'}>
+      <div className={'w-full max-w-[900px]'}>
         <div>
           <p className={'font-semibold text-[16px] my-[15px]'}>리뷰</p>
         </div>
