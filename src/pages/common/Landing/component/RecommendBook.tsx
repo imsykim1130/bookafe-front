@@ -3,15 +3,15 @@ import { ResponseDto } from '@/api/response.dto.ts';
 import { useUserStore } from '@/zustand/userStore.ts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRecommendBookRequest, GetRecommendBookResponseDto } from '../../../../api/api.ts';
-import { TodayBookInterface } from '../../../../api/item.ts';
+import { getRecommendBookRequest, GetRecommendBookResponseDto } from '@/api/api.ts';
+import { TodayBookInterface } from '@/api/item.ts';
 
 const RecommendBook = () => {
   const { user } = useUserStore();
   const [recommendBook, setRecommendBook] = useState<TodayBookInterface | null>(null);
   const navigate = useNavigate();
-
-  // handler: 책 상세 페이지 이동
+  
+  // function: 책 상세 페이지 이동
   const bookClickHandler = () => {
     navigate('/book/detail/' + recommendBook?.isbn);
   };
@@ -72,7 +72,7 @@ const RecommendBook = () => {
             <p className="text-xl font-semibold">오늘의 책</p>
             <div className="flex flex-col items-center gap-[0.9375rem]">
               {/* 책 이미지 */}
-              <div className={'w-[120px]'} onClick={bookClickHandler}>
+              <div className={'w-[120px] cursor-pointer'} onClick={bookClickHandler}>
                 <img
                   src={recommendBook.bookImg}
                   alt="book cover image"
