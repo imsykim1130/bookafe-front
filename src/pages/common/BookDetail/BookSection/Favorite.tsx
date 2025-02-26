@@ -1,29 +1,33 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { deleteBookFromFavoriteRequest, getIsFavoriteRequest, putBookToFavoriteRequest } from '../../../../api/api';
+import { deleteBookFromFavoriteRequest, getBookFavoriteInfoRequest, putBookToFavoriteRequest } from '@/api/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { allFavoriteBookkey } from '@/api/query';
+import { GetBookFavoriteInfoResponseDto } from '@/api/response.dto';
 
 const Favorite = ({ isbn }: { isbn: string | undefined }) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [favoriteCount, setFavoriteCount] = useState<number>(0);
   const [cookies] = useCookies(['jwt']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // function: 좋아요 여부
-  const getIsFavorite = () => {
+  // function: 책의 좋아요 관련 정보 가져오기
+  const getBookFavoriteInfo= () => {
     if (!cookies.jwt) {
       return;
     }
     if (!isbn) return;
-    getIsFavoriteRequest(cookies.jwt, isbn).then((res) => {
-      if (res === null) {
-        window.alert('좋아요 여부 가져오기 실패. 다시 시도해주세요');
-        return;
+    getBookFavoriteInfoRequest(cookies.jwt, isbn).then((res) => {
+      if(!res) {
+        navigate("/error/500");
       }
-      setIsFavorite(res);
-    });
+      const {isFavorite, favoriteCount} = res as GetBookFavoriteInfoResponseDto;
+      setIsFavorite(isFavorite);
+      setFavoriteCount(favoriteCount);
+    })
   };
 
   // function: 좋아요 누르기
@@ -43,7 +47,7 @@ const Favorite = ({ isbn }: { isbn: string | undefined }) => {
       if (!res) {
         window.alert('좋아요 추가 실패');
       }
-      getIsFavorite();
+      getBookFavoriteInfo();
       // 좋아요 책 모두 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: [allFavoriteBookkey]
@@ -69,7 +73,7 @@ const Favorite = ({ isbn }: { isbn: string | undefined }) => {
       if (!res) {
         window.alert('좋아요 삭제 실패');
       }
-      getIsFavorite();
+      getBookFavoriteInfo();
       // 좋아요 책 모두 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: [allFavoriteBookkey]
@@ -79,16 +83,17 @@ const Favorite = ({ isbn }: { isbn: string | undefined }) => {
 
   // effect
   useEffect(() => {
-    getIsFavorite();
+    getBookFavoriteInfo();
   }, []);
 
   return (
-    <div>
+    <div className='flex flex-col items-center'>
       {isFavorite ? (
-        <i className="fi fi-ss-heart cursor-pointer text-[16px]" onClick={deleteBookFromFavorite}></i>
+        <i className="fi fi-ss-heart cursor-pointer text-[1.2rem]" onClick={deleteBookFromFavorite}></i>
       ) : (
-        <i className="fi fi-rs-heart cursor-pointer text-[16px]" onClick={putBookToFavorite}></i>
+        <i className="fi fi-rs-heart cursor-pointer text-[1.2rem]" onClick={putBookToFavorite}></i>
       )}
+      <p>{favoriteCount}</p>
     </div>
   );
 };

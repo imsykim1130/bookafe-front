@@ -75,3 +75,8 @@ export interface GetDeliveryInfoResponseDto extends ResponseDto {
 export interface GetAllDeliveryInfoResponseDto extends ResponseDto {
   userDeliveryInfoList: DeliveryInfoItem[];
 }
+
+export interface GetBookFavoriteInfoResponseDto extends ResponseDto {
+  isFavorite: boolean;
+  favoriteCount: number;
+}

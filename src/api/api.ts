@@ -24,6 +24,7 @@ import {
 } from './request.dto.ts';
 import {
   GetAllDeliveryInfoResponseDto,
+  GetBookFavoriteInfoResponseDto,
   GetCommentListResponse,
   getCouponListResponseDto,
   GetDeliveryStatusListResponseDto,
@@ -734,16 +735,16 @@ export const deleteBookFromCartRequest = async (jwt: string, isbn: string) => {
     });
 };
 
-// 좋아요 여부
-export const getIsFavoriteRequest = async (jwt: string, isbn: string) => {
+// 책의 좋아요 관련 정보
+export const getBookFavoriteInfoRequest = async (jwt: string, isbn: string) => {
   return await axios
     .get('http://localhost:8080/api/v1/favorite/' + isbn, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
     })
-    .then((res): boolean => {
-      return res.data;
+    .then((res): GetBookFavoriteInfoResponseDto=> {
+      return res.data as GetBookFavoriteInfoResponseDto;
     })
     .catch((err) => {
       console.log(err.response.data);
