@@ -24,7 +24,7 @@ const BookPrev = (props: Props) => {
       <img
         src={bookImg}
         alt="book image"
-        className={`w-full my-[15px] rounded-[10px] shadow-[0_0_10px_rgba(0,0,0,0.2)]`}
+        className={`w-full my-[15px] rounded-[10px] shadow-[0_0_10px_rgba(0,0,0,0.2)] icon-btn`}
       />
       <div className="flex flex-col gap-[5px] mt-[10px] ml-[5px] text-md">
         <p className="font-semibold text-default-black text-wrap">{title}</p>
