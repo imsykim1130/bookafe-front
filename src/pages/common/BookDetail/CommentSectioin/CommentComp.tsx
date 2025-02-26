@@ -9,10 +9,11 @@ import {
   getReplyListRequest,
   modifyCommentRequest,
   postCommentRequest,
-} from '../../../../api/api.ts';
-import { CommentItem } from '../../../../api/item.ts';
-import { PostCommentRequestDto } from '../../../../api/request.dto.ts';
+} from '@/api/api.ts';
+import { CommentItem } from '@/api/item.ts';
+import { PostCommentRequestDto } from '@/api/request.dto.ts';
 import FavoriteCount from './FavoriteCount.tsx';
+import { Button } from '@/components/ui/button.tsx';
 
 interface CommentCompProp {
   comment: CommentItem;
@@ -150,17 +151,17 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
     );
 
   const replyContentRender = () => (
-    <div className={'flex flex-col items-end mb-[20px]'}>
+    <div className={'flex flex-col items-end mb-[20px] gap-[1rem]'}>
       <textarea
         className={
-          'resize-none w-full min-h-[100px] outline-none border-[1px] border-black border-opacity-10 rounded-[5px] p-[15px] box-border'
+          'resize-none w-full min-h-[100px] outline-none border-[0.0625rem] border-black border-opacity-10 rounded-[1rem] p-[15px] box-border'
         }
         placeholder={'리뷰에 대한 의견을 남겨주세요'}
         value={replyContent}
         onChange={(e) => setReplyContent(e.target.value)}
       />
-      <button
-        className={'border-[1px] border-black border-opacity-80 rounded-[5px] mt-[15px] px-[10px] py-[5px]'}
+      <Button
+        variant={'outline'}
         onClick={() => {
           const requestDto: PostCommentRequestDto = {
             parentId: comment.id,
@@ -179,16 +180,16 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
         }}
       >
         작성
-      </button>
+      </Button>
     </div>
   );
 
-  const replyListRender = () =>
+  const ReplyListRender = () =>
     replyList && (
       <div className={'flex flex-col gap-[20px]'}>
         {replyList.map((item) => (
           // 리플
-          <div key={item.id} className={'flex flex-col gap-[10px] p-[20px] rounded-[5px] bg-black bg-opacity-5'}>
+          <div key={item.id} className={'flex flex-col gap-[10px] p-[20px] rounded-[1rem] bg-black bg-opacity-5'}>
             <div className={'flex items-center gap-[10px]'}>
               <span>{`re : ${item.nickname}`}</span>
               <span className={'text-black text-opacity-60'}>{moment(item.writeDate).format('YYYY.MM.DD')}</span>
@@ -235,11 +236,10 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
       </div>
       {/* 리플 리스트 */}
       {isReplyOpen && (
-        <div className={'pl-[30px] flex flex-col gap-[30px]'}>
-          {/* 리플 리스트 */}
-          {replyList && replyList.length ? replyListRender() : <p className="px-4 text-gray-500">댓글이 없어요. 첫 댓글을 남겨보세요 👍</p>}
+        <div className={'pl-[2rem] pb-[2rem] flex flex-col gap-[1rem]'}>
           {/* 리플 작성창 */}
           {cookies.jwt && !comment.isDeleted && replyContentRender()}
+          <ReplyListRender/>
         </div>
       )}
     </article>
