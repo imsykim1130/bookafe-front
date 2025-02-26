@@ -6,6 +6,7 @@ import { getCommentListRequest, postCommentRequest } from '../../../../api/api.t
 import { CommentItem } from '../../../../api/item.ts';
 import { PostCommentRequestDto } from '../../../../api/request.dto.ts';
 import CommentComp from './CommentComp.tsx';
+import { Button } from '@/components/ui/button.tsx';
 
 interface Props {
   // 책이 db 에 있지 않아 카카오 api 에서 받아와야 할 때가 있다.
@@ -56,27 +57,30 @@ const CommentSection = ({ bookLoading }: Props) => {
 
   // render
   return (
-    <section className={'flex justify-center mt-[60px] mx-[5%] text-[14px]'}>
+    <section className={'flex justify-center mt-[60px] mx-[5%]'}>
       <div className={'w-full max-w-[900px]'}>
+        {/* 리뷰 제목 */}
         <div>
           <p className={'font-semibold text-[16px] my-[15px]'}>리뷰</p>
         </div>
-        {/* 댓글 작성창 */}
+        {/* 리뷰 작성창 */}
         {/* 로그인 되어 있을 때 */}
         {cookies.jwt && (
           <div className={'flex flex-col gap-[15px]'}>
+            {/* 리뷰 작성창 */}
             <textarea
               className={
-                'w-full min-h-[100px] p-[20px] pb-[40px] outline-none border-[1px] border-black border-opacity-15 rounded-[5px] resize-none'
+                'w-full min-h-[100px] p-[20px] pb-[40px] outline-none border-[1px] border-black border-opacity-15 rounded-[10px] resize-none'
               }
               value={content}
               placeholder={'책에 대한 감상을 남겨주세요 😃'}
               onChange={(e) => setContent(e.target.value)}
             />
-            <div className={'flex justify-between items-center'}>
+            <div className={'flex justify-end gap-[1.5rem] items-center'}>
+              {/* 이모티콘 */}
               <div
                 className={
-                  'border-[1px] border-black border-opacity-10 rounded-[20px] p-[10px] flex gap-[20px] items-center text-[20px]'
+                  'border-[1px] border-black border-opacity-10 rounded-[20px] p-[10px] flex gap-[20px] items-center'
                 }
               >
                 {emojiList.map((emoji, index) => (
@@ -95,10 +99,8 @@ const CommentSection = ({ bookLoading }: Props) => {
                   </div>
                 ))}
               </div>
-              <button
-                className={
-                  'border-[1px] border-black border-opacity-80 rounded-[5px] px-[10px] py-[5px] duration-200 hover:bg-black hover:bg-opacity-5'
-                }
+              {/* 작성 버튼 */}
+              <Button
                 onClick={() => {
                   if (!isbn) return;
                   const requestDto: PostCommentRequestDto = {
@@ -117,7 +119,7 @@ const CommentSection = ({ bookLoading }: Props) => {
                 }}
               >
                 작성
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -136,6 +138,7 @@ const CommentSection = ({ bookLoading }: Props) => {
             후 가능합니다
           </p>
         )}
+
         {/* 댓글 리스트 */}
         <div className={'mt-[60px]'}>
           {commentList &&

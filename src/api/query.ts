@@ -4,7 +4,6 @@ import {
   GetAllFavoriteBookResponseDto,
   GetDeliveryInfoResponseDto,
   GetSearchBookListResponseDto,
-  GetUserResponseDto,
 } from '@/api/response.dto';
 import { DOMAIN } from '@/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -109,33 +108,6 @@ export const useAllSearchBookQuery = (searchWord: string, page: number, requestD
     },
     staleTime: Infinity,
     // gcTime: 기본 5분
-  });
-};
-
-// 유저 정보
-// gc time 과 stale time 을 무한대로 하여 유저 정보 변경 시에만 요청 보내도록 함
-export const userInfoKey = 'userInfo';
-export const useUserInfoQuery = (jwt: string) => {
-  return useQuery({
-    queryKey: [userInfoKey],
-    queryFn: async () => {
-      console.log('fetch user');
-      return axios
-        .get(DOMAIN + '/user', {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        })
-        .then((res) => {
-          return res.data as GetUserResponseDto;
-        })
-        .catch((err) => {
-          throw err;
-        });
-    },
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 30, // 30분동안 캐시에 저장
-    enabled: false,
   });
 };
 
