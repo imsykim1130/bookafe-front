@@ -1,3 +1,4 @@
+import AlertDialogComp from '@/components/AlertDialogComp';
 import { useJwt } from '@/hook/useJwt';
 import { useUser } from '@/hook/useUser';
 import { useEffect, useState } from 'react';
@@ -6,9 +7,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
-  const {removeCookie} = useJwt();
+  const { jwt, removeCookie } = useJwt();
   const { pathname } = useLocation();
-  const { user, invalidateUser } = useUser();
+  const { deleteUser } = useUser(jwt);
 
   const [isAlarm] = useState<boolean>(false);
   const [isNavOpened, setIsNavOpened] = useState<boolean>(false);
@@ -16,7 +17,7 @@ const Header = () => {
   // function: 로그아웃 버튼 클릭 핸들러
   function logoutClickHandler() {
     removeCookie('jwt', { path: '/' });
-    invalidateUser();
+    deleteUser();
   }
 
   // function: 로그인 버튼 클릭 핸들러
@@ -60,7 +61,7 @@ const Header = () => {
 
         {/* 드롭다운 */}
         <div className={`items-start gap-[1.875rem] nav ${isNavOpened ? 'flex' : 'hidden md:flex'}`}>
-          {!user ? (
+          {!jwt ? (
             <>
               {/* 로그인 안되어 있을 때 */}
               {/* 로그인, 로그아웃 */}
@@ -81,14 +82,15 @@ const Header = () => {
               <Link to={'/user'} className="icon-btn ">
                 내 정보
               </Link>
-              <button
-                className="icon-btn "
-                onClick={() => {
-                  logoutClickHandler();
-                }}
-              >
-                로그아웃
-              </button>
+              <AlertDialogComp logoutClickHandler={logoutClickHandler}>
+                {/* 로그아웃 팝업 띄울 트리거 버튼 */}
+                <button
+                  className="icon-btn"
+                >
+                  로그아웃
+                </button>
+              </AlertDialogComp>
+              
             </>
           )}
         </div>
