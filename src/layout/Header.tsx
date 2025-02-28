@@ -1,21 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useUser } from '@/hook/useUser';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useUserStore } from '../zustand/userStore';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
   const [, , removeCookie] = useCookies(['jwt']);
 
   const { pathname } = useLocation();
-  const isAuthPage = pathname.includes('/auth/');
-  const { authType } = useParams();
 
-  const { user } = useUserStore();
+  const { user, invalidateUser } = useUser();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  const [isAlarm, setIsAlarm] = useState<boolean>(false);
+  const [isAlarm] = useState<boolean>(false);
 
   const [isNavOpened, setIsNavOpened] = useState<boolean>(false);
   // const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
@@ -32,6 +30,7 @@ const Header = () => {
   // function: 로그아웃 버튼 클릭 핸들러
   function logoutClickHandler() {
     removeCookie('jwt', { path: '/' });
+    invalidateUser();
   }
 
   // function: 로그인 버튼 클릭 핸들러
@@ -53,6 +52,7 @@ const Header = () => {
 
   // effect: user 변경 사항으로 로그인 여부 확인
   useEffect(() => {
+    console.log(user);
     if (!user) {
       setIsLoggedIn(false);
       return;

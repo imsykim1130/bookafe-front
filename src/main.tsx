@@ -1,8 +1,8 @@
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
-import './index.css';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './App.css';
+import './index.css';
 
 import App from './App.tsx';
 import Search from './pages/Search.tsx';
@@ -96,5 +96,6 @@ createRoot(document.getElementById('root')!).render(
     <CookiesProvider>
       <RouterProvider router={router} />
     </CookiesProvider>
+    <ReactQueryDevtools/>
   </QueryClientProvider>,
 );

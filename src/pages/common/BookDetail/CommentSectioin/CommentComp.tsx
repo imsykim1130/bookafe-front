@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useUserStore } from '@/zustand/userStore.ts';
 import moment from 'moment/moment';
 import { useEffect, useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -14,6 +13,7 @@ import { CommentItem } from '@/api/item.ts';
 import { PostCommentRequestDto } from '@/api/request.dto.ts';
 import FavoriteCount from './FavoriteCount.tsx';
 import { Button } from '@/components/ui/button.tsx';
+import { useUser } from '@/hook/useUser.ts';
 
 interface CommentCompProp {
   comment: CommentItem;
@@ -21,7 +21,9 @@ interface CommentCompProp {
 }
 
 const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
-  const nickname = useUserStore((state) => (state.user ? state.user.nickname : null));
+  const {user} = useUser();
+  const nickname = user ? user.nickname : "";
+  const profileImg = user ? user.profileImg : "";
   const [cookies] = useCookies(['jwt']);
   const { isbn } = useParams();
 
@@ -112,17 +114,13 @@ const CommentComp = ({ comment, getCommentList }: CommentCompProp) => {
     setIsModify(true);
   };
 
-  // function : 이미지 이름으로 이미지를 가져올 수 있는 url 주소로 변경
-  const getProfileImageUrl = (fileName: string) => {
-    return `http://localhost:8080/image/${fileName}`;
-  };
 
   // render
   const commentInfoRender = () => (
     <div className={'flex gap-[10px] items-center'}>
       <div className={'w-[30px] h-[30px] rounded-full overflow-hidden flex justify-center items-center'}>
-        {comment.profileImg ? (
-          <img src={getProfileImageUrl(comment.profileImg)} alt="profile image" />
+        {profileImg ? (
+          <img src={profileImg} alt="profile image" />
         ) : (
           <div className={'flex justify-center items-center w-full h-full bg-black bg-opacity-5'}>
             <i className="text-black fi fi-br-user text-opacity-20"></i>
