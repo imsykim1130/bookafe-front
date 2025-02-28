@@ -1,31 +1,17 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+import { useJwt } from '@/hook/useJwt';
 import { useUser } from '@/hook/useUser';
 import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
+
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
-  const [, , removeCookie] = useCookies(['jwt']);
-
+  const {removeCookie} = useJwt();
   const { pathname } = useLocation();
-
   const { user, invalidateUser } = useUser();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const [isAlarm] = useState<boolean>(false);
-
   const [isNavOpened, setIsNavOpened] = useState<boolean>(false);
-  // const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
-
-  // // function: 이미지 url 생성
-  // const changeProfileImage = (changeImage: string) => {
-  //   if (!changeImage) {
-  //     setProfileImageUrl(null);
-  //     return;
-  //   }
-  //   setProfileImageUrl(`http://localhost:8080/image/${changeImage}`);
-  // };
 
   // function: 로그아웃 버튼 클릭 핸들러
   function logoutClickHandler() {
@@ -43,22 +29,6 @@ const Header = () => {
   function toggleNav() {
     setIsNavOpened(!isNavOpened);
   }
-
-  // // effect: 프로필 이미지 변경 시 새로 받아오기
-  // useEffect(() => {
-  //   if (!user) return;
-  //   changeProfileImage(user.profileImg);
-  // }, [user?.profileImg]);
-
-  // effect: user 변경 사항으로 로그인 여부 확인
-  useEffect(() => {
-    console.log(user);
-    if (!user) {
-      setIsLoggedIn(false);
-      return;
-    }
-    setIsLoggedIn(true);
-  }, [user]);
 
   // effect: 페이지 이동마다 메뉴 네비게이션 드롭다운 닫기
   useEffect(() => {
@@ -90,7 +60,7 @@ const Header = () => {
 
         {/* 드롭다운 */}
         <div className={`items-start gap-[1.875rem] nav ${isNavOpened ? 'flex' : 'hidden md:flex'}`}>
-          {!isLoggedIn ? (
+          {!user ? (
             <>
               {/* 로그인 안되어 있을 때 */}
               {/* 로그인, 로그아웃 */}

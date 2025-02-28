@@ -9,7 +9,6 @@ export const userKey = 'user';
 export const useUser = () => {
     const [cookies]= useCookies();
     const queryClient = useQueryClient();
-    console.log(cookies.jwt);
 
     // 유저 정보를 불러오고 캐시에 저장 (전역적으로 사용 가능)
     const {data: user, isLoading: isUserLoading, error: userError} = useQuery({
@@ -22,6 +21,7 @@ export const useUser = () => {
         gcTime: 1000 * 60 * 30 // 30분
     });
 
+    // 프로필 이미지 변경
     const changeProfileImage = (file: File) => {
         changeProfileImgRequest(cookies.jwt, file).then((result) => {
             if (!result) {
@@ -34,6 +34,7 @@ export const useUser = () => {
         });
     }
     
+    // 유저 캐시 무효화
     const invalidateUser = () => {
         queryClient.invalidateQueries({
             queryKey: [userKey]
