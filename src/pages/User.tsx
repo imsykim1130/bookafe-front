@@ -1,10 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from '@/components/ui/button';
+import { useJwt } from '@/hook/useJwt';
 import { useUser } from '@/hook/useUser.ts';
 
 // 유저 페이지
 const User = () => {
-  const {user, isUserLoading, userError, changeProfileImage} = useUser();
+  const {jwt} = useJwt();
+  const {user, isUserLoading, userError, changeProfileImage} = useUser(jwt);
 
   // Rendering
   if(isUserLoading) {

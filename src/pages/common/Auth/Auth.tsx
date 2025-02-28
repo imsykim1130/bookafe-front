@@ -3,10 +3,11 @@ import { SignInRequestDto, SignUpRequestDto } from '@/api/request.dto';
 import { ResponseDto, SignInResponseDto } from '@/api/response.dto';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
+import { useJwt } from '@/hook/useJwt';
+import { useUser } from '@/hook/useUser';
 import { getRandomNickname } from '@/utils';
 import moment from 'moment';
 import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const Auth = () => {
@@ -15,7 +16,8 @@ const Auth = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const pathname = state ? state.pathname : null;
-  const [, setCookie] = useCookies(['jwt']);
+  const {jwt, setCookie} = useJwt();
+  const {refetchUser} = useUser(jwt);
 
   // Ref
   const emailRef = useRef<HTMLInputElement>(null);
@@ -70,6 +72,7 @@ const Auth = () => {
       const { jwt } = response as SignInResponseDto;
       const expire = moment().add(1, 'hour').toDate(); // 유효시간 1시간
       setCookie('jwt', jwt, { path: '/', expires: expire });
+      refetchUser();
 
       // 페이지 이동
       if (pathname) {
