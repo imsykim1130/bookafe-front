@@ -14,7 +14,7 @@ export const useUser = (jwt: string) => {
         queryFn: () => {
             return getUser(jwt);
         },
-        enabled: false,
+        enabled: !!jwt,
         staleTime: Infinity,
         gcTime: 1000 * 60 * 30 // 30분
     });
