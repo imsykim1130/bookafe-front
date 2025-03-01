@@ -18,6 +18,7 @@ const Header = () => {
   function logoutClickHandler() {
     removeCookie('jwt', { path: '/' });
     deleteUser();
+    navigate("/");
   }
 
   // function: 로그인 버튼 클릭 핸들러
