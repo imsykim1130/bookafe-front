@@ -125,7 +125,7 @@ export const searchBookListQueryKey = 'searchBookList';
 
 type UseSearchBookListQuery = (params: UseSearchBookListQueryParams) => UseSearchBookListQueryReturn;
 
-export const useSearchBookListQuery: UseSearchBookListQuery = (params) => {
+export const useSearchBookListQuery: UseSearchBookListQuery = (params: UseSearchBookListQueryParams) => {
   const {
     data: searchBookListWithInfo,
     isLoading: isSearchBookListLoading,

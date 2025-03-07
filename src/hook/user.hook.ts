@@ -38,17 +38,14 @@ export const useUserQuery: UseUserQuery = () => {
   } = useQuery({
     queryKey: [userKey],
     queryFn: async () => {
-      console.log('user fetching');
       return await request
         .get<UserResponse>(DOMAIN + '/user')
         .then((user) => user)
         .catch(() => null);
     },
-    retry: 0,
     enabled: false,
-    staleTime: Infinity,
+    retry: 0,
     initialData: null,
-    gcTime: 1000 * 60 * 60, // 1시간
   });
 
   const resetUser = () => {

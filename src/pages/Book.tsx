@@ -168,7 +168,6 @@ const RecommendBtnComp = () => {
   }
 
   const { recommend, unrecommend } = useRecommendBookMutation({
-    isbn,
     onRecommendSuccess,
     onRecommendError,
     onUnrecommendSuccess,
@@ -182,9 +181,9 @@ const RecommendBtnComp = () => {
   return (
     <div className="text-xl font-semibold">
       {isRecommended ? (
-        <i className="cursor-pointer fi fi-sr-star" onClick={unrecommend}></i>
+        <i className="cursor-pointer fi fi-sr-star" onClick={()=>unrecommend(isbn)}></i>
       ) : (
-        <i className="cursor-pointer fi fi-rr-star" onClick={recommend}></i>
+        <i className="cursor-pointer fi fi-rr-star" onClick={()=>recommend(isbn)}></i>
       )}
     </div>
   );

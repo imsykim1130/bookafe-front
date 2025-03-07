@@ -432,22 +432,7 @@ export const deleteRecommendBookRequest = async (jwt: string, isbn: string) => {
     });
 };
 
-// 추천 책 가져오기
-export const getAllRecommendBookRequest = async (jwt: string) => {
-  return await axios
-    .get('http://localhost:8080/api/v1/recommend-book/all', {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-    .then((res): RecommendBookItem[] => {
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err.response.data);
-      return null;
-    });
-};
+
 
 // 유저 검색
 export const searchUserRequest = async (jwt: string, searchWord: string) => {

@@ -1,65 +1,40 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
-import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
+import { request } from '@/api/template';
 import SearchBox from '@/components/SearchBox.tsx';
+import { SearchBookListResponse } from '@/hook/book.hooks.ts';
 import { useDebounce } from '@/hook/hooks.ts';
+import { RecommendBook, useRecommendBookListQuery, useRecommendBookMutation } from '@/hook/recommend.book.hooks.ts';
+import { ErrorResponse } from '@/types/common.type.ts';
+import { DOMAIN } from '@/utils/env.ts';
 import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import {
-  deleteRecommendBookRequest,
-  getAllRecommendBookRequest,
-  getSearchBookRequest,
-  registerRecommendBookRequest,
-} from '../../api/common.api.ts';
 import { BookSearchItem, RecommendBookItem } from '../../api/item.ts';
 
-// const mock: RecommendBookItem = {
-//   title: 'hihi',
-//   author: 'heheh',
-//   bookImg:
-//     'https://plus.unsplash.com/premium_photo-1670598267085-053235b0d6de?q=80&w=3686&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//   publisher: 'heheh',
-// };
+const RecommendBookPage = () => {
+  const { recommendBookList, isRecommendBookListLoading, isRecommendBookListError, refetchRecommendBookList } =
+    useRecommendBookListQuery();
+  const { recommend } = useRecommendBookMutation({
+    onRecommendError,
+    onRecommendSuccess,
+  });
 
-const RecommendBook = () => {
-  const [cookies] = useCookies(['jwt']);
-  const [recommentBookList, setRecommentBookList] = useState<RecommendBookItem[] | null>(null);
   const [searchBookList, setSearchBookList] = useState<BookSearchItem[] | null>(null);
   const [searchWord, setSearchWord] = useState<string>('');
   const debouncedSearchWord = useDebounce(searchWord, 400);
   const [isMouseInSerchSection, setIsMouseInSerchSection] = useState<boolean>(false);
 
-  // function: 추천 책 리스트 가져오기
-  const getAllRecommendBook = async () => {
-    getAllRecommendBookRequest(cookies.jwt).then((result) => {
-      setRecommentBookList(result);
-    });
-  };
-
-  // 추천 책 추가
-  const registerRecommendBook = (isbn: string) => {
-    console.log('recommend');
-    registerRecommendBookRequest(cookies.jwt, isbn).then((res) => {
-      if (res !== true) {
-        window.alert(res);
-        return;
-      }
-      initSearch();
-      getAllRecommendBook();
-    });
-  };
-
-  // function: 추천 책 삭제하기
-  const deleteRecommendBook = async (isbn: string) => {
-    deleteRecommendBookRequest(cookies.jwt, isbn).then((result) => {
-      if (!result) {
-        window.alert('오류가 발생했습니다 다시 시도해주세요');
-        return;
-      }
-      getAllRecommendBook();
-    });
-  };
+  // 책 추천 핸들러
+  // 성공
+  function onRecommendSuccess() {
+    initSearch();
+    // invalidateRecommendBookList();
+    refetchRecommendBookList();
+  }
+  // 실패
+  function onRecommendError(err: ErrorResponse) {
+    console.log(err.message);
+    window.alert(err.message);
+  }
 
   // function: 검색 결과 초기화
   const initSearch = () => {
@@ -69,23 +44,14 @@ const RecommendBook = () => {
 
   // function: 책 검색하기
   const searchBook = () => {
-    const requestDto: getSearchBookListRequestDto = {
-      query: searchWord,
-      sort: 'accuracy',
-      page: 1,
-      size: 10,
-      target: 'title',
-    };
-    getSearchBookRequest(requestDto)
-      .then((response) => {
-        // 책 데이터 받아오기 성공
-        const { bookList } = response.data as getSearchBookListResponseDto;
-        setSearchBookList(bookList);
+    request
+      .getWithParams<SearchBookListResponse, { query: string }>(DOMAIN + '/books/search', { query: searchWord }, false)
+      .then((data: SearchBookListResponse) => {
+        setSearchBookList(data.bookList);
       })
-      .catch((error) => {
-        // 책 데이터 받아오기 실패
-        console.log(error.response.data);
-        setSearchBookList(null);
+      .catch((err) => {
+        console.log(err.message);
+        setSearchBookList([]);
       });
   };
 
@@ -110,10 +76,8 @@ const RecommendBook = () => {
     console.log(isMouseInSerchSection);
   }, [isMouseInSerchSection]);
 
-  // effect: 초기 렌더링 시 추천 책 리스트 가져오기
+  // 마운트
   useEffect(() => {
-    getAllRecommendBook();
-
     document.addEventListener('click', clickHandler);
 
     return () => {
@@ -148,7 +112,7 @@ const RecommendBook = () => {
                     <div>
                       <button
                         className="px-2 py-1 text-white bg-black rounded-[10px]"
-                        onClick={() => registerRecommendBook(book.isbn)}
+                        onClick={() => recommend(book.isbn)}
                       >
                         추천
                       </button>
@@ -166,28 +130,56 @@ const RecommendBook = () => {
         </div>
         {/* 추천 책 리스트 */}
         <div className="py-[2rem]">
-          {recommentBookList && recommentBookList.length > 0 ? (
-            recommentBookList.map((book: RecommendBookItem) => (
-              <RecommendBookComp key={book.id} book={book} deleteRecommendBook={deleteRecommendBook} />
-            ))
-          ) : (
-            <h1 className="font-semibold text-[1.5rem]">추천 책이 없습니다.</h1>
-          )}
+          <RecommendBookList
+            recommendBookList={recommendBookList}
+            isLoading={isRecommendBookListLoading}
+            isError={isRecommendBookListError}
+          />
         </div>
       </div>
     </main>
   );
 };
 
-const RecommendBookComp = ({
-  book,
-  deleteRecommendBook,
+const RecommendBookList = ({
+  recommendBookList,
+  isLoading,
+  isError,
 }: {
-  book: RecommendBookItem;
-  deleteRecommendBook: (isbn: string) => void;
+  recommendBookList: RecommendBook[];
+  isLoading: boolean;
+  isError: boolean;
 }) => {
+  if (isLoading) {
+    return <p>로딩중</p>;
+  }
+  if (isError) {
+    return <p>불러오지 못했습니다</p>;
+  }
+
+  if (recommendBookList.length === 0) {
+    return <p>추천 책이 없습니다</p>;
+  }
+
+  return recommendBookList.map((book) => <RecommendBookComp book={book} />);
+};
+
+const RecommendBookComp = ({ book }: { book: RecommendBookItem }) => {
   const { title, author, bookImg, publisher, isbn } = book;
+  const { unrecommend, invalidateRecommendBookList } = useRecommendBookMutation({ onUnrecommendSuccess, onUnrecommendError });
   const navigate = useNavigate();
+
+  // 책 추천 취소 핸들러
+  // 성공
+  function onUnrecommendSuccess() {
+    invalidateRecommendBookList();
+  }
+
+  // 실패
+  function onUnrecommendError(err: ErrorResponse) {
+    console.log(err.message);
+    window.alert('추천 취소 실패. 다시 시도해주세요');
+  }
 
   return (
     <div className={'flex justify-between py-[30px] border-b-[1px] border-black border-opacity-10'}>
@@ -211,11 +203,11 @@ const RecommendBookComp = ({
       <div>
         <i
           className="text-[1rem] duration-300 cursor-pointer fi fi-rr-trash text-default-black hover:text-opacity-40"
-          onClick={() => deleteRecommendBook(isbn)}
+          onClick={() => unrecommend(isbn)}
         ></i>
       </div>
     </div>
   );
 };
 
-export default RecommendBook;
+export default RecommendBookPage;

@@ -29,3 +29,32 @@ export const bookPrevDataListMock: BookPrevData[] = [
     discountPercent: 10,
   },
 ];
+
+export const userListMock = [
+  {
+    email: 'hi@hi.com',
+    datetime: '2024.12.12',
+    point: 1222,
+    commentCount: 29,
+  },
+  {
+    email: 'hi@hi2.com',
+    datetime: '2024.12.12',
+    point: 12,
+    commentCount: 2,
+  },
+  {
+    email: 'hi@hi3.com',
+    datetime: '2024.12.12',
+    point: 1222242224,
+    commentCount: 29009,
+  },
+];
+
+export const recommendBookmock = {
+  title: 'hihi',
+  author: 'heheh',
+  bookImg:
+    'https://plus.unsplash.com/premium_photo-1670598267085-053235b0d6de?q=80&w=3686&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  publisher: 'heheh',
+};

@@ -5,27 +5,6 @@ import { useCookies } from 'react-cookie';
 import { deleteUserRequest, searchUserRequest } from '../../api/common.api.ts';
 import { UserManagementItem } from '../../api/item.ts';
 
-// const userListMock: UserManagementItem[] = [
-//   {
-//     email: 'hi@hi.com',
-//     datetime: '2024.12.12',
-//     point: 1222,
-//     commentCount: 29,
-//   },
-//   {
-//     email: 'hi@hi2.com',
-//     datetime: '2024.12.12',
-//     point: 12,
-//     commentCount: 2,
-//   },
-//   {
-//     email: 'hi@hi3.com',
-//     datetime: '2024.12.12',
-//     point: 1222242224,
-//     commentCount: 29009,
-//   },
-// ];
-
 const UserManagement = () => {
   const [userList, setUserList] = useState<UserManagementItem[] | null>(null);
   const [cookies] = useCookies(['jwt']);

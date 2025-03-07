@@ -4,8 +4,10 @@ import { Input } from '@/components/ui/input.tsx';
 import { useAuthMutation } from '@/hook/auth.hooks';
 import { ErrorResponse } from '@/types/common.type';
 import { getRandomNickname } from '@/utils/openai';
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import queryString from "query-string";
 
 const Auth = () => {
   // index: top
@@ -13,6 +15,8 @@ const Auth = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const pathname = state ? state.pathname : null;
+  const isLogout = queryString.parse(window.location.search).logout;
+  const queryClient = useQueryClient();
 
   // Ref
   const emailRef = useRef<HTMLInputElement>(null);
@@ -31,12 +35,35 @@ const Auth = () => {
 
   const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
 
-  const { signIn, signUp } = useAuthMutation({
+  const { signIn, signUp, logout } = useAuthMutation({
     onSignInSuccess,
     onSignInError,
     onSignUpSuccess,
     onSignUpError,
+    onLogoutSuccess,
+    onLogoutError,
   });
+
+  // hander: 로그아웃 성공 핸들러
+  function onLogoutSuccess() {
+    // 캐시 완전히 삭제
+    queryClient.clear();
+    navigate('/auth/sign-in');
+  }
+
+  // handler: 로그아웃 실패 핸들러
+  function onLogoutError() {
+    // 캐시 완전히 삭제
+    queryClient.clear();
+    navigate('/auth/sign-in');
+  }
+
+  // 로그아웃 요청으로 로그인 페이지 접속 시 서버에 로그아웃 요청
+  useEffect (() => {
+   if(isLogout){
+    logout();
+   }
+  }, [])
 
   // function: 로그인 / 회원가입 페이지 이동
   function changeAuthType() {

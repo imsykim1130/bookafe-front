@@ -1,16 +1,14 @@
 import AlertDialogComp from '@/components/AlertDialogComp';
-import { useAuthMutation } from '@/hook/auth.hooks';
 import { useUserQuery } from '@/hook/user.hook';
 import { useAuth, useChangeAuth } from '@/store/auth.store';
-import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  console.log('header render');
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const queryClient = useQueryClient();
 
   const [isAlarm] = useState<boolean>(false);
   const [isNavOpened, setIsNavOpened] = useState<boolean>(false);
@@ -20,24 +18,7 @@ const Header = () => {
   const auth = useAuth();
   const changeAuth = useChangeAuth();
 
-  const { logout } = useAuthMutation({
-    onLogoutError,
-    onLogoutSuccess,
-  });
-
-  // hander: 로그아웃 성공 핸들러
-  function onLogoutSuccess() {
-    // 캐시 완전히 삭제
-    queryClient.clear();
-    navigate('/auth/sign-in');
-  }
-
-  // handler: 로그아웃 실패 핸들러
-  function onLogoutError() {
-    // 캐시 완전히 삭제
-    queryClient.clear();
-    navigate('/auth/sign-in');
-  }
+  
 
   // function: 로그인 버튼 클릭 핸들러
   // 로그인 성공 시 로그인 버튼을 누른 페이지로 다시 돌아가기 위해 state 에 돌아올 pathname 넣어서 보냄
@@ -49,6 +30,7 @@ const Header = () => {
   useEffect(() => {
     // 메뉴 네비게이션 드롭다운 닫기
     setIsNavOpened(false);
+    
     if (pathname.includes('auth')) return;
     // 유저 정보 가져오기(유저 정보 가져오기 겸 로그인 여부 확인용)
     refetchUser();
@@ -113,7 +95,9 @@ const Header = () => {
               <Link to={'/user'} className="icon-btn ">
                 내 정보
               </Link>
-              <AlertDialogComp logoutClickHandler={logout} message='정말 로그아웃 하시겠습니까?'>
+              <AlertDialogComp logoutClickHandler={() => {
+                window.location.href = "/auth/sign-in?logout=true";
+              }} message="정말 로그아웃 하시겠습니까?">
                 {/* 로그아웃 팝업 띄울 트리거 버튼 */}
                 <button className="icon-btn">로그아웃</button>
               </AlertDialogComp>

@@ -1,8 +1,10 @@
 import { request } from '@/api/template';
-import { DOMAIN } from '@/utils/env';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useUserQuery } from './user.hook';
 import { useAuth } from '@/store/auth.store';
+import { ErrorResponse } from '@/types/common.type';
+import { DOMAIN } from '@/utils/env';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import RecommendBook from '../pages/admin/RecommendBook';
+import { useUserQuery } from './user.hook';
 
 //// 관리자의 책 추천 여부
 type UseIsBookRecommendedQueryParams = {
@@ -46,45 +48,93 @@ export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRe
   return { isRecommended, isRecommendedLoading, isRecommendedError, refetchIsRecommended };
 };
 
+// 추천 책 리스트 쿼리
+export type RecommendBook = {
+  id: number;
+  title: string;
+  publisher: string;
+  author: string;
+  bookImg: string;
+  isbn: string;
+};
+interface UseRecommendBookListQueryReturn {
+  recommendBookList: RecommendBook[];
+  isRecommendBookListLoading: boolean;
+  isRecommendBookListError: boolean;
+  refetchRecommendBookList: () => void;
+}
+
+type UseRecommendBookListQuery = () => UseRecommendBookListQueryReturn;
+
+export const recommendBookListQueryKey = 'recommendBookList';
+
+export const useRecommendBookListQuery: UseRecommendBookListQuery = () => {
+  const {
+    data: recommendBookList,
+    isError: isRecommendBookListError,
+    isLoading: isRecommendBookListLoading,
+    refetch: refetchRecommendBookList
+  } = useQuery({
+    queryKey: [recommendBookListQueryKey],
+    queryFn: () => {
+      return request.get<RecommendBook[]>(DOMAIN + '/recommend-book/all');
+    },
+    initialData: [],
+    staleTime: 1000 * 60 * 60
+  });
+
+  return { recommendBookList, isRecommendBookListError, isRecommendBookListLoading, refetchRecommendBookList };
+};
+
 //// 추천 책 mutation
 type UseRecommendBookMutationParams = {
-  isbn: string | undefined;
-
   onRecommendSuccess?: () => void;
-  onRecommendError?: () => void;
+  onRecommendError?: (err: ErrorResponse) => void;
 
   onUnrecommendSuccess?: () => void;
-  onUnrecommendError?: () => void;
+  onUnrecommendError?: (err: ErrorResponse) => void;
 };
 
 interface UseRecommendBookMutationReturn {
-  recommend: () => void;
+  recommend: (isbn: string) => void;
   isRecommendPending: boolean;
 
-  unrecommend: () => void;
+  unrecommend: (isbn: string) => void;
   isUnrecommendPending: boolean;
+
+  invalidateRecommendBookList: () => void;
 }
 
-type UseRecommendBookMutation = (params: UseRecommendBookMutationParams) => UseRecommendBookMutationReturn;
+type UseRecommendBookMutation = (params?: UseRecommendBookMutationParams) => UseRecommendBookMutationReturn;
 
-export const useRecommendBookMutation: UseRecommendBookMutation = (params: UseRecommendBookMutationParams) => {
+export const useRecommendBookMutation: UseRecommendBookMutation = (params?: UseRecommendBookMutationParams) => {
+  const queryClient = useQueryClient();
+
   // 책 추천하기
   const { mutate: recommend, isPending: isRecommendPending } = useMutation({
-    mutationFn: () => {
-      return request.post(DOMAIN + '/recommend-book/' + params.isbn, null);
+    mutationFn: (isbn: string) => {
+      console.log("책 추천");
+      return request.post(DOMAIN + '/recommend-book/' + isbn, null);
     },
-    onSuccess: params.onRecommendSuccess,
-    onError: params.onRecommendError,
+    onSuccess: params?.onRecommendSuccess,
+    onError: params?.onRecommendError,
   });
 
   // 책 추천 취소하기
   const { mutate: unrecommend, isPending: isUnrecommendPending } = useMutation({
-    mutationFn: () => {
-      return request.delete(DOMAIN + '/recommend-book/' + params.isbn);
+    mutationFn: (isbn: string) => {
+      console.log("책 추천 취소");
+      return request.delete(DOMAIN + '/recommend-book/' + isbn);
     },
-    onSuccess: params.onUnrecommendSuccess,
-    onError: params.onUnrecommendError,
+    onSuccess: params?.onUnrecommendSuccess,
+    onError: params?.onUnrecommendError,
   });
 
-  return { recommend, isRecommendPending, unrecommend, isUnrecommendPending };
+  const invalidateRecommendBookList = () => {
+    queryClient.invalidateQueries({
+      queryKey: [recommendBookListQueryKey],
+    });
+  };
+
+  return { recommend, isRecommendPending, unrecommend, isUnrecommendPending, invalidateRecommendBookList };
 };
