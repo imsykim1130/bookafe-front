@@ -2,29 +2,80 @@ import ErrorComp from '@/components/ErrorComp';
 import PaginationComp from '@/components/PaginationComp';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useFavorite, useFavoriteBookList } from '@/hook/favoriteHooks';
+import {
+  favoriteBookListQueryKey,
+  useFavoriteBookHandler,
+  useFavoriteBookListQuery,
+  useFavoriteBookMutation,
+} from '@/hook/favorite.book.hooks';
+import { ErrorResponse } from '@/types/common.type';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Favorite = () => {
   const navigate = useNavigate();
-  const { page, setPage, favoriteBookList, totalPages, isFavoriteBookListLoading, favoriteBookListError } =
-    useFavoriteBookList();
+  // handlers
+  const { size, page, setPage, checkedBookIsbnList, setCheckedBookIsbnList, bookCheckHandler, checkAllClickHandler } =
+    useFavoriteBookHandler();
+  // query
+  const { favoriteBookList, totalPages, isFavoriteBookListLoading, isFavoriteBookListError } = useFavoriteBookListQuery(
+    { page, size },
+  );
+  // mutate
+  const { unlikeBook, unlikeBookList } = useFavoriteBookMutation({
+    onUnlikeBookError,
+    onUnlikeBookSuccess,
+    onUnlikeBookListError,
+    onUnlikeBookListSuccess,
+  });
+  const queryClient = useQueryClient();
 
-  const {
-    checkedBookIsbnList,
-    checkAllBtnClickHandler,
-    checkBookClickHandler,
-    favoriteCancelBtnClickHandler,
-    favoriteDeleteIconBtnClickHandler,
-  } = useFavorite();
+  // mutation 성공, 실패 핸들러
+  // 좋아요 취소 성공 핸들러
+  function onUnlikeBookError(err: ErrorResponse) {
+    console.log(err.message);
+    window.alert('좋아요 취소 실패. 잠시후 다시 시도해주세요');
+  }
 
-  // effect
+  // 좋아요 취소 실패 핸들러
+  function onUnlikeBookSuccess() {
+    // 좋아요 책 리스트 쿼리 무효화
+    queryClient.invalidateQueries({
+      queryKey: [favoriteBookListQueryKey],
+    });
+    // 선택 isbn 리스트 초기화
+    setCheckedBookIsbnList([]);
+  }
+
+  // 좋아요 일괄 취소 성공 핸들러
+  function onUnlikeBookListSuccess() {
+    // 좋아요 책 리스트 쿼리 무효화
+    queryClient.invalidateQueries({
+      queryKey: [favoriteBookListQueryKey],
+    });
+    // 선택 isbn 리스트 초기화
+    setCheckedBookIsbnList([]);
+  }
+
+  // 좋아요 일괄 취소 실패 핸들러
+  function onUnlikeBookListError(err: ErrorResponse) {
+    console.log(err.message);
+    window.alert('좋아요 취소 실패. 잠시후 다시 시도해주세요');
+  }
+
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: [favoriteBookListQueryKey],
+    });
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [page]);
 
-  if (favoriteBookListError) {
+  // render
+  if (isFavoriteBookListError) {
     return <ErrorComp />;
   }
 
@@ -42,7 +93,7 @@ const Favorite = () => {
             {/* 전체선택 체크박스 */}
             <div className="flex items-center gap-4">
               <p className="text-sm">전체선택</p>
-              <Checkbox onClick={() => checkAllBtnClickHandler(favoriteBookList.map((item) => item.isbn))}></Checkbox>
+              <Checkbox onClick={() => checkAllClickHandler(favoriteBookList.map((item) => item.isbn))}></Checkbox>
             </div>
           </div>
           <div>
@@ -60,18 +111,22 @@ const Favorite = () => {
                 >
                   {/* 책 이미지 */}
                   <div
-                    className={
-                      'max-w-[8rem] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.4)] transition-all duration-300 ease hover:drop-shadow-[2px_2px_5px_rgba(0,0,0,0.8)] cursor-pointer'
-                    }
+                    className={'max-w-[8rem]  cursor-pointer'}
                     onClick={() => {
                       navigate('/book/detail/' + book.isbn);
                     }}
                   >
-                    <img src={book.bookImg} alt="book cover image" className={'rounded-[0.625rem]'} />
+                    <img
+                      src={book.bookImg}
+                      alt="book cover image"
+                      className={
+                        'rounded-[0.625rem] shadow-[0_0_5px_rgba(0,0,0,0.3)] transition-shadow ease hover:shadow-[0_0_10px_rgba(0,0,0,0.5)]'
+                      }
+                    />
                   </div>
 
                   {/* 오른쪽 */}
-                  <div className={'flex-1 text-[14px] flex flex-col gap-[20px]'}>
+                  <div className={'flex-1 text-[14px] flex flex-col gap-[20px] mr-[3rem]'}>
                     {/* 위 */}
                     <div className={'w-full flex flex-col gap-[20px]'}>
                       {/* 왼쪽 */}
@@ -85,7 +140,7 @@ const Favorite = () => {
                       <i
                         className="fi fi-rr-trash text-[16px] cursor-pointer flex   justify-center items-center icon-btn"
                         onClick={() => {
-                          favoriteDeleteIconBtnClickHandler(book.isbn);
+                          unlikeBook(book.isbn);
                         }}
                       ></i>
                     </div>
@@ -93,7 +148,7 @@ const Favorite = () => {
                     <div className="absolute top-[1.5rem] right-[1.5rem]">
                       <Checkbox
                         onClick={() => {
-                          checkBookClickHandler(book.isbn);
+                          bookCheckHandler(book.isbn);
                         }}
                         checked={checkedBookIsbnList.indexOf(book.isbn) >= 0}
                       ></Checkbox>
@@ -102,10 +157,13 @@ const Favorite = () => {
                 </article>
               ))}
             {/* 페이지네이션 */}
-            <PaginationComp currentPage={page} totalPages={totalPages} setCurrentPage={setPage} />
+            <PaginationComp currentPage={page} setCurrentPage={setPage} totalPages={totalPages} />
             {/* 일괄 삭제 버튼 */}
             {checkedBookIsbnList.length > 0 && (
-              <Button className="sticky bottom-[2rem] w-full my-[1rem]" onClick={favoriteCancelBtnClickHandler}>
+              <Button
+                className="sticky bottom-[2rem] w-full my-[1rem]"
+                onClick={() => unlikeBookList(checkedBookIsbnList)}
+              >
                 삭제
               </Button>
             )}

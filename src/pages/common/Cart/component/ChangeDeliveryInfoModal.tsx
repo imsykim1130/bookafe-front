@@ -5,7 +5,7 @@ import AddDeliveryInfoModal from '@/pages/common/Cart/component/AddDeliveryInfoM
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { DOMAIN } from '@/utils';
+import { DOMAIN } from '@/utils/env';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -26,11 +26,7 @@ const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInf
   const [selectDeliveryInfo, setSelectDeliveryInfo] = useState<DeliveryInfoItem | null>(null);
 
   // query: 배송지 리스트
-  const {
-    isLoading,
-    isError,
-    data: deliveryInfoList
-  } = useAllDeliveryInfoQuery(cookies.jwt);
+  const { isLoading, isError, data: deliveryInfoList } = useAllDeliveryInfoQuery(cookies.jwt);
 
   // mutation: 배송지 삭제
   const { mutate } = useMutation({
@@ -89,7 +85,7 @@ const ChangeDeliveryInfoModal = ({ setDeliveryInfoListPopup, selectedDeliveryInf
     }
     // 모달창 열림 시 스크롤 방지
     window.document.body.style.overflowY = 'hidden';
-  
+
     // 모달을 열기 전 선택된 배송지 정보 반영
     setSelectDeliveryInfo(selectedDeliveryInfo);
 

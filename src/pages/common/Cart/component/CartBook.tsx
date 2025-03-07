@@ -1,10 +1,10 @@
-import { changeCartBookCountRequest, deleteCartBookRequest } from '@/api/api';
+import { changeCartBookCountRequest, deleteCartBookRequest } from '@/api/common.api';
 import { CartBookData } from '@/api/item';
 import { useMemo } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 
-const CartBookComp = ({ book, refetchCartBookList }: { book: CartBookData,  refetchCartBookList: () => void }) => {
+const CartBookComp = ({ book, refetchCartBookList }: { book: CartBookData; refetchCartBookList: () => void }) => {
   const navigate = useNavigate();
   const [cookies] = useCookies(['jwt']);
   const discounted = (book.price * (100 - book.discountPercent)) / 100;
@@ -31,16 +31,15 @@ const CartBookComp = ({ book, refetchCartBookList }: { book: CartBookData,  refe
     }
     console.log('장바구니 수량 변경');
     // 수량 변경 요청
-    changeCartBookCountRequest(cookies.jwt, isbn, changeCount)
-    .then(result => {
+    changeCartBookCountRequest(cookies.jwt, isbn, changeCount).then((result) => {
       // 수량 변경 실패
-      if(!result) {
-        window.alert("다시 시도해주세요");
+      if (!result) {
+        window.alert('다시 시도해주세요');
         return;
       }
       // 수량 변경 성공
       refetchCartBookList();
-    })
+    });
   };
 
   const cartBookDeleteBtnClickHandler = () => {

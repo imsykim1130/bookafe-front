@@ -43,7 +43,7 @@ const SearchBox = (props: Props) => {
             navigate(`/search/${searchWord}`);
           }
         }}
-        onBlur={onBlur}
+        onBlur={onBlur} // 포커스 잃었을 때
       />
     </div>
   );

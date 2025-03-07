@@ -1,7 +1,6 @@
 //// mutation
 // types
 import { request } from '@/api/template';
-import { UserResponse } from '@/hook/user.hook';
 import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
 import { useMutation } from '@tanstack/react-query';
@@ -71,7 +70,7 @@ export const useAuthMutation: UseAuthMutation = (props?: UseAuthMutationProps) =
   // 로그아웃
   const { mutate: logout, isPending: isLogoutPending } = useMutation({
     mutationFn: () => {
-      return request.post(DOMAIN + '/auth/logout', {}, false);
+      return request.post(DOMAIN + '/auth/logout', {}, true);
     },
     onSuccess: props?.onLogoutSuccess,
     onError: props?.onLogoutError,

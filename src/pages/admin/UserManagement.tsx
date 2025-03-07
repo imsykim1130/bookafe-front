@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useDebounce } from '@/hook';
+import { useDebounce } from '@/hook/hooks.ts';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { deleteUserRequest, searchUserRequest } from '../../api/api.ts';
+import { deleteUserRequest, searchUserRequest } from '../../api/common.api.ts';
 import { UserManagementItem } from '../../api/item.ts';
 
 // const userListMock: UserManagementItem[] = [

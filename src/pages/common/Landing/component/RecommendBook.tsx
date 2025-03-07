@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { getRecommendBookRequest, GetRecommendBookResponseDto } from '@/api/common.api';
+import { TodayBookInterface } from '@/api/item.ts';
 import { ResponseDto } from '@/api/response.dto.ts';
-import { useUserStore } from '@/zustand/userStore.ts';
+import { useUserQuery } from '@/hook/user.hook';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getRecommendBookRequest, GetRecommendBookResponseDto } from '@/api/api.ts';
-import { TodayBookInterface } from '@/api/item.ts';
 
 const RecommendBook = () => {
-  const { user } = useUserStore();
+  const { user } = useUserQuery();
   const [recommendBook, setRecommendBook] = useState<TodayBookInterface | null>(null);
   const navigate = useNavigate();
-  
+
   // function: 책 상세 페이지 이동
   const bookClickHandler = () => {
     navigate('/book/detail/' + recommendBook?.isbn);

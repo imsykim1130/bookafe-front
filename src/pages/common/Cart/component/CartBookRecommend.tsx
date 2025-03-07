@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getSearchBookListRequest, putBookToCartRequest } from '@/api/api';
+import { getSearchBookListRequest, putBookToCartRequest } from '@/api/common.api';
 import { BookSearchItem } from '@/api/item';
 import { GetSearchBookListResponseDto, ResponseDto } from '@/api/response.dto';
 import BookPrev from '@/components/BookPrev';

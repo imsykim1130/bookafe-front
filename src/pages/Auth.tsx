@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { useAuthMutation } from '@/hook/auth.hooks';
 import { ErrorResponse } from '@/types/common.type';
-import { addIsAuthCookie } from '@/utils/cookie';
 import { getRandomNickname } from '@/utils/openai';
 import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -52,14 +51,7 @@ const Auth = () => {
   /**
    * @param expire (초 단위)
    */
-  function onSignInSuccess(expire: number) {
-    // 유저 정보 가져오기
-    // refetchUser();
-
-    // 로그인 여부를 확인할 isAuth 쿠키 생성
-    const expires = new Date(Date.now() + 1000 * expire);
-    addIsAuthCookie(expires);
-    
+  function onSignInSuccess() {
     // 페이지 이동
     if (pathname) {
       navigate(pathname);
@@ -316,7 +308,7 @@ const Auth = () => {
 
         {/*로그인,회원가입 버튼*/}
         <Button
-          className={'w-full py-7 border-gray-400 flex items-center'}
+          className={'w-full py-7 mt-[1rem] border-gray-400 flex items-center'}
           onClick={() => {
             if (authType === 'sign-in') {
               signInBtnClickHandler();

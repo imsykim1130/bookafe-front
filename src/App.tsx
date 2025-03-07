@@ -6,12 +6,12 @@ import Header from './layout/Header.tsx';
 
 const App = () => {
   const { pathname } = useLocation();
-
+  
   // effect: 페이지 이동 시 스크롤 맨 위로 이동
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
-
+  
   // render
   return (
     <>

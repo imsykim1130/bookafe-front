@@ -1,4 +1,4 @@
-import { getTop10BookListRequest } from '@/api/api';
+import { getTop10BookListRequest } from '@/api/common.api';
 import { Top10BookItem } from '@/api/item';
 import BookPrev from '@/components/BookPrev';
 import { useEffect, useRef, useState } from 'react';

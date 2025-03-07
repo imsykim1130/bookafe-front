@@ -1,42 +1,37 @@
-import { deleteCommentRequest, PostCommentRequestDto } from '@/api/comment.api';
-import { CommentItem } from '@/api/item';
 import Container from '@/components/Container';
 import { Button } from '@/components/ui/button';
 import TextAreaComp from '@/components/ui/TextAreaComp';
+import { useBookQuery } from '@/hook/book.hooks';
 import {
-  replyListKey,
-  reviewListKey,
-  useBookFavoriteInfoQuery,
-  useBookQuery,
-  useReplyList,
-  useReviewHandler,
+  Comment,
+  replyListQueryKey,
+  reviewListQueryKey,
+  useCommentMutation,
+  useReplyListQuery,
   useReviewListQuery,
-} from '@/hook/book.hooks';
-import { useCreateComment, useUpdateComment } from '@/hook/commentHooks';
-import { useJwt } from '@/hook/hooks';
+} from '@/hook/comment.hooks';
+import { useBookFavoriteInfoQuery, useFavoriteBookMutation } from '@/hook/favorite.book.hooks';
 import { useRecommendBookMutation, useRecommendQuery } from '@/hook/recommend.book.hooks';
 import { useUserQuery } from '@/hook/user.hook';
+import { useAuth } from '@/store/auth.store';
 import { useChangePage, usePage } from '@/store/page.store';
-import { useUser } from '@/store/user.store';
-import { DOMAIN } from '@/utils/env';
 import { toBookSite } from '@/utils/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import AlertDialogComp from '../components/AlertDialogComp';
 
 //// page
 const Book = () => {
   const { isbn } = useParams();
+  const { reviewList, isReviewListError, isReviewListLoading } = useReviewListQuery({ isbn });
 
-  const queryClient = useQueryClient();
-
-  const reviewList = queryClient.getQueryData([reviewListKey, isbn]) as CommentItem[];
+  if (!isbn) return;
 
   return (
     <main className="w-full max-w-[60rem] mx-auto">
-      <div className="px-[1rem]">
+      <div className="px-[5%]">
         <BookInfo />
         <div className="flex gap-[0.5rem] items-center text-lg font-semibold">
           <p>리뷰</p>
@@ -46,7 +41,11 @@ const Book = () => {
           </span>
         </div>
         <ReviewInput />
-        <ReviewList />
+        <ReviewList
+          reviewList={reviewList}
+          isReviewListLoading={isReviewListLoading}
+          isReviewListError={isReviewListError}
+        />
       </div>
     </main>
   );
@@ -59,8 +58,6 @@ const BookInfo = () => {
   const kyobo = `https://search.kyobobook.co.kr/search?keyword=${book?.title}`;
   const yes24 = `https://www.yes24.com/Product/Search?query=${book?.title}`;
   const aladin = `https://www.aladin.co.kr/search/wsearchresult.aspx?SearchTarget=All&KeyWord=${book?.title}`;
-
-  console.log('book info render');
 
   if (!book) return null;
 
@@ -147,9 +144,10 @@ const BookInfo = () => {
   );
 };
 
+// 책 추천 표시 컴포넌트
 const RecommendBtnComp = () => {
   const { isbn } = useParams();
-  const user = useUser();
+  const { user } = useUserQuery();
   const role = user ? user.role : '';
   const { isRecommended, refetchIsRecommended } = useRecommendQuery({ isbn });
 
@@ -168,7 +166,7 @@ const RecommendBtnComp = () => {
   function onUnrecommendError() {
     console.log('추천 취소 실패. 잠시후 다시 시도해주세요');
   }
-  
+
   const { recommend, unrecommend } = useRecommendBookMutation({
     isbn,
     onRecommendSuccess,
@@ -177,7 +175,7 @@ const RecommendBtnComp = () => {
     onUnrecommendError,
   });
 
-  if (role === 'ROLE_USER' || !isbn) {
+  if (!user || role !== 'ROLE_ADMIN' || !isbn) {
     return null;
   }
 
@@ -192,68 +190,81 @@ const RecommendBtnComp = () => {
   );
 };
 
-////
+//// 책 좋아요 표시 컴포넌트
 const FavoriteBtnComp = () => {
   const { isbn } = useParams();
-  const { favoriteCount, isFavorite, putFavorite, cancelFavorite } = useBookFavoriteInfoQuery(isbn);
+  const { isFavorite, favoriteCount, refetchBookFavoriteInfo } = useBookFavoriteInfoQuery({ isbn });
+  const { likeBook, unlikeBook } = useFavoriteBookMutation({ onLikeBookSuccess, onUnlikeBookSuccess });
+  const auth = useAuth();
+  function onLikeBookSuccess() {
+    refetchBookFavoriteInfo();
+  }
 
-  console.log('favorite btn comp render');
+  function onUnlikeBookSuccess() {
+    refetchBookFavoriteInfo();
+  }
+
+  if (!isbn) return;
 
   return (
     <div className="flex flex-col items-center">
-      {isFavorite ? (
-        <i className="fi fi-ss-heart cursor-pointer text-[1.2rem]" onClick={cancelFavorite}></i>
+      {auth && isFavorite ? (
+        <i
+          className="fi fi-ss-heart cursor-pointer text-[1.2rem]"
+          onClick={() => {
+            if (!auth) {
+              window.alert('로그인이 필요합니다');
+              return;
+            }
+            unlikeBook(isbn);
+          }}
+        ></i>
       ) : (
-        <i className="fi fi-rs-heart cursor-pointer text-[1.2rem]" onClick={putFavorite}></i>
+        <i
+          className="fi fi-rs-heart cursor-pointer text-[1.2rem]"
+          onClick={() => {
+            if (!auth) {
+              window.alert('로그인이 필요합니다');
+              return;
+            }
+            likeBook(isbn);
+          }}
+        ></i>
       )}
       {favoriteCount && <p>{favoriteCount}</p>}
     </div>
   );
 };
 
-////
+//// 리뷰 작성창
 const ReviewInput = () => {
   const { isbn } = useParams();
-  const { jwt } = useJwt();
   const queryClient = useQueryClient();
   const changePage = useChangePage();
+  const auth = useAuth();
 
   const [content, setContent] = useState<string>('');
   const [emojiIndex, setEmojiIndex] = useState<number>(0);
   const emojiList = ['😀', '🥲', '🤯', '😱'];
 
+  const { createReview } = useCommentMutation({ isbn, onCreateReviewError, onCreateReviewSuccess });
+
   console.log('review input render');
 
-  // mutate: 리뷰 작성
-  const { mutate: postReview } = useMutation({
-    mutationFn: (isbn: string) => {
-      const requestDto: PostCommentRequestDto = {
-        parentId: null,
-        isbn: isbn,
-        content: content,
-        emoji: emojiList[emojiIndex],
-      };
-      return axios.post(DOMAIN + `/comment`, requestDto, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-    },
-    onSuccess: () => {
-      // 리뷰 작성 성공 시 리뷰 리스트 캐시 무효화 하고 첫번째 페이지로 이동
-      queryClient.invalidateQueries({
-        queryKey: [reviewListKey, isbn],
-      });
+  function onCreateReviewSuccess() {
+    // 리뷰 작성 성공 시 리뷰 리스트 캐시 무효화 하고 첫번째 페이지로 이동
+    queryClient.invalidateQueries({
+      queryKey: [reviewListQueryKey, isbn],
+    });
 
-      changePage(0);
-      setContent('');
-      setEmojiIndex(0);
-    },
-    onError: () => {
-      window.alert('리뷰 작성 실패. 다시 시도해주세요');
-    },
-  });
+    changePage(0);
+    setContent('');
+    setEmojiIndex(0);
+  }
 
+  function onCreateReviewError() {
+    window.alert('리뷰 작성 실패. 다시 시도해주세요');
+  }
   return (
     <div className={'flex flex-col gap-[15px] my-[1.5rem]'}>
       <TextAreaComp
@@ -272,9 +283,12 @@ const ReviewInput = () => {
         <Button
           onClick={() => {
             if (!isbn) return;
-            postReview(isbn);
+            createReview({
+              content,
+              emoji: emojiList[emojiIndex],
+            });
           }}
-          disabled={!jwt}
+          disabled={!auth}
         >
           작성
         </Button>
@@ -291,7 +305,7 @@ type EmojiListProps = {
 };
 
 const EmojiList = (props: EmojiListProps) => {
-  const { jwt } = useJwt();
+  const auth = useAuth();
   const { emojiList, setEmojiIndex, emojiIndex } = props;
 
   return emojiList.map((emoji, index) => (
@@ -300,7 +314,7 @@ const EmojiList = (props: EmojiListProps) => {
       className={`w-[30px] h-[30px] flex justify-center items-center rounded-full ${index === emojiIndex ? 'bg-black bg-opacity-10' : ''}`}
     >
       <button
-        disabled={!jwt}
+        disabled={!auth}
         onClick={() => {
           setEmojiIndex(index);
         }}
@@ -311,21 +325,22 @@ const EmojiList = (props: EmojiListProps) => {
   ));
 };
 
-////
-const ReviewList = () => {
-  const { isbn } = useParams();
-  const { isBookLoading } = useBookQuery({isbn});
-  const { reviewList, isReviewListLoading, reviewListError } = useReviewListQuery(isbn, isBookLoading);
+//// 리뷰 리스트 컴포넌트
+type ReviewListProps = {
+  reviewList: Comment[];
+  isReviewListLoading: boolean;
+  isReviewListError: boolean;
+};
+
+const ReviewList = (props: ReviewListProps) => {
+  const { reviewList, isReviewListLoading, isReviewListError } = props;
   const page = usePage();
-  const pageChange = useChangePage();
 
   console.log('review list render');
 
   const Alert = ({ children }: { children: React.ReactNode }) => {
     return <div className="text-black/40 text-center my-[3rem]">{children}</div>;
   };
-
-  if (reviewList === undefined) return;
 
   if (isReviewListLoading) {
     return (
@@ -335,7 +350,7 @@ const ReviewList = () => {
     );
   }
 
-  if (reviewListError) {
+  if (isReviewListError) {
     return (
       <Alert>
         <p>리뷰를 불러오는 중에 문제가 생겼습니다</p>
@@ -353,48 +368,65 @@ const ReviewList = () => {
 
   return (
     <div className="my-[3rem]">
-      {reviewList.map((reviewItem: CommentItem) => (
-        <Review key={reviewItem.id} review={reviewItem} page={page} pageChange={pageChange} />
+      {reviewList.map((reviewItem: Comment) => (
+        <Review key={reviewItem.id} review={reviewItem} page={page} />
       ))}
     </div>
     // 페이지네이션 추후 추가
   );
 };
 
-////
+//// 리뷰 컴포넌트
 const Review = ({
   review,
   page,
-  pageChange,
+  // pageChange,
 }: {
-  review: CommentItem;
+  review: Comment;
   page: number;
-  pageChange: (page: number) => void;
 }) => {
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
-  const [favoriteCount, setFavaroiteCount] = useState<number>(0);
+  const [isFavorite] = useState<boolean>(false);
+  const [favoriteCount] = useState<number>(0);
   const [replyCount, setReplyCount] = useState<number>(0);
   const [replyOpen, setReplyOpen] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const { isbn } = useParams();
+  const changePage = useChangePage();
 
   const [isModify, setIsModify] = useState<boolean>(false);
-  const { content, setContent, cancelUpdateReview, deleteReview } = useReviewHandler();
+  const [content, setContent] = useState('');
+  const { fixReview, deleteReview } = useCommentMutation({ isbn, onFixReviewSuccess, onDeleteReviewSuccess });
 
-  // 리뷰 수정 요청
-  const { updateComment } = useUpdateComment({
-    onSuccess: () => {
-      // 리뷰 수정 성공 시 수정된 리뷰의 캐시 데이터 수정
-      // 수정의 경우 캐시 데이터를 다시 받아오면 수정한 리뷰가 다른 화면으로 넘어가는 경우가 생길 수 있기 때문에
-      // 캐시 무효화로 데이터를 새로 받아오지 않고 수동으로 캐시 데이터를 수정함
-      queryClient.setQueryData([reviewListKey, isbn, page], (oldReviews: CommentItem[]) =>
-        oldReviews.map((oldReview) => {
-          return oldReview.id === review.id ? { ...oldReview, content: content } : oldReview;
-        }),
-      );
-      setIsModify(false);
-    },
-  });
+  // handler: 리뷰 수정 성공 핸들러
+  function onFixReviewSuccess() {
+    // 리뷰 수정 성공 시 수정된 리뷰의 캐시 데이터 수정
+    // 수정의 경우 캐시 데이터를 다시 받아오면 수정한 리뷰가 다른 화면으로 넘어가는 경우가 생길 수 있기 때문에
+    // 캐시 무효화로 데이터를 새로 받아오지 않고 수동으로 캐시 데이터를 수정함
+    queryClient.setQueryData([reviewListQueryKey, isbn, page], (oldReviews: Comment[]) =>
+      oldReviews.map((oldReview) => {
+        return oldReview.id === review.id ? { ...oldReview, content: content } : oldReview;
+      }),
+    );
+    setIsModify(false);
+  }
+
+  // handler: 리뷰 삭제 성공 핸들러
+  function onDeleteReviewSuccess() {
+    // 리뷰 삭제 성공 시 리뷰 리스트 캐시 삭제 후 첫 페이지로 이동
+    queryClient.invalidateQueries({
+      queryKey: [reviewListQueryKey, isbn],
+    });
+    changePage(0);
+  }
+
+  // 리뷰 수정 취소
+  const cancelUpdateReview = (page: number, reviewId: number) => {
+    // 쿼리에서 수정하기 전 리뷰 내용을 캐시에서 가져와서 현재 리뷰 내용에 덮어쓰기
+    const replyList = queryClient.getQueryData([reviewListQueryKey, isbn, page]) as Comment[];
+    console.log(replyList);
+    const oldReply = replyList.filter((reply: Comment) => reply.id === reviewId)[0] as Comment;
+    setContent(oldReply.content);
+  };
 
   useEffect(() => {
     setReplyCount(review.replyCount);
@@ -403,29 +435,37 @@ const Review = ({
 
   return (
     <article>
-      <div className="border-b-[0.0625rem] pb-[1.5rem] border-black/10 flex flex-col gap-[0.6rem] py-[1.3rem]">
-        <div className="flex items-center justify-between">
-          <ReviewInfo
-            profileImg={review.profileImg}
-            nickname={review.nickname}
-            writeDate={review.writeDate}
-            emoji={review.emoji}
-          />
-          <ReviewModify
+      <div className="border-b-[0.0625rem] pb-[1.5rem] border-black/10 flex flex-col gap-[1.3rem] py-[1.3rem]">
+        <div className="flex flex-col gap-[0.6rem]">
+          <div className="flex items-center justify-between">
+            <ReviewInfo
+              profileImg={review.profileImg}
+              nickname={review.nickname}
+              writeDate={review.writeDate}
+              emoji={review.emoji}
+            />
+            <ReviewModify
+              isDeleted={review.isDeleted}
+              isModify={isModify}
+              nickname={review.nickname}
+              setIsModify={setIsModify}
+              deleteReview={() => deleteReview(review.id)}
+              updateReview={() =>
+                fixReview({
+                  reviewId: review.id,
+                  content,
+                })
+              }
+              cancelUpdateReview={() => cancelUpdateReview(page, review.id)}
+            />
+          </div>
+          <ReviewContent
+            reviewContent={content}
+            setReviewContent={setContent}
             isModify={isModify}
-            nickname={review.nickname}
-            setIsModify={setIsModify}
-            deleteReview={() => deleteReview(review.id, pageChange)}
-            updateReview={() =>
-              updateComment({
-                commentId: review.id,
-                content: content,
-              })
-            }
-            cancelUpdateReview={() => cancelUpdateReview(page, review.id)}
+            isDeleted={review.isDeleted}
           />
         </div>
-        <ReviewContent reviewContent={content} setReviewContent={setContent} isModify={isModify} />
         <ReviewStats
           replyCount={replyCount}
           setReplyOpen={() => setReplyOpen(!replyOpen)}
@@ -469,6 +509,7 @@ const ReviewStats = (props: ReviewStatsProps) => {
 
 ////
 const ReviewModify = ({
+  isDeleted,
   isModify,
   nickname,
   setIsModify,
@@ -476,6 +517,7 @@ const ReviewModify = ({
   cancelUpdateReview,
   deleteReview,
 }: {
+  isDeleted: boolean;
   isModify: boolean;
   nickname: string;
   setIsModify: React.Dispatch<React.SetStateAction<boolean>>;
@@ -489,7 +531,7 @@ const ReviewModify = ({
     return <div className="flex gap-[0.8rem] text-sm text-black/60">{children}</div>;
   };
 
-  if (!user || user?.nickname !== nickname) return;
+  if (!user || user?.nickname !== nickname || isDeleted) return;
 
   // 수정 중일 때
   if (isModify) {
@@ -513,12 +555,14 @@ const ReviewModify = ({
     <Container>
       <button onClick={() => setIsModify(true)}>수정</button>
       <span className="border-r-[0.0625rem]"></span>
-      <button onClick={deleteReview}>삭제</button>
+      <AlertDialogComp logoutClickHandler={deleteReview} message="삭제하시겠습니까?">
+        <button>삭제</button>
+      </AlertDialogComp>
     </Container>
   );
 };
 
-////
+//// 리뷰 정보
 const ReviewInfo = ({
   profileImg,
   nickname,
@@ -548,15 +592,17 @@ const ReviewInfo = ({
   );
 };
 
-////
+//// 리뷰 내용
 const ReviewContent = ({
   reviewContent,
   setReviewContent,
   isModify,
+  isDeleted,
 }: {
   reviewContent: string | null;
   setReviewContent: (newContent: string) => void;
   isModify: boolean;
+  isDeleted: boolean;
 }) => {
   const reviewContentRef = useRef<HTMLTextAreaElement>(null);
 
@@ -576,14 +622,14 @@ const ReviewContent = ({
     reviewContentRef.current.setSelectionRange(reviewContent.length, reviewContent.length);
   }, [isModify]);
 
-  if (!reviewContent) {
+  if (isDeleted) {
     return <p>삭제된 댓글입니다</p>;
   }
 
   return (
     <textarea
       ref={reviewContentRef}
-      value={reviewContent}
+      value={reviewContent ? reviewContent : ''}
       disabled={!isModify}
       onInput={() => resizeTextArea(reviewContentRef.current as HTMLTextAreaElement)}
       onChange={(e) => {
@@ -602,35 +648,35 @@ interface ReplySectionProps {
 const ReplySection = (props: ReplySectionProps) => {
   const { isbn } = useParams();
   const { isOpen, reviewId } = props;
-  const page = usePage();
+  const page = usePage(); // 리뷰 페이지
   const queryClient = useQueryClient();
   const [content, setContent] = useState('');
+  const { createReply } = useCommentMutation({ isbn, onCreateReplySuccess });
 
-  // 리플 생성
-  const { createComment } = useCreateComment({
-    onSuccess: () => {
-      // 성공
-      // 입력창 초기화
-      setContent('');
+  // 리플 작성 성공 핸들러
+  function onCreateReplySuccess() {
+    // 성공
+    // 입력창 초기화
+    setContent('');
 
-      // 리뷰의 리플 개수 캐시 수정
-      queryClient.setQueryData([reviewListKey, isbn, page], (oldReviews: CommentItem[]) => {
-        return oldReviews.map((review) =>
-          review.id === reviewId ? { ...review, replyCount: review.replyCount + 1 } : review,
-        );
-      });
-      // 리플 리스트 캐시 무효화하여 데이터 다시 가져오기
-      queryClient.invalidateQueries({
-        queryKey: [replyListKey, reviewId],
-      });
-    },
-  });
+    // 리뷰의 리플 개수 캐시 수정
+    queryClient.setQueryData([reviewListQueryKey, isbn, page], (oldReviews: Comment[]) => {
+      return oldReviews.map((review) =>
+        review.id === reviewId ? { ...review, replyCount: review.replyCount + 1 } : review,
+      );
+    });
+    // 리플 리스트 캐시 무효화하여 데이터 다시 가져오기
+    queryClient.invalidateQueries({
+      queryKey: [replyListQueryKey, reviewId],
+    });
+  }
 
   if (!isOpen) return null;
 
   return (
     <>
-      <div className="my-[1rem]">
+      <div className="my-[0.6rem]">
+        <ReplyList replyOpen={isOpen} reviewId={reviewId} />
         <TextAreaComp
           content={content}
           setContent={setContent}
@@ -640,7 +686,7 @@ const ReplySection = (props: ReplySectionProps) => {
         <div className="flex justify-end my-[0.5rem]">
           <ReplyCreateBtn
             onClick={() =>
-              createComment({
+              createReply({
                 content,
                 parentId: reviewId,
               })
@@ -648,7 +694,6 @@ const ReplySection = (props: ReplySectionProps) => {
           />
         </div>
       </div>
-      <ReplyList replyOpen={isOpen} reviewId={reviewId} />
     </>
   );
 };
@@ -661,10 +706,10 @@ interface ReplyCreateBtnProps {
 
 const ReplyCreateBtn = (props: ReplyCreateBtnProps) => {
   const { onClick, className } = props;
-  const { jwt } = useJwt();
+  const auth = useAuth();
 
   return (
-    <Button className={className} onClick={onClick} disabled={!jwt}>
+    <Button className={className} onClick={onClick} disabled={!auth}>
       작성
     </Button>
   );
@@ -672,37 +717,26 @@ const ReplyCreateBtn = (props: ReplyCreateBtnProps) => {
 
 /// 리플 리스트
 const ReplyList = ({ replyOpen, reviewId }: { replyOpen: boolean; reviewId: number }) => {
-  const { replyList } = useReplyList(reviewId, replyOpen);
-  const { jwt } = useJwt();
+  const { replyList } = useReplyListQuery(reviewId, replyOpen);
   const { isbn } = useParams();
   const page = usePage();
   const queryClient = useQueryClient();
+  const { deleteReply } = useCommentMutation({ isbn, onDeleteReplySuccess });
 
-  // mutation: 리플 삭제
-  const { mutate: deleteReply } = useMutation({
-    mutationFn: (replyId: number) => {
-      return deleteCommentRequest(jwt, replyId);
-    },
-    onError: (error) => {
-      if (!error) {
-        window.alert('네트워크 에러');
-        return;
-      }
-    },
-    onSuccess: () => {
-      // 리뷰의 리플 개수 캐시 수정
-      queryClient.setQueryData([reviewListKey, isbn, page], (oldReviews: CommentItem[]) => {
-        return oldReviews.map((review) =>
-          review.id === reviewId ? { ...review, replyCount: review.replyCount - 1 } : review,
-        );
-      });
+  // 리뷰 삭제 성공 핸들러
+  function onDeleteReplySuccess() {
+    // 리뷰의 리플 개수 캐시 수정
+    queryClient.setQueryData([reviewListQueryKey, isbn, page], (oldReviews: Comment[]) => {
+      return oldReviews.map((review) =>
+        review.id === reviewId ? { ...review, replyCount: review.replyCount - 1 } : review,
+      );
+    });
 
-      // 성공하면 리플 리스트 캐시 무효화
-      queryClient.invalidateQueries({
-        queryKey: [replyListKey, reviewId],
-      });
-    },
-  });
+    // 성공하면 리플 리스트 캐시 무효화
+    queryClient.invalidateQueries({
+      queryKey: [replyListQueryKey, reviewId],
+    });
+  }
 
   if (!replyList || !replyOpen) {
     return null;
@@ -718,7 +752,7 @@ const ReplyList = ({ replyOpen, reviewId }: { replyOpen: boolean; reviewId: numb
 
   return (
     <Container className="pt-[1rem] pb-[3rem]">
-      {replyList.map((reply: CommentItem) => (
+      {replyList.map((reply: Comment) => (
         <Reply key={reply.id} reply={reply} deleteReply={(replyId: number) => deleteReply(replyId)} />
       ))}
     </Container>
@@ -726,7 +760,7 @@ const ReplyList = ({ replyOpen, reviewId }: { replyOpen: boolean; reviewId: numb
 };
 
 //// 리플
-const Reply = ({ reply, deleteReply }: { reply: CommentItem; deleteReply: (replyId: number) => void }) => {
+const Reply = ({ reply, deleteReply }: { reply: Comment; deleteReply: (replyId: number) => void }) => {
   const { user } = useUserQuery();
 
   return (

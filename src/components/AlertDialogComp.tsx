@@ -8,7 +8,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-function AlertDialogComp({children, logoutClickHandler}: { children?: React.ReactNode, logoutClickHandler: () => void }) {
+function AlertDialogComp({children, message, logoutClickHandler}: { children?: React.ReactNode, message: string, logoutClickHandler: () => void }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -17,12 +17,12 @@ function AlertDialogComp({children, logoutClickHandler}: { children?: React.Reac
       <AlertDialogContent className='w-[24rem]'>
         <AlertDialogHeader>
           <AlertDialogDescription className='text-black'>
-            정말 로그아웃 하시겠습니까? 🥲
+            {message}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <>
-          <AlertDialogCancel>돌아가기</AlertDialogCancel>
-          <AlertDialogAction onClick={logoutClickHandler}>로그아웃</AlertDialogAction>
+          <AlertDialogCancel>아니오</AlertDialogCancel>
+          <AlertDialogAction onClick={logoutClickHandler}>네</AlertDialogAction>
         </>
       </AlertDialogContent>
     </AlertDialog>

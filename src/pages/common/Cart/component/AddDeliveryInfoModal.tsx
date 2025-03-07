@@ -1,7 +1,7 @@
 import { allDeliveryInfoKey } from '@/api/query.ts';
 import { PostDeliveryInfoRequestDto } from '@/api/request.dto.ts';
 import { Button } from '@/components/ui/button.tsx';
-import { DOMAIN } from '@/utils';
+import { DOMAIN } from '@/utils/env';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useState } from 'react';
@@ -30,13 +30,15 @@ const AddDeliveryInfoModal = ({ changeAddDeliveryInfoModalStatus }: Props) => {
     },
     onSuccess: async () => {
       window.alert('배송지 추가 성공');
-      await queryClient.invalidateQueries({
-        queryKey: allDeliveryInfoKey
-      }).then(() => {
-        if (isDefault) {
-          // todo: 기본배송지 추가 시 배송지 정보 다시 가져오기
-        }
-      });
+      await queryClient
+        .invalidateQueries({
+          queryKey: allDeliveryInfoKey,
+        })
+        .then(() => {
+          if (isDefault) {
+            // todo: 기본배송지 추가 시 배송지 정보 다시 가져오기
+          }
+        });
       changeAddDeliveryInfoModalStatus();
     },
     onError: () => {

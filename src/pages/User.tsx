@@ -1,18 +1,16 @@
 import { Button } from '@/components/ui/button';
-import { useJwt } from '@/hook/useJwt';
-import { useUser } from '@/hook/useUser.ts';
+import { useUserQuery } from '@/hook/user.hook';
 
 // 유저 페이지
 const User = () => {
-  const {jwt} = useJwt();
-  const {user, isUserLoading, userError, changeProfileImage} = useUser(jwt);
+  const { user, isUserLoading, userError, changeProfileImage } = useUserQuery();
 
   // Rendering
-  if(isUserLoading) {
+  if (isUserLoading) {
     return <p>로딩중</p>;
   }
 
-  if(userError) {
+  if (userError) {
     return <p>데이터를 가져오는 중 오류가 발생했습니다</p>;
   }
 
@@ -22,10 +20,14 @@ const User = () => {
       <section>
         {/* 프로필 */}
         <div className={'flex flex-col items-center gap-[1rem]'}>
-          <div className={'flex justify-center items-center w-[80px] h-[80px] border-[0.0625rem] border-black/10 rounded-full overflow-hidden drop-shadow-[0_0_10px_rgba(0, 0, 0, 0.1)]'}>
+          <div
+            className={
+              'flex justify-center items-center w-[80px] h-[80px] border-[0.0625rem] border-black/10 rounded-full overflow-hidden drop-shadow-[0_0_10px_rgba(0, 0, 0, 0.1)]'
+            }
+          >
             {/* 프로필 이미지 */}
             {user?.profileImg ? (
-              <img src={user.profileImg + `?timestamp=${Date.now()}`} alt="profile image"/>
+              <img src={user.profileImg + `?timestamp=${Date.now()}`} alt="profile image" />
             ) : (
               <div className={'w-full h-full bg-black bg-opacity-20'}></div>
             )}
@@ -41,9 +43,7 @@ const User = () => {
             }}
           />
           <Button variant={'outline'}>
-            <label htmlFor={'profile_image'}>
-              변경하기
-            </label>
+            <label htmlFor={'profile_image'}>변경하기</label>
           </Button>
         </div>
         <div className={'mt-[20px] flex flex-col items-center gap-[5px]'}>

@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { GetDeliveryStatusListResponseDto } from '@/api/response.dto.ts';
 import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import { getDeliveryStatusListRequest } from '../../api/api.ts';
+import { getDeliveryStatusListRequest } from '../../api/common.api.ts';
 import { DeliveryStatus } from '../../api/item.ts';
 import DateInput from '../../components/DateInput';
 import OrderStatusComp from '../../components/OrderStatusComp.tsx';
 import Dropdown from '../common/OrderDetailPage/component/Dropdown.tsx';
-import { useCookies } from 'react-cookie';
 
 // component
 const OrderStatus = () => {

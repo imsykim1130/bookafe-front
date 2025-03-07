@@ -2,7 +2,7 @@
 import { CouponData } from '@/api/item';
 import { useEffect, useReducer } from 'react';
 
-import { getCouponListRequest } from '@/api/api';
+import { getCouponListRequest } from '@/api/common.api';
 import { useCookies } from 'react-cookie';
 
 import couponListReducer from '../reducer/couponListReducer';

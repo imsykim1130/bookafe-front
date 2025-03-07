@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';
 import { useCookies } from 'react-cookie';
-import { changeDeliveryStatusRequest } from '../api/api.ts';
+import { changeDeliveryStatusRequest } from '../api/common.api.ts';
 import { DeliveryStatus } from '../api/item.ts';
 
 // function

@@ -1,41 +1,71 @@
 import AlertDialogComp from '@/components/AlertDialogComp';
-import { useJwt } from '@/hook/useJwt';
-import { useUser } from '@/hook/useUser';
+import { useAuthMutation } from '@/hook/auth.hooks';
+import { useUserQuery } from '@/hook/user.hook';
+import { useAuth, useChangeAuth } from '@/store/auth.store';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { jwt, removeCookie } = useJwt();
   const { pathname } = useLocation();
-  const { deleteUser } = useUser(jwt);
+  const queryClient = useQueryClient();
 
   const [isAlarm] = useState<boolean>(false);
   const [isNavOpened, setIsNavOpened] = useState<boolean>(false);
 
-  // function: 로그아웃 버튼 클릭 핸들러
-  function logoutClickHandler() {
-    removeCookie('jwt', { path: '/' });
-    deleteUser();
-    navigate("/");
+  const { user, refetchUser } = useUserQuery();
+
+  const auth = useAuth();
+  const changeAuth = useChangeAuth();
+
+  const { logout } = useAuthMutation({
+    onLogoutError,
+    onLogoutSuccess,
+  });
+
+  // hander: 로그아웃 성공 핸들러
+  function onLogoutSuccess() {
+    // 캐시 완전히 삭제
+    queryClient.clear();
+    navigate('/auth/sign-in');
+  }
+
+  // handler: 로그아웃 실패 핸들러
+  function onLogoutError() {
+    // 캐시 완전히 삭제
+    queryClient.clear();
+    navigate('/auth/sign-in');
   }
 
   // function: 로그인 버튼 클릭 핸들러
   // 로그인 성공 시 로그인 버튼을 누른 페이지로 다시 돌아가기 위해 state 에 돌아올 pathname 넣어서 보냄
   function signInClickHandler() {
-    navigate('/auth/sign-in', { state: { pathname: pathname } });
+    navigate('/auth/sign-in', { state: { pathname } });
   }
 
-  // function: 네비게이션 열기/닫기
-  function toggleNav() {
-    setIsNavOpened(!isNavOpened);
-  }
-
-  // effect: 페이지 이동마다 메뉴 네비게이션 드롭다운 닫기
+  // effect: 페이지 이동마다
   useEffect(() => {
+    // 메뉴 네비게이션 드롭다운 닫기
     setIsNavOpened(false);
+    if (pathname.includes('auth')) return;
+    // 유저 정보 가져오기(유저 정보 가져오기 겸 로그인 여부 확인용)
+    refetchUser();
   }, [pathname]);
+
+  useEffect(() => {
+    // 로그인 되어 있는 상태에서 user 값이 존재하지 않게 변경되면
+    // 로그아웃 처리
+    if (auth && !user) {
+      changeAuth(false);
+    }
+    // 로그인 되어 있지 않은 상태에서 user 값이 있으면
+    // 로그인 처리
+    if (!auth && user) {
+      changeAuth(true);
+    }
+  }, [user]);
 
   return (
     <header
@@ -56,13 +86,13 @@ const Header = () => {
           )}
         </button>
         {/* 메뉴 버튼 */}
-        <button className="md:hidden icon-btn" onClick={toggleNav}>
+        <button className="md:hidden icon-btn" onClick={() => setIsNavOpened(!isNavOpened)}>
           <i className="flex items-center justify-center text-base fi fi-br-grid"></i>
         </button>
 
         {/* 드롭다운 */}
         <div className={`items-start gap-[1.875rem] nav ${isNavOpened ? 'flex' : 'hidden md:flex'}`}>
-          {!jwt ? (
+          {!auth ? (
             <>
               {/* 로그인 안되어 있을 때 */}
               {/* 로그인, 로그아웃 */}
@@ -83,15 +113,10 @@ const Header = () => {
               <Link to={'/user'} className="icon-btn ">
                 내 정보
               </Link>
-              <AlertDialogComp logoutClickHandler={logoutClickHandler}>
+              <AlertDialogComp logoutClickHandler={logout} message='정말 로그아웃 하시겠습니까?'>
                 {/* 로그아웃 팝업 띄울 트리거 버튼 */}
-                <button
-                  className="icon-btn"
-                >
-                  로그아웃
-                </button>
+                <button className="icon-btn">로그아웃</button>
               </AlertDialogComp>
-              
             </>
           )}
         </div>

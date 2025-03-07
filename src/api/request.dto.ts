@@ -30,8 +30,8 @@ export interface PostOrderRequestDto {
   usedPoint: number | null;
 }
 
-export interface PostCommentRequestDto {
-  parentId: number | null;
+export interface postcommentrequestdto {
+  parentid: number | null;
   isbn: string;
   content: string;
   emoji: string | null;

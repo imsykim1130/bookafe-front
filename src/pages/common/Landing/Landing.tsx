@@ -1,57 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getSearchBookRequest } from '@/api/api.ts';
-import { BookSearchItem } from '@/api/item.ts';
-import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
-import { GetSearchBookListResponseDto } from '@/api/response.dto.ts';
-import { useDebounce } from '@/hook/index.ts';
-import { useUserStore } from '@/zustand/userStore.ts';
-import { useEffect, useState } from 'react';
+import { searchBookListQueryKey, useRecommendBookQuery } from '@/hook/book.hooks.ts';
+import { useUserQuery } from '@/hook/user.hook';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import AdminLanding from './AdminLanding.tsx';
 import LandingSearchPart from './component/LandingSearchPart.tsx';
-import RecommendBook from './component/RecommendBook.tsx';
 import Top10 from './component/Top10.tsx';
 
 const Landing = () => {
-  const [searchWord, setSearchWord] = useState<string>('');
-  const debouncedSearchWord = useDebounce(searchWord, 500);
-  const [searchBookList, setSearchBookList] = useState<BookSearchItem[]>([]);
-  const { user } = useUserStore();
-  const role = user ? user.role : 'ROLE_USER';
+  const { user } = useUserQuery();
+  const role = user?.role ?? '';
+  const queryClient = useQueryClient();
 
-  // handler: 빈 화면 클릭 시 책 검색 지우기
-  const emptyClickHandler = () => {
-    setSearchBookList([]);
-  };
-
-  // function: 책 검색하기
-  const searchBook = () => {
-    const requestDto: getSearchBookListRequestDto = {
-      query: debouncedSearchWord,
-      sort: 'accuracy',
-      page: 1,
-      size: 10,
-      target: 'title',
-    };
-    getSearchBookRequest(requestDto)
-      .then((response) => {
-        // 책 데이터 받아오기 성공
-        const { bookList } = response.data as GetSearchBookListResponseDto;
-        setSearchBookList(bookList);
-      })
-      .catch((error) => {
-        // 책 데이터 받아오기 실패
-        console.log(error.response.data);
-      });
-  };
-
-  // effect: 검색어 변경 시 책 검색
-  useEffect(() => {
-    if (debouncedSearchWord === '') {
-      setSearchBookList([]);
-      return;
-    }
-    searchBook();
-  }, [debouncedSearchWord]);
+  // 검색 결과 캐시 초기화
+  function initSearchBookList() {
+    queryClient.resetQueries({
+      queryKey: [searchBookListQueryKey],
+    });
+  }
 
   // render: 관리자 페이지
   if (role === 'ROLE_ADMIN') {
@@ -60,7 +26,7 @@ const Landing = () => {
 
   // render: 일반 랜딩 페이지
   return (
-    <main className="landing-container-layout" onClick={emptyClickHandler}>
+    <main className="landing-container-layout" onClick={initSearchBookList}>
       {/* 추천 책 */}
       <RecommendBook />
       {/* 구분 */}
@@ -69,9 +35,68 @@ const Landing = () => {
         {/* top 10 */}
         <Top10 />
         {/* 검색 */}
-        <LandingSearchPart searchWord={searchWord} setSearchWord={setSearchWord} searchBookList={searchBookList} />
+        <LandingSearchPart initSearchBookList={initSearchBookList} />
       </div>
     </main>
+  );
+};
+
+const RecommendBook = () => {
+  const { user } = useUserQuery();
+  const { recommendBook } = useRecommendBookQuery();
+  const navigate = useNavigate();
+
+  // function: 책 상세 페이지 이동
+  const bookClickHandler = () => {
+    navigate('/book/detail/' + recommendBook?.isbn);
+  };
+
+  return (
+    <section className="relative flex flex-col gap-[60px] justify-center items-center">
+      {recommendBook === null ? null : (
+        <div className={'flex flex-col gap-[3.125rem]'}>
+          {/* 환영문구 */}
+          <div className="text-3xl text-center leading-[150%]">
+            {user ? (
+              // 로그인이 되어있으면 환영인사
+              <p>
+                환영합니다
+                <br />
+                <span className="font-bold">{user.nickname}</span> 님!
+              </p>
+            ) : (
+              // 로그인이 되어있지 않으면 책 추천 문구
+              <p>
+                이런 책은
+                <br />
+                어떠세요?
+              </p>
+            )}
+          </div>
+          {/* 구분선 */}
+          <span className="w-full border-b-[0.01rem] border-black/20"></span>
+          {/* 오늘의 책 */}
+          <div className="flex flex-col items-center gap-[1.25rem]">
+            <p className="text-xl font-semibold">오늘의 책</p>
+            <div className="flex flex-col items-center gap-[0.9375rem]">
+              {/* 책 이미지 */}
+              <div className={'w-[120px] cursor-pointer'} onClick={bookClickHandler}>
+                <img
+                  src={recommendBook.bookImg}
+                  alt="book cover image"
+                  className={'w-full rounded-[10px] shadow-[6px_6px_15px_rgba(0,0,0,0.4)]'}
+                />
+              </div>
+              {/* 책 제목, 작가 */}
+              <div className="flex flex-col items-center gap-[0.3125rem]">
+                <p className="font-semibold">{recommendBook.title}</p>
+                <p className="opacity-60">{recommendBook.author}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
   );
 };
 

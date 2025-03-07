@@ -2,7 +2,7 @@
 import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
 import { getSearchBookListResponseDto } from '@/api/response.dto.ts';
 import SearchBox from '@/components/SearchBox.tsx';
-import { useDebounce } from '@/hook/index.ts';
+import { useDebounce } from '@/hook/hooks.ts';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import {
   getAllRecommendBookRequest,
   getSearchBookRequest,
   registerRecommendBookRequest,
-} from '../../api/api.ts';
+} from '../../api/common.api.ts';
 import { BookSearchItem, RecommendBookItem } from '../../api/item.ts';
 
 // const mock: RecommendBookItem = {

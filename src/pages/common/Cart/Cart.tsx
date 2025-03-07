@@ -1,5 +1,5 @@
 // /cart
-import { createOrderRequest } from '@/api/api.ts';
+import { createOrderRequest } from '@/api/common.api';
 import { CartBookData, CouponData, DeliveryInfoItem } from '@/api/item.ts';
 import { useAllCartBookQuery, useDeliveryInfoQuery } from '@/api/query.ts';
 import CartDeliveryInfo from '@/pages/common/Cart/component/CartDeliveryInfo.tsx';
@@ -32,15 +32,9 @@ function Cart() {
     return price - couponDiscountedPrice - usingPoint;
   }, [price, couponDiscountedPrice, usingPoint]);
   // query: 장바구니 책
-  const {
-    isLoading,
-    isError,
-    data: cartBookList,
-    refetch: cartBookListRefetch,
-  } = useAllCartBookQuery(cookies.jwt);
+  const { isLoading, isError, data: cartBookList, refetch: cartBookListRefetch } = useAllCartBookQuery(cookies.jwt);
 
   const allDataReady = !isLoading && !isError && !deliveryInfoLoading && !deliveryInfoError;
-
 
   // function: 장바구니 책 가져오기 성공 시 책의 총 가격 계산
   const calculateBookTotalPrice = () => {
@@ -107,15 +101,15 @@ function Cart() {
 
   // effect: 첫 마운트
   useEffect(() => {
-    if(!cartBookList) return;
+    if (!cartBookList) return;
     calculateBookTotalPrice();
   }, [cartBookList]);
 
   // effect: 첫 마운트 시 기본 배송정보 있는지 가져오기
-  useEffect(()=>{
-    if(deliveryInfo === undefined) return;
+  useEffect(() => {
+    if (deliveryInfo === undefined) return;
     setDeliveryInfoView(deliveryInfo);
-  }, [deliveryInfo])
+  }, [deliveryInfo]);
 
   // render
   if (!allDataReady) {

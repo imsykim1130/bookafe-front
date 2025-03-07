@@ -1,8 +1,6 @@
 import { request } from '@/api/template';
-import { getIsAuthCookie } from '@/utils/cookie';
 import { DOMAIN } from '@/utils/env';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
 // user query
 // types
@@ -31,7 +29,6 @@ export const userKey = 'user';
 // query
 export const useUserQuery: UseUserQuery = () => {
   const queryClient = useQueryClient();
-  const isAuth = getIsAuthCookie();
 
   const {
     data: user,
@@ -42,9 +39,13 @@ export const useUserQuery: UseUserQuery = () => {
     queryKey: [userKey],
     queryFn: async () => {
       console.log('user fetching');
-      return await request.get<UserResponse>(DOMAIN + '/user');
+      return await request
+        .get<UserResponse>(DOMAIN + '/user')
+        .then((user) => user)
+        .catch(() => null);
     },
-    enabled: isAuth,
+    retry: 0,
+    enabled: false,
     staleTime: Infinity,
     initialData: null,
     gcTime: 1000 * 60 * 60, // 1시간

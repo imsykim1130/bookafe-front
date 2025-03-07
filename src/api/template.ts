@@ -1,6 +1,21 @@
 import { ErrorResponse } from '@/types/common.type';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+// axios 인터셉터
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // 에러가 401 이면 jwt 만료로 인식
+      // 로그인 페이지로 이동
+      window.location.href = '/auth/sign-in';
+    }
+    return error;
+  },
+);
+
 // ✅ 응답 데이터 추출
 export const responseBody = <D>(response: AxiosResponse<D>) => response.data;
 
@@ -83,4 +98,13 @@ export const request = {
    */
   delete: <D = void>(url: string, withCredentials: boolean = true) =>
     axios.delete<D>(url, { withCredentials }).then(responseBody).catch(responseError),
+
+  /**
+   * ✅ DELETE 요청(body 포함)
+   * @param url 
+   * @param body 
+   * @param withCredentials 
+   * @returns 
+   */
+  deleteWithBody: <B, D = void>(url: string, body: B, withCredentials: boolean = true) => axios.delete<D>(url, { withCredentials, data: body }).then(responseBody).catch(responseError),
 };

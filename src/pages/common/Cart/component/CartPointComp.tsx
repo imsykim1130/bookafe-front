@@ -1,8 +1,8 @@
-import { useEffect, useReducer, useState } from 'react';
+import { getTotalPointRequest } from '@/api/common.api';
 import { Button } from '@/components/ui/button.tsx';
 import pointReducer from '@/pages/common/Cart/reducer/pointReducer.ts';
+import { useEffect, useReducer, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { getTotalPointRequest } from '@/api/api.ts';
 
 interface Props {
   usingPoint: number;

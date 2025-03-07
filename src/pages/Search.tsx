@@ -2,7 +2,7 @@
 import SearchBox from '@/components/SearchBox.tsx';
 import { Dispatch, Reducer, useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getSearchBookRequest } from '../api/api.ts';
+import { getSearchBookRequest } from '../api/common.api.ts';
 import { BookSearchItem } from '../api/item.ts';
 import { getSearchBookListRequestDto } from '../api/request.dto.ts';
 import { GetSearchBookListResponseDto } from '../api/response.dto.ts';

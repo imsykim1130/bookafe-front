@@ -1,8 +1,8 @@
 import { request } from '@/api/template';
-import { useUser } from '@/store/user.store';
 import { DOMAIN } from '@/utils/env';
 import { useMutation, useQuery } from '@tanstack/react-query';
-
+import { useUserQuery } from './user.hook';
+import { useAuth } from '@/store/auth.store';
 
 //// 관리자의 책 추천 여부
 type UseIsBookRecommendedQueryParams = {
@@ -22,7 +22,8 @@ export const isBookRecommendedQueryKey = 'recommendedByAdmin';
 
 export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRecommendedQueryParams) => {
   const { isbn } = params;
-  const user = useUser();
+  const { user } = useUserQuery();
+  const auth = useAuth();
 
   const {
     data: isRecommended,
@@ -38,13 +39,12 @@ export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRe
       );
     },
     staleTime: Infinity,
-    enabled: !!isbn && user?.role === 'ROLE_ADMIN',
+    enabled: auth && !!isbn && user?.role === 'ROLE_ADMIN',
     initialData: false,
   });
 
   return { isRecommended, isRecommendedLoading, isRecommendedError, refetchIsRecommended };
 };
-
 
 //// 추천 책 mutation
 type UseRecommendBookMutationParams = {

@@ -1,11 +1,10 @@
 import { getSearchBookListRequestDto } from '@/api/request.dto.ts';
 import {
   GetAllDeliveryInfoResponseDto,
-  GetAllFavoriteBookResponseDto,
   GetDeliveryInfoResponseDto,
   GetSearchBookListResponseDto,
 } from '@/api/response.dto';
-import { DOMAIN } from '@/utils';
+import { DOMAIN } from '@/utils/env';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { CartBookData } from './item';
@@ -108,33 +107,5 @@ export const useAllSearchBookQuery = (searchWord: string, page: number, requestD
     },
     staleTime: Infinity,
     // gcTime: 기본 5분
-  });
-};
-
-// 좋아요 책 리스트
-export const allFavoriteBookkey = 'allFavoriteBook';
-export const useAllFavoriteBookQuery = (jwt: string, page: number) => {
-  return useQuery({
-    queryKey: [allFavoriteBookkey, page],
-    queryFn: async () => {
-      console.log('좋아요 책 리스트 ' + page + ' 가져오기');
-      return await axios
-        .get(DOMAIN + '/favorite/list', {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-          params: {
-            page,
-          },
-        })
-        .then((res) => {
-          return res.data as GetAllFavoriteBookResponseDto;
-        })
-        .catch((err) => {
-          throw err;
-        });
-    },
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 30, // 30분동안 캐시에 저장
   });
 };
