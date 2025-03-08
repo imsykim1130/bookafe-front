@@ -1,87 +1,56 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { UserManagementItem } from '@/api/item.ts';
 import { useDebounce } from '@/hook/hooks.ts';
+import { SearchUser, searchUserListQueryKey, useSearchUserListQuery, useUserMutation } from '@/hook/user.hook.ts';
+import { queryClient } from '@/main.tsx';
 import { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
-import { deleteUserRequest, searchUserRequest } from '../../api/common.api.ts';
-import { UserManagementItem } from '../../api/item.ts';
 
 const UserManagement = () => {
-  const [userList, setUserList] = useState<UserManagementItem[] | null>(null);
-  const [cookies] = useCookies(['jwt']);
-  const [reload, setReload] = useState<number>(0);
+  const [searchWord, setSearchWord] = useState<string>('');
+  const debouncedSearchWord = useDebounce(searchWord, 500);
 
-  // 유저 리스트 가져오기 요청
-  const getUserList = (searchWord: string) => {
-    if (searchWord.length === 0) {
-      setUserList(null);
-      return;
-    }
-    searchUserRequest(cookies.jwt, searchWord).then((res) => {
-      if (!res) {
-        setUserList(null);
-        window.alert('유저 리스트를 불러오는 동안 오류가 발생했습니다. 다시 시도해주세요');
-        return;
-      }
-      setUserList(res);
-    });
-  };
-
-  // 유저 탈퇴 요청
-  const deleteUser = async (id: number) => {
-    console.log(id);
-    // todo : 요청
-    return await deleteUserRequest(cookies.jwt, id).then((res) => {
-      return res;
-    });
-  };
-
-  const searchReload = () => {
-    setReload(reload + 1);
-  };
-
+  const { searchUserList, isSearchUserListError, isSearchUserListLoading, refetchSearchUserList } =
+    useSearchUserListQuery({ searchWord });
+  
   return (
     <main className={'flex flex-col items-center px-[5%] py-[5vh]'}>
-      <SearchBox getUserList={getUserList} reload={reload} />
-      <section className={'w-full max-w-[600px]'}>
-        {/* 검색 전, 검색 오류 시*/}
-        {userList === null && (
-          <div className={'flex justify-center items-center h-[70vh]'}>
-            <div className={'flex items-center gap-[10px] text-black text-opacity-40'}>
-              <i className="fi fi-br-search"></i>
-              <p>찾고자 하는 유저의 이메일을 입력해주세요</p>
-            </div>
-          </div>
-        )}
-        {/* 검색 결과가 없을 때 */}
-        {userList && userList.length === 0 && (
-          <div className={'flex justify-center items-center h-[70vh]'}>
-            <p className={'text-black text-opacity-40'}>검색 결과가 없습니다</p>
-          </div>
-        )}
-        {/* 검색 결과가 존재할 때*/}
-        {userList && userList.length > 0 && (
-          <div className={'mt-[30px]'}>
-            {userList.map((user: UserManagementItem) => (
-              <UserComp key={user.email} user={user} deleteUser={deleteUser} searchReload={searchReload} />
-            ))}
-          </div>
-        )}
-      </section>
+      <SearchBox
+        searchWord={searchWord}
+        setSearchWord={setSearchWord}
+        debouncedSearchWord={debouncedSearchWord}
+        refetchSearchUserList={refetchSearchUserList}
+      />
+      <div className={'w-full max-w-[600px]'}>
+        <SearchUserList
+          searchUserList={searchUserList}
+          isError={isSearchUserListError}
+          isLoading={isSearchUserListLoading}
+        />
+      </div>
     </main>
   );
 };
 
-const SearchBox = ({ getUserList, reload }: { getUserList: (searchWord: string) => void; reload: number }) => {
-  const [searchWord, setSearchWord] = useState<string>('');
-  const debouncedSearchWord = useDebounce(searchWord, 500);
-
+// 검색창
+const SearchBox = ({
+  searchWord,
+  setSearchWord,
+  debouncedSearchWord,
+  refetchSearchUserList,
+}: {
+  searchWord: string;
+  setSearchWord: (searchWord: string) => void;
+  debouncedSearchWord: string;
+  refetchSearchUserList: () => void;
+}) => {
   useEffect(() => {
-    getUserList(debouncedSearchWord);
+    // todo
+    if (debouncedSearchWord === '') {
+      queryClient.setQueryData([searchUserListQueryKey], []);
+      return;
+    }
+    refetchSearchUserList();
   }, [debouncedSearchWord]);
-
-  useEffect(() => {
-    getUserList(debouncedSearchWord);
-  }, [reload]);
 
   return (
     <div className={'flex justify-center'}>
@@ -101,16 +70,31 @@ const SearchBox = ({ getUserList, reload }: { getUserList: (searchWord: string) 
   );
 };
 
-const UserComp = ({
-  user,
-  deleteUser,
-  searchReload,
+// 유저 리스트
+const SearchUserList = ({
+  searchUserList,
+  isError,
+  isLoading,
 }: {
-  user: UserManagementItem;
-  deleteUser: (id: number) => Promise<boolean>;
-  searchReload: () => void;
+  searchUserList: SearchUser[];
+  isLoading: boolean;
+  isError: boolean;
 }) => {
-  const { id, email, point, datetime, commentCount } = user;
+  if (isLoading) {
+    return <p>로딩중</p>;
+  }
+  if (isError) {
+    return <p>오류로 인해 불러오지 못했습니다</p>;
+  }
+
+  return searchUserList.map((user: UserManagementItem) => <UserComp key={user.email} user={user} />);
+};
+
+// 유저
+const UserComp = ({ user }: { user: UserManagementItem }) => {
+  const { email, point, datetime, commentCount } = user;
+  const { cancelUser } = useUserMutation();
+
   return (
     <div
       className={'text-[14px] flex justify-between items-start py-[20px] border-b-[1px] border-black border-opacity-10'}
@@ -131,19 +115,7 @@ const UserComp = ({
           </div>
         </div>
       </div>
-      <button
-        className={'border-[1px] border-black border-opacity-80 rounded-[5px] p-[5px]'}
-        onClick={() => {
-          deleteUser(id).then((res) => {
-            if (!res) {
-              window.alert('오류가 발생했습니다. 다시 시도해주세요');
-              return;
-            }
-            window.alert('탈퇴 완료');
-            searchReload();
-          });
-        }}
-      >
+      <button className={'border-[1px] border-black border-opacity-80 rounded-[5px] p-[5px]'} onClick={cancelUser}>
         탈퇴
       </button>
     </div>

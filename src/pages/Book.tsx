@@ -16,11 +16,11 @@ import { useUserQuery } from '@/hook/user.hook';
 import { useAuth } from '@/store/auth.store';
 import { useChangePage, usePage } from '@/store/page.store';
 import { toBookSite } from '@/utils/utils';
-import { useQueryClient } from '@tanstack/react-query';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AlertDialogComp from '../components/AlertDialogComp';
+import { queryClient } from '@/main';
 
 //// page
 const Book = () => {
@@ -238,7 +238,6 @@ const FavoriteBtnComp = () => {
 //// 리뷰 작성창
 const ReviewInput = () => {
   const { isbn } = useParams();
-  const queryClient = useQueryClient();
   const changePage = useChangePage();
   const auth = useAuth();
 
@@ -388,7 +387,6 @@ const Review = ({
   const [favoriteCount] = useState<number>(0);
   const [replyCount, setReplyCount] = useState<number>(0);
   const [replyOpen, setReplyOpen] = useState<boolean>(false);
-  const queryClient = useQueryClient();
   const { isbn } = useParams();
   const changePage = useChangePage();
 
@@ -648,7 +646,6 @@ const ReplySection = (props: ReplySectionProps) => {
   const { isbn } = useParams();
   const { isOpen, reviewId } = props;
   const page = usePage(); // 리뷰 페이지
-  const queryClient = useQueryClient();
   const [content, setContent] = useState('');
   const { createReply } = useCommentMutation({ isbn, onCreateReplySuccess });
 
@@ -719,7 +716,6 @@ const ReplyList = ({ replyOpen, reviewId }: { replyOpen: boolean; reviewId: numb
   const { replyList } = useReplyListQuery(reviewId, replyOpen);
   const { isbn } = useParams();
   const page = usePage();
-  const queryClient = useQueryClient();
   const { deleteReply } = useCommentMutation({ isbn, onDeleteReplySuccess });
 
   // 리뷰 삭제 성공 핸들러

@@ -146,11 +146,11 @@ const RecommendBookList = ({
   isLoading,
   isError,
 }: {
-  recommendBookList: RecommendBook[];
+  recommendBookList: RecommendBook[] | undefined;
   isLoading: boolean;
   isError: boolean;
 }) => {
-  if (isLoading) {
+  if (!recommendBookList || isLoading) {
     return <p>로딩중</p>;
   }
   if (isError) {

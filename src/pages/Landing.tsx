@@ -1,6 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { getTop10BookListRequest } from '@/api/common.api.ts';
-import { Top10BookItem } from '@/api/item.ts';
 import BookPrev from '@/components/BookPrev.tsx';
 import SearchBox from '@/components/SearchBox.tsx';
 import {
@@ -10,9 +8,10 @@ import {
   useSearchBookListQuery,
   UseSearchBookListQueryParams,
 } from '@/hook/book.hooks.ts';
+import { useTop10Query } from '@/hook/favorite.book.hooks';
 import { useDebounce } from '@/hook/hooks.ts';
 import { useUserQuery } from '@/hook/user.hook';
-import { useQueryClient } from '@tanstack/react-query';
+import { queryClient } from '@/main';
 import { useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link, useNavigate } from 'react-router-dom';
@@ -20,7 +19,6 @@ import { Link, useNavigate } from 'react-router-dom';
 const Landing = () => {
   const { user } = useUserQuery();
   const role = user?.role ?? '';
-  const queryClient = useQueryClient();
 
   // 검색 결과 캐시 초기화
   function initSearchBookList() {
@@ -132,6 +130,7 @@ const RecommendBook = () => {
 };
 
 const LandingSearchPart = ({ initSearchBookList }: { initSearchBookList: () => void }) => {
+  const navigate = useNavigate();
   const [searchWord, setSearchWord] = useState<string>('');
   const debouncedSearchWord = useDebounce(searchWord, 500);
 
@@ -160,7 +159,13 @@ const LandingSearchPart = ({ initSearchBookList }: { initSearchBookList: () => v
   return (
     <div className={'absolute flex flex-col w-full items-center top-[8rem] xl:top-[3rem] px-[5%]'}>
       <div className={'w-full max-w-[25rem]'}>
-        <SearchBox searchWord={searchWord} setSearchWord={setSearchWord} />
+        <SearchBox
+          searchWord={searchWord}
+          setSearchWord={setSearchWord}
+          onEnter={() => {
+            navigate(`/search/${searchWord}`);
+          }}
+        />
         <SearchBookList searchBookList={searchBookList} />
       </div>
     </div>
@@ -196,8 +201,8 @@ const SearchBookList = ({ searchBookList }: { searchBookList: SearchBook[] }) =>
     </div>
   );
 };
+
 const Top10 = () => {
-  const [books, setBooks] = useState<Top10BookItem[] | null>(null);
   const [isMouseInside, setIsMouseInside] = useState<boolean>(false);
 
   // 책 리스트 컨테이너 첫 번째 요소 참조
@@ -207,22 +212,6 @@ const Top10 = () => {
 
   // 책 리스트 컨테이너 스크롤 조작을 위한 참조
   const bookListRef = useRef<HTMLDivElement>(null);
-
-  // 책 리스트 조회
-  const getTop10BookList = () => {
-    getTop10BookListRequest().then((res) => {
-      setBooks(res);
-    });
-  };
-
-  // 컴포넌트 마운트 시 책 리스트 조회
-  useEffect(() => {
-    getTop10BookList();
-  }, []);
-
-  if (books === null || books.length === 0) {
-    return null;
-  }
 
   return (
     // top10 섹션 컨테이너
@@ -264,27 +253,30 @@ const Top10 = () => {
         </span>
         {/* 책 리스트 컨테이너 */}
         <div ref={bookListRef} className="flex w-[90%] xl:w-full gap-4 mx-auto overflow-x-scroll scrollbar-hidden">
-          {/* 책 리스트 */}
           <span ref={firstRef}></span>
-          {books
-            ? books.map((book, index) => {
-                return (
-                  <div key={book.isbn} className="max-w-[120px] flex-shrink-0">
-                    <BookPrev
-                      key={index}
-                      bookImg={book.bookImg}
-                      author={book.author}
-                      title={book.title}
-                      isbn={book.isbn}
-                    />
-                  </div>
-                );
-              })
-            : null}
+          <BookList />
           <span ref={lastRef}></span>
         </div>
       </div>
     </section>
   );
+};
+
+const BookList = () => {
+  const { bookList, isTop10Error, isTop10Loading } = useTop10Query();
+
+  if (bookList === undefined || isTop10Loading) {
+    return <p>로딩중</p>;
+  }
+
+  if (isTop10Error) {
+    return <p>다시 시도해주세요</p>;
+  }
+
+  return bookList.map((book) => (
+    <div key={book.isbn} className="max-w-[120px] flex-shrink-0">
+      <BookPrev key={book.isbn} bookImg={book.bookImg} author={book.author} title={book.title} isbn={book.isbn} />
+    </div>
+  ));
 };
 export default Landing;

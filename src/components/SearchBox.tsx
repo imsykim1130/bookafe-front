@@ -1,5 +1,3 @@
-import { useNavigate } from 'react-router-dom';
-
 interface Props {
   searchWord: string;
   setSearchWord: React.Dispatch<React.SetStateAction<string>>;
@@ -9,7 +7,6 @@ interface Props {
 
 const SearchBox = (props: Props) => {
   const { searchWord, setSearchWord, onEnter, onBlur } = props;
-  const navigate = useNavigate();
 
   return (
     <div className={'relative'}>
@@ -40,7 +37,6 @@ const SearchBox = (props: Props) => {
             if(onEnter !== undefined) {
               onEnter();
             }
-            navigate(`/search/${searchWord}`);
           }
         }}
         onBlur={onBlur} // 포커스 잃었을 때

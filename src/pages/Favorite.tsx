@@ -8,8 +8,8 @@ import {
   useFavoriteBookListQuery,
   useFavoriteBookMutation,
 } from '@/hook/favorite.book.hooks';
+import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
-import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,7 +29,6 @@ const Favorite = () => {
     onUnlikeBookListError,
     onUnlikeBookListSuccess,
   });
-  const queryClient = useQueryClient();
 
   // mutation 성공, 실패 핸들러
   // 좋아요 취소 성공 핸들러

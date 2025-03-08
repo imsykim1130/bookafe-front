@@ -1,16 +1,17 @@
 import { Button } from '@/components/ui/button';
-import { useUserQuery } from '@/hook/user.hook';
+import { useUserMutation, useUserQuery } from '@/hook/user.hook';
 
 // 유저 페이지
 const User = () => {
-  const { user, isUserLoading, userError, changeProfileImage } = useUserQuery();
-
+  const { user, isUserLoading, isUserError } = useUserQuery();
+  const {changeProfileImage} = useUserMutation();
+  
   // Rendering
   if (isUserLoading) {
     return <p>로딩중</p>;
   }
 
-  if (userError) {
+  if (isUserError) {
     return <p>데이터를 가져오는 중 오류가 발생했습니다</p>;
   }
 

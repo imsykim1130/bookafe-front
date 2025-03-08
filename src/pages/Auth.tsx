@@ -1,13 +1,12 @@
-import { SignInRequestDto, SignUpRequestDto } from '@/api/request.dto';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
-import { useAuthMutation } from '@/hook/auth.hooks';
+import { SignInRequest, SignUpRequest, useAuthMutation } from '@/hook/auth.hooks';
 import { ErrorResponse } from '@/types/common.type';
 import { getRandomNickname } from '@/utils/openai';
-import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import queryString from "query-string";
+import { queryClient } from '@/main';
 
 const Auth = () => {
   // index: top
@@ -16,7 +15,6 @@ const Auth = () => {
   const { state } = useLocation();
   const pathname = state ? state.pathname : null;
   const isLogout = queryString.parse(window.location.search).logout;
-  const queryClient = useQueryClient();
 
   // Ref
   const emailRef = useRef<HTMLInputElement>(null);
@@ -108,7 +106,7 @@ const Auth = () => {
     // 입력값 검증
     if (!emailRef.current || !passwordRef.current || emailErr || passwordErr) return;
 
-    const requestDto: SignInRequestDto = {
+    const requestDto: SignInRequest = {
       email: emailRef.current.value,
       password: passwordRef.current.value,
     };
@@ -170,7 +168,7 @@ const Auth = () => {
       return;
     }
 
-    const requestDto: SignUpRequestDto = {
+    const requestDto: SignUpRequest = {
       email: emailRef.current?.value as string,
       password: passwordRef.current?.value as string,
       nickname: nicknameRef.current?.value as string,
