@@ -4,6 +4,39 @@ import { DOMAIN } from '@/utils/env';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
+// top10 쿼리
+type Top10Book = {
+  isbn: string;
+  bookImg: string;
+  title: string;
+  author: string;
+  favoriteCount: number;
+};
+
+interface UseTop10QueryReturn {
+  bookList: Top10Book[] | undefined;
+  isTop10Loading: boolean;
+  isTop10Error: boolean;
+}
+
+type UseTop10Query = () => UseTop10QueryReturn;
+
+export const useTop10Query : UseTop10Query = () => {
+  const query = () => request.get<Top10Book[]>(DOMAIN + '/favorite/top10');
+
+  const {
+    data: bookList,
+    isError: isTop10Error,
+    isLoading: isTop10Loading,
+  } = useQuery({
+    queryKey: [],
+    queryFn: query,
+  });
+
+
+  return { bookList, isTop10Loading, isTop10Error };
+};
+
 // query
 // 책의 좋아요 정보
 export type BookFavoriteInfo = {

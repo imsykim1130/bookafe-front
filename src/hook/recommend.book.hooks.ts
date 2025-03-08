@@ -2,9 +2,10 @@ import { request } from '@/api/template';
 import { useAuth } from '@/store/auth.store';
 import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
 import RecommendBook from '../pages/admin/RecommendBook';
 import { useUserQuery } from './user.hook';
+import { queryClient } from '@/main';
 
 //// 관리자의 책 추천 여부
 type UseIsBookRecommendedQueryParams = {
@@ -27,23 +28,24 @@ export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRe
   const { user } = useUserQuery();
   const auth = useAuth();
 
+  const query= () => request.getWithParams<boolean, UseIsBookRecommendedQueryParams>(
+    DOMAIN + '/recommend-book/is-recommended/' + isbn,
+    params,
+  )
+
   const {
-    data: isRecommended,
+    data,
     isLoading: isRecommendedLoading,
     isError: isRecommendedError,
     refetch: refetchIsRecommended,
   } = useQuery({
     queryKey: [isBookRecommendedQueryKey, isbn],
-    queryFn: () => {
-      return request.getWithParams<boolean, UseIsBookRecommendedQueryParams>(
-        DOMAIN + '/recommend-book/is-recommended/' + isbn,
-        params,
-      );
-    },
+    queryFn: auth && !!isbn && user?.role === 'ROLE_ADMIN'? query : skipToken
+    ,
     staleTime: Infinity,
-    enabled: auth && !!isbn && user?.role === 'ROLE_ADMIN',
-    initialData: false,
   });
+
+  const isRecommended = data ? data : false;
 
   return { isRecommended, isRecommendedLoading, isRecommendedError, refetchIsRecommended };
 };
@@ -58,7 +60,7 @@ export type RecommendBook = {
   isbn: string;
 };
 interface UseRecommendBookListQueryReturn {
-  recommendBookList: RecommendBook[];
+  recommendBookList: RecommendBook[] | undefined;
   isRecommendBookListLoading: boolean;
   isRecommendBookListError: boolean;
   refetchRecommendBookList: () => void;
@@ -79,7 +81,7 @@ export const useRecommendBookListQuery: UseRecommendBookListQuery = () => {
     queryFn: () => {
       return request.get<RecommendBook[]>(DOMAIN + '/recommend-book/all');
     },
-    initialData: [],
+    placeholderData: [],
     staleTime: 1000 * 60 * 60
   });
 
@@ -108,8 +110,6 @@ interface UseRecommendBookMutationReturn {
 type UseRecommendBookMutation = (params?: UseRecommendBookMutationParams) => UseRecommendBookMutationReturn;
 
 export const useRecommendBookMutation: UseRecommendBookMutation = (params?: UseRecommendBookMutationParams) => {
-  const queryClient = useQueryClient();
-
   // 책 추천하기
   const { mutate: recommend, isPending: isRecommendPending } = useMutation({
     mutationFn: (isbn: string) => {

@@ -1,9 +1,10 @@
 import { request } from '@/api/template';
+import { queryClient } from '@/main';
+import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-// user query
-// types
+// 유저 검색 쿼리
 export type UserResponse = {
   id: number;
   email: string;
@@ -26,10 +27,7 @@ type UseUserQuery = () => UseUserQueryReturn;
 
 export const userKey = 'user';
 
-// query
 export const useUserQuery: UseUserQuery = () => {
-  const queryClient = useQueryClient();
-
   const {
     data: user,
     isError: isUserError,
@@ -63,17 +61,62 @@ export const useUserQuery: UseUserQuery = () => {
   return { user, isUserError, isUserLoading, refetchUser, resetUser, setUser };
 };
 
+// 유저 검색 리스트 쿼리
+export const searchUserListQueryKey = 'searchUserList';
+
+export type SearchUser = {
+  id: number;
+  email: string;
+  datetime: string;
+  point: number;
+  commentCount: number;
+};
+
+type UseSearchUserListQueryParams = {
+  searchWord: string;
+  filter?: 'nickname' | 'email';
+};
+
+interface UseSearchUserListQueryReturn {
+  searchUserList: SearchUser[];
+  isSearchUserListLoading: boolean;
+  isSearchUserListError: boolean;
+  refetchSearchUserList: () => void;
+}
+
+type UseSearchUserListQuery = (params: UseSearchUserListQueryParams) => UseSearchUserListQueryReturn;
+
+export const useSearchUserListQuery: UseSearchUserListQuery = (params: UseSearchUserListQueryParams) => {
+  const {
+    data: searchUserList,
+    isError: isSearchUserListError,
+    isLoading: isSearchUserListLoading,
+    refetch: refetchSearchUserList,
+  } = useQuery({
+    queryKey: [searchUserListQueryKey],
+    queryFn: () => request.getWithParams<SearchUser[], UseSearchUserListQueryParams>(DOMAIN + '/user/search', params),
+    initialData: [],
+    enabled: false,
+  });
+
+  return { searchUserList, isSearchUserListLoading, isSearchUserListError, refetchSearchUserList };
+};
+
 // user mutation
 // types
 interface UseUserMutationReturn {
   changeProfileImage: (img: File) => void;
   isChangeProfileImagePending: boolean;
+
+  cancelUser: () => void;
+  isCancelUserPending: boolean;
 }
 
 type UseUserMutation = () => UseUserMutationReturn;
 
 // mutation
 export const useUserMutation: UseUserMutation = () => {
+  // 프로필 이미지 변경
   const { mutate: changeProfileImage, isPending: isChangeProfileImagePending } = useMutation({
     mutationFn: (img: File) => {
       // 파일은 Form 에 담아 전달 해야한다
@@ -84,5 +127,20 @@ export const useUserMutation: UseUserMutation = () => {
     },
   });
 
-  return { changeProfileImage, isChangeProfileImagePending };
+  // 탈퇴하기
+  const { mutate: cancelUser, isPending: isCancelUserPending } = useMutation({
+    mutationFn: () => {
+      return request.delete(DOMAIN + '/user');
+    },
+    onSuccess: () => {
+      // 탈퇴 성공 시 로그아웃을 위한 url 로 이동
+      window.location.href = "/auth/sign-in?logout=true";
+    },
+    onError: (err: ErrorResponse) => {
+      console.log(err.message);
+      window.alert("다시 시도해주세요");
+    }
+  });
+
+  return { changeProfileImage, isChangeProfileImagePending, cancelUser, isCancelUserPending };
 };

@@ -1,9 +1,16 @@
 import { request } from '@/api/template';
 import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  FetchNextPageOptions,
+  InfiniteData,
+  InfiniteQueryObserverResult,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
 
-// 리뷰 리스트 쿼리
+// 책의 리뷰 리스트 쿼리
 export type Comment = {
   id: number;
   profileImg: string;
@@ -39,7 +46,7 @@ export const useReviewListQuery: UseReviewListQuery = (params) => {
   } = useQuery({
     queryKey: [reviewListQueryKey, isbn, page],
     queryFn: () => {
-      return request.get<Comment[]>(DOMAIN + '/comment/list/' + isbn, false);
+      return request.get<Comment[]>(DOMAIN + '/comment/list/' + isbn);
     },
     enabled: !!isbn,
     initialData: [],
@@ -47,7 +54,7 @@ export const useReviewListQuery: UseReviewListQuery = (params) => {
   return { reviewList, isReviewListLoading, isReviewListError };
 };
 
-//// 리플 리스트 쿼리
+//// 리뷰의 리플 리스트 쿼리
 export const replyListQueryKey = 'replyList';
 
 interface UseReplyListQueryReturn {
@@ -67,7 +74,7 @@ export const useReplyListQuery: UseReplyListQuery = (reviewId: number, replyOpen
     queryKey: [replyListQueryKey, reviewId],
     queryFn: () => {
       console.log('hi');
-      return request.get<Comment[]>(DOMAIN + '/comment/reply/list/' + reviewId, false);
+      return request.get<Comment[]>(DOMAIN + '/comment/reply/list/' + reviewId);
     },
     enabled: replyOpen,
     initialData: [],
@@ -78,8 +85,59 @@ export const useReplyListQuery: UseReplyListQuery = (reviewId: number, replyOpen
   return { replyList, isReplyListLoading, isReplyListError };
 };
 
-// 리뷰, 댓글 mutation
+// 유저의 리뷰 리스트 쿼리
+type MyReview = {
+  content: string;
+  createdAt: string;
+  title: string;
+  author: string;
+};
 
+type UseUserReviewListQueryParams = {
+  userId: number; // 유저 id
+  size: number; // 한 번에 가져올 데이터 개수
+};
+interface UseUserReviewListQueryReturn {
+  userReviewList: MyReview[][];
+  isError: boolean;
+  isLoading: boolean;
+  fetchNextPage: (
+    options?: FetchNextPageOptions,
+  ) => Promise<InfiniteQueryObserverResult<InfiniteData<MyReview[], unknown>, Error>>;
+}
+
+type UseUserReviewListQuery = (params: UseUserReviewListQueryParams) => UseUserReviewListQueryReturn;
+export const userReviewListQueryKey = 'userReviewList';
+export const useUserReviewListQuery: UseUserReviewListQuery = (params) => {
+  const { userId, size } = params;
+  const {
+    data,
+    isError,
+    isLoading,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: [userReviewListQueryKey, userId],
+    queryFn: ({ pageParam }: { pageParam: number }) => {
+      return request.getWithParams<MyReview[], { userId: number; size: number; page: number }>(
+        DOMAIN + '/comment/my/list',
+        {
+          userId,
+          size,
+          page: pageParam,
+        },
+      );
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, pages) => (lastPage.length > 0 ? pages.length + 1 : undefined), // 가져온 데이터의 길이가 0 이면 더 이상 가져올 데이터가 없기 때문에 pageParam 을 undefined 반환
+    maxPages: 5,
+  });
+
+  const userReviewList = data ? data.pages : [];
+
+  return {userReviewList , isError, isLoading, fetchNextPage };
+};
+
+// 리뷰, 댓글 mutation
 export type CommentRequestVar = {
   parentId: number | null;
   isbn: string | undefined;

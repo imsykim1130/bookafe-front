@@ -116,6 +116,10 @@ export type UseSearchBookListQueryParams = {
 
 interface UseSearchBookListQueryReturn {
   searchBookListWithInfo: SearchBookListResponse;
+  searchBookList: SearchBook[];
+  isEnd: boolean;
+  totalCount: number;
+  pageableCount: number;
   isSearchBookListLoading: boolean;
   isSearchBookListError: boolean;
   refetchSearchBookList: () => void;
@@ -147,8 +151,21 @@ export const useSearchBookListQuery: UseSearchBookListQuery = (params: UseSearch
       bookList: [],
     },
     enabled: false,
-    gcTime: 0,
   });
 
-  return { searchBookListWithInfo, isSearchBookListLoading, isSearchBookListError, refetchSearchBookList };
+  const searchBookList = searchBookListWithInfo.bookList;
+  const isEnd = searchBookListWithInfo.isEnd;
+  const totalCount = searchBookListWithInfo.totalCount;
+  const pageableCount = searchBookListWithInfo.pageableCount;
+
+  return {
+    searchBookListWithInfo,
+    searchBookList,
+    isEnd,
+    totalCount,
+    pageableCount,
+    isSearchBookListLoading,
+    isSearchBookListError,
+    refetchSearchBookList,
+  };
 };

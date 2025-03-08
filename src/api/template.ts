@@ -10,7 +10,7 @@ axios.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // 에러가 401 이면 jwt 만료로 인식
       // 로그인 페이지로 이동
-      window.alert("로그인 시간이 만료되었습니다. 다시 로그인 해주세요.")
+      window.alert('로그인이 필요합니다. 다시 로그인 해주세요.');
       window.location.href = '/auth/sign-in?logout=true';
     }
     return error;
@@ -18,11 +18,11 @@ axios.interceptors.response.use(
 );
 
 // ✅ 응답 데이터 추출
-export const responseBody = <D>(response: AxiosResponse<D>) => response.data;
+export const responseBody = <Data>(response: AxiosResponse<Data>) => response.data;
 
 // ✅ 에러 발생 시 ResponseDto 타입으로 던지기
 // 에러 타입 변경을 대비하여 제네릭으로 설정
-export const responseError = <E = ErrorResponse>(error: AxiosError<E>) => {
+export const responseError = <Error = ErrorResponse>(error: AxiosError<Error>) => {
   throw error.response?.data ?? { code: 'UNE', message: '알 수 없는 에러 발생' };
 };
 
@@ -33,8 +33,8 @@ export const request = {
    * @param withCredentials default true, 헤더에 jwt 정보 필요 여부에 따라 결정
    * @returns D
    */
-  get: <D>(url: string, withCredentials: boolean = true) =>
-    axios.get<D>(url, { withCredentials }).then(responseBody).catch(responseError),
+  get: <Data>(url: string, withCredentials: boolean = true) =>
+    axios.get<Data>(url, { withCredentials }).then(responseBody).catch(responseError),
 
   /*
    * ✅ GET 요청 (params 포함)
@@ -43,8 +43,8 @@ export const request = {
    * @param withCredentials default true, 헤더에 jwt 정보 필요 여부에 따라 결정
    * @returns D
    */
-  getWithParams: <D, P>(url: string, params: P, withCredentials: boolean = true) =>
-    axios.get<D>(url, { withCredentials, params }).then(responseBody).catch(responseError),
+  getWithParams: <Data, Params>(url: string, params: Params, withCredentials: boolean = true) =>
+    axios.get<Data>(url, { withCredentials, params }).then(responseBody).catch(responseError),
 
   /**
    * ✅ 일반적인 POST 요청 (JSON 전송)
@@ -53,8 +53,8 @@ export const request = {
    * @param withCredentials default true, 헤더에 jwt 정보 필요 여부에 따라 결정
    * @returns D (default void)
    */
-  post: <B, D = void>(url: string, body: B, withCredentials: boolean = true) =>
-    axios.post<D>(url, body, { withCredentials }).then(responseBody).catch(responseError),
+  post: <Body, Data = void>(url: string, body: Body, withCredentials: boolean = true) =>
+    axios.post<Data>(url, body, { withCredentials }).then(responseBody).catch(responseError),
 
   /**
    * ✅ PUT 요청
@@ -62,8 +62,8 @@ export const request = {
    * @param withCredentials
    * @returns
    */
-  put: <B, D = void>(url: string, data: B | null, withCredentials: boolean = true) =>
-    axios.put<D>(url, data, { withCredentials: withCredentials }).then(responseBody).catch(responseError),
+  put: <Body, Data = void>(url: string, data: Body | null, withCredentials: boolean = true) =>
+    axios.put<Data>(url, data, { withCredentials: withCredentials }).then(responseBody).catch(responseError),
 
   /**
    * ✅ POST 요청 (FormData 전송)
@@ -72,9 +72,9 @@ export const request = {
    * @param withCredentials default true, 헤더에 jwt 정보 필요 여부에 따라 결정
    * @returns D (default void)
    */
-  postFormData: <D = void>(url: string, formData: FormData, withCredentials: boolean = true) =>
+  postFormData: <Data = void>(url: string, formData: FormData, withCredentials: boolean = true) =>
     axios
-      .post<D>(url, formData, {
+      .post<Data>(url, formData, {
         withCredentials,
         headers: { 'Content-Type': 'multipart/form-data' },
       })
@@ -88,8 +88,8 @@ export const request = {
    * @param withCredentials default true, 헤더에 jwt 정보 필요 여부에 따라 결정
    * @returns D (default void)
    */
-  patch: <B, D = void>(url: string, body: B, withCredentials: boolean = true) =>
-    axios.patch<D>(url, body, { withCredentials }).then(responseBody).catch(responseError),
+  patch: <Body, Data = void>(url: string, body: Body, withCredentials: boolean = true) =>
+    axios.patch<Data>(url, body, { withCredentials }).then(responseBody).catch(responseError),
 
   /**
    * ✅ DELETE 요청
@@ -97,15 +97,16 @@ export const request = {
    * @param withCredentials default true, 헤더에 jwt 정보 필요 여부에 따라 결정
    * @returns D (defualt void)
    */
-  delete: <D = void>(url: string, withCredentials: boolean = true) =>
-    axios.delete<D>(url, { withCredentials }).then(responseBody).catch(responseError),
+  delete: <Data = void>(url: string, withCredentials: boolean = true) =>
+    axios.delete<Data>(url, { withCredentials }).then(responseBody).catch(responseError),
 
   /**
    * ✅ DELETE 요청(body 포함)
-   * @param url 
-   * @param body 
-   * @param withCredentials 
-   * @returns 
+   * @param url
+   * @param body
+   * @param withCredentials
+   * @returns
    */
-  deleteWithBody: <B, D = void>(url: string, body: B, withCredentials: boolean = true) => axios.delete<D>(url, { withCredentials, data: body }).then(responseBody).catch(responseError),
+  deleteWithBody: <Body, Data = void>(url: string, body: Body, withCredentials: boolean = true) =>
+    axios.delete<Data>(url, { withCredentials, data: body }).then(responseBody).catch(responseError),
 };
