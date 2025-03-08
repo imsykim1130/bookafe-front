@@ -20,7 +20,7 @@ import Favorite from './pages/Favorite.tsx';
 import Landing from './pages/Landing.tsx';
 import Test from './temp/gsap.test.tsx';
 
-const queryClient = new QueryClient({});
+export const queryClient = new QueryClient({});
 
 const router = createBrowserRouter([
   {
