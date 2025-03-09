@@ -1,6 +1,5 @@
 import Container from '@/components/Container';
 import { Button } from '@/components/ui/button';
-import TextAreaComp from '@/components/ui/TextAreaComp';
 import { useBookQuery } from '@/hook/book.hooks';
 import {
   Comment,
@@ -13,6 +12,7 @@ import {
 import { useBookFavoriteInfoQuery, useFavoriteBookMutation } from '@/hook/favorite.book.hooks';
 import { useRecommendBookMutation, useRecommendQuery } from '@/hook/recommend.book.hooks';
 import { useUserQuery } from '@/hook/user.hook';
+import { queryClient } from '@/main';
 import { useAuth } from '@/store/auth.store';
 import { useChangePage, usePage } from '@/store/page.store';
 import { toBookSite } from '@/utils/utils';
@@ -20,7 +20,7 @@ import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AlertDialogComp from '../components/AlertDialogComp';
-import { queryClient } from '@/main';
+import TextAreaComp from '@/components/TextAreaComp';
 
 //// page
 const Book = () => {
@@ -181,9 +181,9 @@ const RecommendBtnComp = () => {
   return (
     <div className="text-xl font-semibold">
       {isRecommended ? (
-        <i className="cursor-pointer fi fi-sr-star" onClick={()=>unrecommend(isbn)}></i>
+        <i className="cursor-pointer fi fi-sr-star" onClick={() => unrecommend(isbn)}></i>
       ) : (
-        <i className="cursor-pointer fi fi-rr-star" onClick={()=>recommend(isbn)}></i>
+        <i className="cursor-pointer fi fi-rr-star" onClick={() => recommend(isbn)}></i>
       )}
     </div>
   );
