@@ -121,7 +121,7 @@ export const useUserMutation: UseUserMutation = () => {
     mutationFn: (img: File) => {
       // 파일은 Form 에 담아 전달 해야한다
       const formData = new FormData();
-      formData.append('data', img);
+      formData.append('file', img);
 
       return request.postFormData(DOMAIN + '/user/profile-image', formData);
     },
@@ -134,12 +134,12 @@ export const useUserMutation: UseUserMutation = () => {
     },
     onSuccess: () => {
       // 탈퇴 성공 시 로그아웃을 위한 url 로 이동
-      window.location.href = "/auth/sign-in?logout=true";
+      window.location.href = '/auth/sign-in?logout=true';
     },
     onError: (err: ErrorResponse) => {
       console.log(err.message);
-      window.alert("다시 시도해주세요");
-    }
+      window.alert('다시 시도해주세요');
+    },
   });
 
   return { changeProfileImage, isChangeProfileImagePending, cancelUser, isCancelUserPending };

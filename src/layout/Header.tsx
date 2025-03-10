@@ -18,8 +18,6 @@ const Header = () => {
   const auth = useAuth();
   const changeAuth = useChangeAuth();
 
-  
-
   // function: 로그인 버튼 클릭 핸들러
   // 로그인 성공 시 로그인 버튼을 누른 페이지로 다시 돌아가기 위해 state 에 돌아올 pathname 넣어서 보냄
   function signInClickHandler() {
@@ -30,7 +28,7 @@ const Header = () => {
   useEffect(() => {
     // 메뉴 네비게이션 드롭다운 닫기
     setIsNavOpened(false);
-    
+
     if (pathname.includes('auth')) return;
     // 유저 정보 가져오기(유저 정보 가져오기 겸 로그인 여부 확인용)
     refetchUser();
@@ -92,12 +90,15 @@ const Header = () => {
               <Link to={'/favorite'} className="icon-btn ">
                 좋아요
               </Link>
-              <Link to={'/user'} className="icon-btn ">
+              <Link to={'/user/' + user?.id} className="icon-btn ">
                 내 정보
               </Link>
-              <AlertDialogComp logoutClickHandler={() => {
-                window.location.href = "/auth/sign-in?logout=true";
-              }} message="정말 로그아웃 하시겠습니까?">
+              <AlertDialogComp
+                logoutClickHandler={() => {
+                  window.location.href = '/auth/sign-in?logout=true';
+                }}
+                message="정말 로그아웃 하시겠습니까?"
+              >
                 {/* 로그아웃 팝업 띄울 트리거 버튼 */}
                 <button className="icon-btn">로그아웃</button>
               </AlertDialogComp>

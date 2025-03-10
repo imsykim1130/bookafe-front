@@ -1,4 +1,5 @@
 import Container from '@/components/Container';
+import TextAreaComp from '@/components/TextAreaComp';
 import { Button } from '@/components/ui/button';
 import { useBookQuery } from '@/hook/book.hooks';
 import {
@@ -20,7 +21,6 @@ import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import AlertDialogComp from '../components/AlertDialogComp';
-import TextAreaComp from '@/components/TextAreaComp';
 
 //// page
 const Book = () => {
@@ -245,7 +245,7 @@ const ReviewInput = () => {
   const [emojiIndex, setEmojiIndex] = useState<number>(0);
   const emojiList = ['😀', '🥲', '🤯', '😱'];
 
-  const { createReview } = useCommentMutation({ isbn, onCreateReviewError, onCreateReviewSuccess });
+  const { createReview } = useCommentMutation({ onCreateReviewError, onCreateReviewSuccess });
 
   console.log('review input render');
 
@@ -282,6 +282,7 @@ const ReviewInput = () => {
           onClick={() => {
             if (!isbn) return;
             createReview({
+              isbn,
               content,
               emoji: emojiList[emojiIndex],
             });
@@ -392,7 +393,7 @@ const Review = ({
 
   const [isModify, setIsModify] = useState<boolean>(false);
   const [content, setContent] = useState('');
-  const { fixReview, deleteReview } = useCommentMutation({ isbn, onFixReviewSuccess, onDeleteReviewSuccess });
+  const { fixReview, deleteReview } = useCommentMutation({ onFixReviewSuccess, onDeleteReviewSuccess });
 
   // handler: 리뷰 수정 성공 핸들러
   function onFixReviewSuccess() {
@@ -449,7 +450,7 @@ const Review = ({
               deleteReview={() => deleteReview(review.id)}
               updateReview={() =>
                 fixReview({
-                  reviewId: review.id,
+                  commentId: review.id,
                   content,
                 })
               }
@@ -647,7 +648,7 @@ const ReplySection = (props: ReplySectionProps) => {
   const { isOpen, reviewId } = props;
   const page = usePage(); // 리뷰 페이지
   const [content, setContent] = useState('');
-  const { createReply } = useCommentMutation({ isbn, onCreateReplySuccess });
+  const { createReply } = useCommentMutation({ onCreateReplySuccess });
 
   // 리플 작성 성공 핸들러
   function onCreateReplySuccess() {
@@ -681,12 +682,10 @@ const ReplySection = (props: ReplySectionProps) => {
         />
         <div className="flex justify-end my-[0.5rem]">
           <ReplyCreateBtn
-            onClick={() =>
-              createReply({
-                content,
-                parentId: reviewId,
-              })
-            }
+            onClick={() => {
+              if (!isbn) return;
+              createReply({ parentId: reviewId, content, isbn });
+            }}
           />
         </div>
       </div>
@@ -716,7 +715,7 @@ const ReplyList = ({ replyOpen, reviewId }: { replyOpen: boolean; reviewId: numb
   const { replyList } = useReplyListQuery(reviewId, replyOpen);
   const { isbn } = useParams();
   const page = usePage();
-  const { deleteReply } = useCommentMutation({ isbn, onDeleteReplySuccess });
+  const { deleteReply } = useCommentMutation({ onDeleteReplySuccess });
 
   // 리뷰 삭제 성공 핸들러
   function onDeleteReplySuccess() {
@@ -740,7 +739,7 @@ const ReplyList = ({ replyOpen, reviewId }: { replyOpen: boolean; reviewId: numb
   if (replyList.length === 0) {
     return (
       <Container className={'py-[1.5rem] bg-black/5 rounded-[1rem] my-[1rem]'}>
-        <p className="text-sm text-center text-black/60 my">리플이 없습니다</p>
+        <p className="text-sm text-center text-black/60">리플이 없습니다</p>
       </Container>
     );
   }

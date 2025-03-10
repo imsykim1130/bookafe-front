@@ -86,7 +86,7 @@ export const useReplyListQuery: UseReplyListQuery = (reviewId: number, replyOpen
 };
 
 // 유저의 리뷰 리스트 쿼리
-type MyReview = {
+export type MyReview = {
   content: string;
   createdAt: string;
   title: string;
@@ -110,12 +110,7 @@ type UseUserReviewListQuery = (params: UseUserReviewListQueryParams) => UseUserR
 export const userReviewListQueryKey = 'userReviewList';
 export const useUserReviewListQuery: UseUserReviewListQuery = (params) => {
   const { userId, size } = params;
-  const {
-    data,
-    isError,
-    isLoading,
-    fetchNextPage,
-  } = useInfiniteQuery({
+  const { data, isError, isLoading, fetchNextPage } = useInfiniteQuery({
     queryKey: [userReviewListQueryKey, userId],
     queryFn: ({ pageParam }: { pageParam: number }) => {
       return request.getWithParams<MyReview[], { userId: number; size: number; page: number }>(
@@ -134,7 +129,66 @@ export const useUserReviewListQuery: UseUserReviewListQuery = (params) => {
 
   const userReviewList = data ? data.pages : [];
 
-  return {userReviewList , isError, isLoading, fetchNextPage };
+  return { userReviewList, isError, isLoading, fetchNextPage };
+};
+
+// 내 리뷰의 좋아요 유저 리스트 쿼리
+export const reviewFavoriteUserListQueryKey = 'reviewFavoriteUserList';
+
+export type ReviewFavoriteUser = {
+  userId: number;
+  nickname: string;
+};
+
+type ReviewFavoriteUserListResonse = {
+  userList: ReviewFavoriteUser[];
+  isEnd: boolean;
+  totalCount: number;
+};
+
+type UseReviewFavoriteUserListQueryParams = {
+  userId: string | undefined;
+  page: number;
+  size: number;
+};
+interface UseReviewFavoriteUserListQueryReturn {
+  userList: ReviewFavoriteUser[] | undefined;
+  isEnd: boolean;
+  totalCount: number;
+  isNicknameListLoading: boolean;
+  isNicknameListError: boolean;
+}
+
+type UseReviewFavoriteUserListQuery = (
+  params: UseReviewFavoriteUserListQueryParams,
+) => UseReviewFavoriteUserListQueryReturn;
+
+export const useReviweFavoriteUserListQuery: UseReviewFavoriteUserListQuery = (params) => {
+  const {
+    data,
+    isError: isNicknameListError,
+    isLoading: isNicknameListLoading,
+  } = useQuery({
+    queryKey: [reviewFavoriteUserListQueryKey],
+    queryFn: () => {
+      return params.userId
+        ? request.getWithParams<ReviewFavoriteUserListResonse, { userId: string; page: number; size: number }>(
+            DOMAIN + '/comment/favorite/user-list',
+            {
+              userId: params.userId,
+              page: params.page,
+              size: params.size,
+            },
+          )
+        : undefined;
+    },
+  });
+
+  const userList = data?.userList;
+  const isEnd = data?.isEnd ?? false;
+  const totalCount = data?.totalCount ?? 0;
+
+  return { userList, isEnd, totalCount, isNicknameListError, isNicknameListLoading };
 };
 
 // 리뷰, 댓글 mutation
@@ -143,16 +197,15 @@ export type CommentRequestVar = {
   isbn: string | undefined;
   content: string;
   emoji: string | null;
+  commentId: number;
   reviewId: number;
+  replyId: number;
 };
 
 export type PostCommentRequest = Pick<CommentRequestVar, 'parentId' | 'isbn' | 'content' | 'emoji'>;
-
-export type PatchReviewRequest = Pick<CommentRequestVar, 'reviewId' | 'content'>;
+export type PatchCommentRequest = Pick<CommentRequestVar, 'commentId' | 'content'>;
 
 export type UseCommentMutationParams = {
-  isbn: string | undefined;
-
   // 리뷰 핸들러
   onCreateReviewSuccess?: () => void;
   onCreateReviewError?: (error: ErrorResponse) => void;
@@ -172,16 +225,16 @@ export type UseCommentMutationParams = {
 };
 
 export interface UseCommentMutationReturn {
-  createReview: (params: Pick<CommentRequestVar, 'content' | 'emoji'>) => void;
+  createReview: (params: { content: string; emoji: string; isbn: string }) => void;
   isCreateReviewPending: boolean;
-
-  fixReview: (requestBody: Pick<CommentRequestVar, 'reviewId' | 'content'>) => void;
-  isFixReviewPending: boolean;
 
   deleteReview: (reviewId: number) => void;
   isDeleteReviewPending: boolean;
 
-  createReply: (params: Pick<CommentRequestVar, 'parentId' | 'content'>) => void;
+  fixReview: (requestBody: { commentId: number; content: string }) => void;
+  isFixReviewPending: boolean;
+
+  createReply: (params: { parentId: number; content: string; isbn: string }) => void;
   isCreateReplyPending: boolean;
 
   deleteReply: (replyId: number) => void;
@@ -192,8 +245,6 @@ type UseCommentMutation = (params: UseCommentMutationParams) => UseCommentMutati
 
 export const useCommentMutation: UseCommentMutation = (params: UseCommentMutationParams) => {
   const {
-    isbn,
-
     onCreateReviewSuccess,
     onCreateReviewError,
 
@@ -212,11 +263,10 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
 
   // 리뷰 작성하기
   const { mutate: createReview, isPending: isCreateReviewPending } = useMutation({
-    mutationFn: (params: Pick<PostCommentRequest, 'content' | 'emoji'>) => {
+    mutationFn: (params: { content: string; emoji: string; isbn: string }) => {
       return request.post<PostCommentRequest>(DOMAIN + '/comment', {
         ...params,
         parentId: null,
-        isbn,
       });
     },
     onError: onCreateReviewError,
@@ -225,11 +275,8 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
 
   // 리뷰 수정하기
   const { mutate: fixReview, isPending: isFixReviewPending } = useMutation({
-    mutationFn: (requestBody: Pick<CommentRequestVar, 'reviewId' | 'content'>) => {
-      return request.patch<{ commentId: number; content: string }>(DOMAIN + '/comment', {
-        content: requestBody.content,
-        commentId: requestBody.reviewId,
-      });
+    mutationFn: (requestBody: { commentId: number; content: string }) => {
+      return request.patch<PatchCommentRequest, PatchCommentRequest>(DOMAIN + '/comment', requestBody);
     },
     onSuccess: onFixReviewSuccess,
     onError: onFixReviewError,
@@ -246,12 +293,8 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
 
   // 댓글 작성하기
   const { mutate: createReply, isPending: isCreateReplyPending } = useMutation({
-    mutationFn: (params: Pick<PostCommentRequest, 'parentId' | 'content'>) => {
-      return request.post<PostCommentRequest>(DOMAIN + '/comment', {
-        ...params,
-        isbn,
-        emoji: null,
-      });
+    mutationFn: (params: { parentId: number; content: string; isbn: string }) => {
+      return request.post<PostCommentRequest, PostCommentRequest>(DOMAIN + '/comment', { ...params, emoji: null });
     },
     onError: onCreateReplyError,
     onSuccess: onCreateReplySuccess,
