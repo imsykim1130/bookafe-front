@@ -1,22 +1,18 @@
 import AlertDialogComp from '@/components/AlertDialogComp';
 import { useUserQuery } from '@/hook/user.hook';
-import { useAuth, useChangeAuth } from '@/store/auth.store';
 import { useEffect, useState } from 'react';
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
-  console.log('header render');
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
   const [isAlarm] = useState<boolean>(false);
   const [isNavOpened, setIsNavOpened] = useState<boolean>(false);
 
-  const { user, refetchUser } = useUserQuery();
-
-  const auth = useAuth();
-  const changeAuth = useChangeAuth();
+  const { user } = useUserQuery();
+  const { refetchUser } = useUserQuery();
 
   // function: 로그인 버튼 클릭 핸들러
   // 로그인 성공 시 로그인 버튼을 누른 페이지로 다시 돌아가기 위해 state 에 돌아올 pathname 넣어서 보냄
@@ -28,24 +24,25 @@ const Header = () => {
   useEffect(() => {
     // 메뉴 네비게이션 드롭다운 닫기
     setIsNavOpened(false);
+    const isLoggedIn = localStorage.getItem('login');
 
-    if (pathname.includes('auth')) return;
+    if (pathname.includes('auth') || !isLoggedIn) return;
     // 유저 정보 가져오기(유저 정보 가져오기 겸 로그인 여부 확인용)
     refetchUser();
-  }, [pathname]);
+  }, []);
 
-  useEffect(() => {
-    // 로그인 되어 있는 상태에서 user 값이 존재하지 않게 변경되면
-    // 로그아웃 처리
-    if (auth && !user) {
-      changeAuth(false);
-    }
-    // 로그인 되어 있지 않은 상태에서 user 값이 있으면
-    // 로그인 처리
-    if (!auth && user) {
-      changeAuth(true);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   // 로그인 되어 있는 상태에서 user 값이 존재하지 않게 변경되면
+  //   // 로그아웃 처리
+  //   if (auth && !user) {
+  //     changeAuth(false);
+  //   }
+  //   // 로그인 되어 있지 않은 상태에서 user 값이 있으면
+  //   // 로그인 처리
+  //   if (!auth && user) {
+  //     changeAuth(true);
+  //   }
+  // }, [user]);
 
   return (
     <header
@@ -72,7 +69,7 @@ const Header = () => {
 
         {/* 드롭다운 */}
         <div className={`items-start gap-[1.875rem] nav ${isNavOpened ? 'flex' : 'hidden md:flex'}`}>
-          {!auth ? (
+          {!user ? (
             <>
               {/* 로그인 안되어 있을 때 */}
               {/* 로그인, 로그아웃 */}

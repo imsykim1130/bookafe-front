@@ -1,11 +1,9 @@
 import { request } from '@/api/template';
-import { useAuth } from '@/store/auth.store';
+import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
 import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
-import RecommendBook from '../pages/admin/RecommendBook';
 import { useUserQuery } from './user.hook';
-import { queryClient } from '@/main';
 
 //// 관리자의 책 추천 여부
 type UseIsBookRecommendedQueryParams = {
@@ -26,12 +24,12 @@ export const isBookRecommendedQueryKey = 'recommendedByAdmin';
 export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRecommendedQueryParams) => {
   const { isbn } = params;
   const { user } = useUserQuery();
-  const auth = useAuth();
 
-  const query= () => request.getWithParams<boolean, UseIsBookRecommendedQueryParams>(
-    DOMAIN + '/recommend-book/is-recommended/' + isbn,
-    params,
-  )
+  const query = () =>
+    request.getWithParams<boolean, UseIsBookRecommendedQueryParams>(
+      DOMAIN + '/recommend-book/is-recommended/' + isbn,
+      params,
+    );
 
   const {
     data,
@@ -40,8 +38,7 @@ export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRe
     refetch: refetchIsRecommended,
   } = useQuery({
     queryKey: [isBookRecommendedQueryKey, isbn],
-    queryFn: auth && !!isbn && user?.role === 'ROLE_ADMIN'? query : skipToken
-    ,
+    queryFn: user && !!isbn && user?.role === 'ROLE_ADMIN' ? query : skipToken,
     staleTime: Infinity,
   });
 
@@ -75,14 +72,14 @@ export const useRecommendBookListQuery: UseRecommendBookListQuery = () => {
     data: recommendBookList,
     isError: isRecommendBookListError,
     isLoading: isRecommendBookListLoading,
-    refetch: refetchRecommendBookList
+    refetch: refetchRecommendBookList,
   } = useQuery({
     queryKey: [recommendBookListQueryKey],
     queryFn: () => {
       return request.get<RecommendBook[]>(DOMAIN + '/recommend-book/all');
     },
     placeholderData: [],
-    staleTime: 1000 * 60 * 60
+    staleTime: 1000 * 60 * 60,
   });
 
   return { recommendBookList, isRecommendBookListError, isRecommendBookListLoading, refetchRecommendBookList };
@@ -113,7 +110,7 @@ export const useRecommendBookMutation: UseRecommendBookMutation = (params?: UseR
   // 책 추천하기
   const { mutate: recommend, isPending: isRecommendPending } = useMutation({
     mutationFn: (isbn: string) => {
-      console.log("책 추천");
+      console.log('책 추천');
       return request.post(DOMAIN + '/recommend-book/' + isbn, null);
     },
     onSuccess: params?.onRecommendSuccess,
@@ -123,7 +120,7 @@ export const useRecommendBookMutation: UseRecommendBookMutation = (params?: UseR
   // 책 추천 취소하기
   const { mutate: unrecommend, isPending: isUnrecommendPending } = useMutation({
     mutationFn: (isbn: string) => {
-      console.log("책 추천 취소");
+      console.log('책 추천 취소');
       return request.delete(DOMAIN + '/recommend-book/' + isbn);
     },
     onSuccess: params?.onUnrecommendSuccess,

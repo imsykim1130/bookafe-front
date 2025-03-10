@@ -41,7 +41,7 @@ export const useUserQuery: UseUserQuery = () => {
         .then((user) => user)
         .catch(() => null);
     },
-    enabled: false,
+    staleTime: 1000 * 60 * 60,
     retry: 0,
     initialData: null,
   });

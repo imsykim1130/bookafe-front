@@ -18,6 +18,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const { user } = useUserQuery();
+  const navigate = useNavigate();
   const role = user?.role ?? '';
 
   // 검색 결과 캐시 초기화

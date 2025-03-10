@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { SignInRequest, SignUpRequest, useAuthMutation } from '@/hook/auth.hooks';
+import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
 import { getRandomNickname } from '@/utils/openai';
+import queryString from 'query-string';
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import queryString from "query-string";
-import { queryClient } from '@/main';
 
 const Auth = () => {
   // index: top
@@ -44,6 +44,8 @@ const Auth = () => {
 
   // hander: 로그아웃 성공 핸들러
   function onLogoutSuccess() {
+    // 로그인 여부 삭제
+    localStorage.removeItem('login');
     // 캐시 완전히 삭제
     queryClient.clear();
     navigate('/auth/sign-in');
@@ -51,17 +53,19 @@ const Auth = () => {
 
   // handler: 로그아웃 실패 핸들러
   function onLogoutError() {
+    // 로그인 여부 삭제
+    localStorage.removeItem('login');
     // 캐시 완전히 삭제
     queryClient.clear();
     navigate('/auth/sign-in');
   }
 
   // 로그아웃 요청으로 로그인 페이지 접속 시 서버에 로그아웃 요청
-  useEffect (() => {
-   if(isLogout){
-    logout();
-   }
-  }, [])
+  useEffect(() => {
+    if (isLogout) {
+      logout();
+    }
+  }, []);
 
   // function: 로그인 / 회원가입 페이지 이동
   function changeAuthType() {
@@ -77,6 +81,7 @@ const Auth = () => {
    * @param expire (초 단위)
    */
   function onSignInSuccess() {
+    localStorage.setItem('login', 'true');
     // 페이지 이동
     if (pathname) {
       navigate(pathname);

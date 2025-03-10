@@ -1,9 +1,12 @@
 import ErrorComp from '@/components/ErrorComp';
 import { Button } from '@/components/ui/button';
 import {
+  MyReview,
   ReviewFavoriteUser,
   reviewFavoriteUserListQueryKey,
   useReviweFavoriteUserListQuery,
+  userReviewListQueryKey,
+  useUserReviewListQuery,
 } from '@/hook/comment.hooks';
 import { useUserMutation, useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
@@ -14,12 +17,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 const User = () => {
   const { userId } = useParams();
   const { user } = useUserQuery();
-  
+
   // path query 로 넘어온 id 와 내 정보의 id 가 같으면 본인
   // 본인 여부를 통해 버튼이나 문구를 다르게 하기 위해 필요한 정보
   const isMe = userId && user ? parseInt(userId) === user.id : false;
 
   const [isNicknameListOpen, setIsNicknameListOpen] = useState<boolean>(false);
+  const [isReviewListOpen, setIsReviewListOpen] = useState<boolean>(false);
 
   return (
     <main className="py-[3rem] px-[2rem]">
@@ -28,19 +32,36 @@ const User = () => {
         <div className="flex flex-col gap-[1rem] my-[3rem]">
           <StatBox
             title={isMe ? '내가 받은 좋아요' : '좋아요'}
-            count={2}
             emoji={'❤️'}
-            onClick={() => setIsNicknameListOpen(true)}
+            onClick={() => {
+              if (isNicknameListOpen) {
+                setIsNicknameListOpen(false);
+                return;
+              }
+              setIsReviewListOpen(false);
+              setIsNicknameListOpen(true);
+            }}
             isClicked={isNicknameListOpen}
           />
-          <StatBox title={isMe ? '내가 쓴 리뷰' : '리뷰'} count={4} emoji={'💬'} />
+          <StatBox
+            title={isMe ? '내가 쓴 리뷰' : '리뷰'}
+            emoji={'💬'}
+            onClick={() => {
+              if (isReviewListOpen) {
+                setIsReviewListOpen(false);
+                return;
+              }
+              setIsNicknameListOpen(false);
+              setIsReviewListOpen(true);
+            }}
+            isClicked={isReviewListOpen}
+          />
         </div>
-        {isNicknameListOpen && (
-          <div>
-            <h1 className="text-lg font-semibold mb-[0.6rem]">좋아요</h1>
-            <FavoriteUserList />
-          </div>
-        )}
+        <h1 className="text-lg font-semibold mb-[0.6rem]">
+          {isNicknameListOpen ? '좋아요 한 유저' : isReviewListOpen ? '리뷰' : ''}
+        </h1>
+        {isNicknameListOpen && <FavoriteUserList />}
+        {isReviewListOpen && <MyReviewList />}
       </div>
     </main>
   );
@@ -118,6 +139,7 @@ const UserInfo = () => {
 
 const ModifyModal = ({ isOpen }: { isOpen: boolean }) => {
   const [isProfileImgModifyModalOpen, setIsProfileImgModifyModalOpen] = useState<boolean>(false);
+  const { cancelUser } = useUserMutation();
 
   if (!isOpen) return null;
 
@@ -135,6 +157,7 @@ const ModifyModal = ({ isOpen }: { isOpen: boolean }) => {
         <button disabled={true}>
           닉네임 변경 🔒 <span className="text-xs opacity-40">지원 예정</span>
         </button>
+        <button onClick={cancelUser}>탈퇴하기</button>
       </div>
       <ProfileImgModifyModal isOpen={isProfileImgModifyModalOpen} setIsOpen={setIsProfileImgModifyModalOpen} />
     </div>
@@ -235,13 +258,11 @@ const ImgSelectBtn = ({
 
 const StatBox = ({
   title,
-  count,
   emoji,
   onClick,
   isClicked,
 }: {
   title: string;
-  count: number;
   emoji: string;
   onClick?: () => void;
   isClicked?: boolean;
@@ -252,10 +273,7 @@ const StatBox = ({
       onClick={onClick}
     >
       <p>{title}</p>
-      <div className="flex items-center gap-[0.5rem]">
-        <p>{count}</p>
-        <p>{emoji}</p>
-      </div>
+      <p>{emoji}</p>
     </button>
   );
 };
@@ -283,8 +301,8 @@ const FavoriteUserList = () => {
 
   return (
     <div>
-      {totalUserList.map((user: ReviewFavoriteUser) => (
-        <p className="py-[1rem] border-b-[0.0625rem]">
+      {totalUserList.map((user: ReviewFavoriteUser, index: number) => (
+        <p key={index} className="py-[1rem] border-b-[0.0625rem]">
           <span
             className="font-semibold"
             onClick={() => {
@@ -299,9 +317,58 @@ const FavoriteUserList = () => {
       ))}
       {!isEnd && (
         <button
+          className="w-full my-[1rem]"
           onClick={() => {
             queryClient.resetQueries({
               queryKey: [reviewFavoriteUserListQueryKey],
+            });
+          }}
+        >
+          더보기
+        </button>
+      )}
+    </div>
+  );
+};
+
+const MyReviewList = () => {
+  const { userId } = useParams();
+  const [page, setPage] = useState<number>(0);
+  const [totalReviewList, setTotalReviewList] = useState<MyReview[]>([]);
+  const { reviewList, isEnd, isError } = useUserReviewListQuery({
+    userId,
+    page,
+    size: 2,
+  });
+
+  useEffect(() => {
+    if (!reviewList || !reviewList.length) return;
+    // 데이터 받아오기 성공 시 페이지 수 증가
+    setPage(page + 1);
+    // 받아온 데이터 기존 데이터에 합치기
+    setTotalReviewList([...totalReviewList, ...reviewList]);
+  }, [reviewList]);
+
+  if (isError) return <ErrorComp />;
+
+  return (
+    <div>
+      {totalReviewList.map((review: MyReview) => (
+        <div key={review.title} className="flex flex-col gap-[1.5rem] py-[1.5rem] border-b-[0.0625rem]">
+          <p>{review.content}</p>
+          <div className="flex items-center gap-[1rem]">
+            <p className="font-semibold">{review.title}</p>
+            <p className="text-black/40">{review.author}</p>
+          </div>
+        </div>
+      ))}
+
+      {!isEnd && (
+        <button
+          className="w-full my-[1rem]"
+          onClick={() => {
+            queryClient.resetQueries({
+              queryKey: [userReviewListQueryKey],
             });
           }}
         >

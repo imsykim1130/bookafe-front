@@ -14,7 +14,6 @@ import { useBookFavoriteInfoQuery, useFavoriteBookMutation } from '@/hook/favori
 import { useRecommendBookMutation, useRecommendQuery } from '@/hook/recommend.book.hooks';
 import { useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
-import { useAuth } from '@/store/auth.store';
 import { useChangePage, usePage } from '@/store/page.store';
 import { toBookSite } from '@/utils/utils';
 import moment from 'moment';
@@ -194,7 +193,7 @@ const FavoriteBtnComp = () => {
   const { isbn } = useParams();
   const { isFavorite, favoriteCount, refetchBookFavoriteInfo } = useBookFavoriteInfoQuery({ isbn });
   const { likeBook, unlikeBook } = useFavoriteBookMutation({ onLikeBookSuccess, onUnlikeBookSuccess });
-  const auth = useAuth();
+  const { user } = useUserQuery();
   function onLikeBookSuccess() {
     refetchBookFavoriteInfo();
   }
@@ -207,11 +206,11 @@ const FavoriteBtnComp = () => {
 
   return (
     <div className="flex flex-col items-center">
-      {auth && isFavorite ? (
+      {user && isFavorite ? (
         <i
           className="fi fi-ss-heart cursor-pointer text-[1.2rem]"
           onClick={() => {
-            if (!auth) {
+            if (!user) {
               window.alert('로그인이 필요합니다');
               return;
             }
@@ -222,7 +221,7 @@ const FavoriteBtnComp = () => {
         <i
           className="fi fi-rs-heart cursor-pointer text-[1.2rem]"
           onClick={() => {
-            if (!auth) {
+            if (!user) {
               window.alert('로그인이 필요합니다');
               return;
             }
@@ -239,7 +238,7 @@ const FavoriteBtnComp = () => {
 const ReviewInput = () => {
   const { isbn } = useParams();
   const changePage = useChangePage();
-  const auth = useAuth();
+  const { user } = useUserQuery();
 
   const [content, setContent] = useState<string>('');
   const [emojiIndex, setEmojiIndex] = useState<number>(0);
@@ -287,7 +286,7 @@ const ReviewInput = () => {
               emoji: emojiList[emojiIndex],
             });
           }}
-          disabled={!auth}
+          disabled={!user}
         >
           작성
         </Button>
@@ -304,7 +303,7 @@ type EmojiListProps = {
 };
 
 const EmojiList = (props: EmojiListProps) => {
-  const auth = useAuth();
+  const { user } = useUserQuery();
   const { emojiList, setEmojiIndex, emojiIndex } = props;
 
   return emojiList.map((emoji, index) => (
@@ -313,7 +312,7 @@ const EmojiList = (props: EmojiListProps) => {
       className={`w-[30px] h-[30px] flex justify-center items-center rounded-full ${index === emojiIndex ? 'bg-black bg-opacity-10' : ''}`}
     >
       <button
-        disabled={!auth}
+        disabled={!user}
         onClick={() => {
           setEmojiIndex(index);
         }}
@@ -326,7 +325,7 @@ const EmojiList = (props: EmojiListProps) => {
 
 //// 리뷰 리스트 컴포넌트
 type ReviewListProps = {
-  reviewList: Comment[];
+  reviewList: Comment[] | undefined;
   isReviewListLoading: boolean;
   isReviewListError: boolean;
 };
@@ -341,7 +340,7 @@ const ReviewList = (props: ReviewListProps) => {
     return <div className="text-black/40 text-center my-[3rem]">{children}</div>;
   };
 
-  if (isReviewListLoading) {
+  if (!reviewList || isReviewListLoading) {
     return (
       <Alert>
         <p>리뷰 로딩중...</p>
@@ -701,10 +700,10 @@ interface ReplyCreateBtnProps {
 
 const ReplyCreateBtn = (props: ReplyCreateBtnProps) => {
   const { onClick, className } = props;
-  const auth = useAuth();
+  const { user } = useUserQuery();
 
   return (
-    <Button className={className} onClick={onClick} disabled={!auth}>
+    <Button className={className} onClick={onClick} disabled={!user}>
       작성
     </Button>
   );
