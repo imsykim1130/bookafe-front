@@ -40,7 +40,7 @@ const router = createBrowserRouter([
         element: <Auth />,
       },
       {
-        path: '/user',
+        path: '/user/:userId',
         element: <User />,
       },
       {
