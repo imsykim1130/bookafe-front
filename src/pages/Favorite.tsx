@@ -3,6 +3,7 @@ import PaginationComp from '@/components/PaginationComp';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+  FavoriteBook,
   favoriteBookListQueryKey,
   useFavoriteBookHandler,
   useFavoriteBookListQuery,
@@ -14,7 +15,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Favorite = () => {
-  const navigate = useNavigate();
   // handlers
   const { size, page, setPage, checkedBookIsbnList, setCheckedBookIsbnList, bookCheckHandler, checkAllClickHandler } =
     useFavoriteBookHandler();
@@ -73,15 +73,6 @@ const Favorite = () => {
     window.scrollTo(0, 0);
   }, [page]);
 
-  // render
-  if (isFavoriteBookListError) {
-    return <ErrorComp />;
-  }
-
-  if (isFavoriteBookListLoading) {
-    return <p>로딩중</p>;
-  }
-
   if (favoriteBookList) {
     return (
       <main className={'flex flex-col mt-[40px] min-h-[100vh]'}>
@@ -90,72 +81,22 @@ const Favorite = () => {
           <div className="flex items-center justify-between pr-[1.5rem]">
             <p className="text-lg font-semibold">좋아요</p>
             {/* 전체선택 체크박스 */}
-            <div className="flex items-center gap-4">
-              <p className="text-sm">전체선택</p>
-              <Checkbox onClick={() => checkAllClickHandler(favoriteBookList.map((item) => item.isbn))}></Checkbox>
-            </div>
+            {favoriteBookList.length !== 0 && (
+              <div className="flex items-center gap-4">
+                <p className="text-sm">전체선택</p>
+                <Checkbox onClick={() => checkAllClickHandler(favoriteBookList.map((item) => item.isbn))}></Checkbox>
+              </div>
+            )}
           </div>
-          <div>
-            {/* 좋아요 책 없을 때 */}
-            {favoriteBookList.length === 0 && <h1 className={'opacity-60'}>결과가 없습니다.</h1>}
-
-            {/* 좋아요 책 있을 때 */}
-            {favoriteBookList.length > 0 &&
-              favoriteBookList.map((book) => (
-                <article
-                  key={book.isbn}
-                  className={
-                    'relative flex gap-[1.5rem] py-[1.5rem] border-b-[0.025rem] border-black border-opacity-10'
-                  }
-                >
-                  {/* 책 이미지 */}
-                  <div
-                    className={'max-w-[8rem]  cursor-pointer'}
-                    onClick={() => {
-                      navigate('/book/detail/' + book.isbn);
-                    }}
-                  >
-                    <img
-                      src={book.bookImg}
-                      alt="book cover image"
-                      className={
-                        'rounded-[0.625rem] shadow-[0_0_5px_rgba(0,0,0,0.3)] transition-shadow ease hover:shadow-[0_0_10px_rgba(0,0,0,0.5)]'
-                      }
-                    />
-                  </div>
-
-                  {/* 오른쪽 */}
-                  <div className={'flex-1 text-[14px] flex flex-col gap-[20px] mr-[3rem]'}>
-                    {/* 위 */}
-                    <div className={'w-full flex flex-col gap-[20px]'}>
-                      {/* 왼쪽 */}
-                      <div>
-                        <p className={'font-semibold'}>{book.title}</p>
-                        <p className={'text-black text-opacity-60'}>{book.author}</p>
-                      </div>
-                    </div>
-                    <div className="absolute bottom-[1.5rem] right-[1.5rem]">
-                      {/* 휴지통 */}
-                      <i
-                        className="fi fi-rr-trash text-[16px] cursor-pointer flex   justify-center items-center icon-btn"
-                        onClick={() => {
-                          unlikeBook(book.isbn);
-                        }}
-                      ></i>
-                    </div>
-                    {/* 체크박스 */}
-                    <div className="absolute top-[1.5rem] right-[1.5rem]">
-                      <Checkbox
-                        onClick={() => {
-                          bookCheckHandler(book.isbn);
-                        }}
-                        checked={checkedBookIsbnList.indexOf(book.isbn) >= 0}
-                      ></Checkbox>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            {/* 페이지네이션 */}
+          <div className="mt-[1rem]">
+            <FavoriteBookList
+              favoriteBookList={favoriteBookList}
+              isError={isFavoriteBookListError}
+              isLoading={isFavoriteBookListLoading}
+              unlikeBook={unlikeBook}
+              bookCheckHandler={bookCheckHandler}
+              checkedBookIsbnList={checkedBookIsbnList}
+            />
             <PaginationComp currentPage={page} setCurrentPage={setPage} totalPages={totalPages} />
             {/* 일괄 삭제 버튼 */}
             {checkedBookIsbnList.length > 0 && (
@@ -172,5 +113,89 @@ const Favorite = () => {
     );
   }
 };
+
+function FavoriteBookList({
+  favoriteBookList,
+  isError,
+  isLoading,
+  unlikeBook,
+  bookCheckHandler,
+  checkedBookIsbnList,
+}: {
+  favoriteBookList: FavoriteBook[];
+  isError: boolean;
+  isLoading: boolean;
+  unlikeBook: (isbn: string) => void;
+  bookCheckHandler: (isbn: string) => void;
+  checkedBookIsbnList: string[];
+}) {
+  const navigate = useNavigate();
+
+  // render
+  if (isError) {
+    return <ErrorComp />;
+  }
+
+  if (isLoading) {
+    return <p className="text-center">로딩중...</p>;
+  }
+
+  if (favoriteBookList.length === 0) {
+    return <h1 className={'text-black/60'}>결과가 없습니다.</h1>;
+  }
+
+  return favoriteBookList.map((book) => (
+    <article
+      key={book.isbn}
+      className={'relative flex gap-[1.5rem] py-[1.5rem] border-b-[0.025rem] border-black border-opacity-10'}
+    >
+      {/* 책 이미지 */}
+      <div
+        className={'max-w-[8rem]  cursor-pointer'}
+        onClick={() => {
+          navigate('/book/detail/' + book.isbn);
+        }}
+      >
+        <img
+          src={book.bookImg}
+          alt="book cover image"
+          className={
+            'rounded-[0.625rem] shadow-[0_0_5px_rgba(0,0,0,0.3)] transition-shadow ease hover:shadow-[0_0_10px_rgba(0,0,0,0.5)]'
+          }
+        />
+      </div>
+
+      {/* 오른쪽 */}
+      <div className={'flex-1 text-[14px] flex flex-col gap-[20px] mr-[3rem]'}>
+        {/* 위 */}
+        <div className={'w-full flex flex-col gap-[20px]'}>
+          {/* 왼쪽 */}
+          <div>
+            <p className={'font-semibold'}>{book.title}</p>
+            <p className={'text-black text-opacity-60'}>{book.author}</p>
+          </div>
+        </div>
+        <div className="absolute bottom-[1.5rem] right-[1.5rem]">
+          {/* 휴지통 */}
+          <i
+            className="fi fi-rr-trash text-[16px] cursor-pointer flex   justify-center items-center icon-btn"
+            onClick={() => {
+              unlikeBook(book.isbn);
+            }}
+          ></i>
+        </div>
+        {/* 체크박스 */}
+        <div className="absolute top-[1.5rem] right-[1.5rem]">
+          <Checkbox
+            onClick={() => {
+              bookCheckHandler(book.isbn);
+            }}
+            checked={checkedBookIsbnList.indexOf(book.isbn) >= 0}
+          ></Checkbox>
+        </div>
+      </div>
+    </article>
+  ));
+}
 
 export default Favorite;

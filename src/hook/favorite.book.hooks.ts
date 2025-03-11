@@ -88,7 +88,7 @@ export const useBookFavoriteInfoQuery: UseFavoriteBookInfoQuery = (params: UseFa
 
 // 좋아요 책 리스트
 
-type FavoriteBook = {
+export type FavoriteBook = {
   isbn: string;
   bookImg: string;
   title: string;
