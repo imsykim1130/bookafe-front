@@ -26,7 +26,7 @@ const User = () => {
   const [isReviewListOpen, setIsReviewListOpen] = useState<boolean>(false);
 
   return (
-    <main className="py-[3rem] px-[2rem]">
+    <main className="py-[3rem] px-[2rem] min-h-[100vh]">
       <div className="max-w-[45rem] mx-auto">
         <UserSection />
         <div className="flex flex-col gap-[1rem] my-[3rem]">

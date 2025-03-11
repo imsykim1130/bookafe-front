@@ -73,45 +73,43 @@ const Favorite = () => {
     window.scrollTo(0, 0);
   }, [page]);
 
-  if (favoriteBookList) {
-    return (
-      <main className={'flex flex-col mt-[40px] min-h-[100vh]'}>
-        <div className={'w-full max-w-[600px] px-[1rem] mx-auto'}>
-          {/* 페이지 이름 */}
-          <div className="flex items-center justify-between pr-[1.5rem]">
-            <p className="text-lg font-semibold">좋아요</p>
-            {/* 전체선택 체크박스 */}
-            {favoriteBookList.length !== 0 && (
-              <div className="flex items-center gap-4">
-                <p className="text-sm">전체선택</p>
-                <Checkbox onClick={() => checkAllClickHandler(favoriteBookList.map((item) => item.isbn))}></Checkbox>
-              </div>
-            )}
-          </div>
-          <div className="mt-[1rem]">
-            <FavoriteBookList
-              favoriteBookList={favoriteBookList}
-              isError={isFavoriteBookListError}
-              isLoading={isFavoriteBookListLoading}
-              unlikeBook={unlikeBook}
-              bookCheckHandler={bookCheckHandler}
-              checkedBookIsbnList={checkedBookIsbnList}
-            />
-            <PaginationComp currentPage={page} setCurrentPage={setPage} totalPages={totalPages} />
-            {/* 일괄 삭제 버튼 */}
-            {checkedBookIsbnList.length > 0 && (
-              <Button
-                className="sticky bottom-[2rem] w-full my-[1rem]"
-                onClick={() => unlikeBookList(checkedBookIsbnList)}
-              >
-                삭제
-              </Button>
-            )}
-          </div>
+  return (
+    <main className={'flex flex-col mt-[40px] min-h-[100vh]'}>
+      <div className={'w-full max-w-[600px] px-[1rem] mx-auto'}>
+        {/* 페이지 이름 */}
+        <div className="flex items-center justify-between pr-[1.5rem]">
+          <p className="text-lg font-semibold">좋아요</p>
+          {/* 전체선택 체크박스 */}
+          {favoriteBookList.length !== 0 && (
+            <div className="flex items-center gap-4">
+              <p className="text-sm">전체선택</p>
+              <Checkbox onClick={() => checkAllClickHandler(favoriteBookList.map((item) => item.isbn))}></Checkbox>
+            </div>
+          )}
         </div>
-      </main>
-    );
-  }
+        <div className="mt-[1rem]">
+          <FavoriteBookList
+            favoriteBookList={favoriteBookList}
+            isError={isFavoriteBookListError}
+            isLoading={isFavoriteBookListLoading}
+            unlikeBook={unlikeBook}
+            bookCheckHandler={bookCheckHandler}
+            checkedBookIsbnList={checkedBookIsbnList}
+          />
+          <PaginationComp currentPage={page} setCurrentPage={setPage} totalPages={totalPages} />
+          {/* 일괄 삭제 버튼 */}
+          {checkedBookIsbnList.length > 0 && (
+            <Button
+              className="sticky bottom-[2rem] w-full my-[1rem]"
+              onClick={() => unlikeBookList(checkedBookIsbnList)}
+            >
+              삭제
+            </Button>
+          )}
+        </div>
+      </div>
+    </main>
+  );
 };
 
 function FavoriteBookList({
