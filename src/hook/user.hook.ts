@@ -3,6 +3,7 @@ import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useCallback, useEffect } from 'react';
 
 // 유저 검색 쿼리
 export type UserResponse = {
@@ -41,22 +42,41 @@ export const useUserQuery: UseUserQuery = () => {
         .then((user) => user)
         .catch(() => null);
     },
-    staleTime: 1000 * 60 * 60,
-    retry: 0,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: false,
     initialData: null,
   });
 
-  const resetUser = () => {
-    // 캐시 초기화
+  // 캐시 초기화
+  const resetUser = useCallback(() => {
     queryClient.resetQueries({
       queryKey: [userKey],
     });
-  };
+  }, []);
 
-  const setUser = (user: UserResponse) => {
-    // 캐시에 수동으로 값 넣기
+  // 캐시에 수동으로 값 넣기
+  const setUser = useCallback((user: UserResponse) => {
     queryClient.setQueryData([userKey], user);
-  };
+  }, []);
+
+  // 새로고침 시 localStorage에서 유저 정보 복구
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      queryClient.setQueryData(['user'], JSON.parse(storedUser));
+      refetchUser(); // 🔥 서버에 유저 데이터 요청
+    }
+  }, [resetUser, setUser, refetchUser]);
+
+  // 유저 정보 변경을 로컬 스토리지의 유저값에 적용
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
 
   return { user, isUserError, isUserLoading, refetchUser, resetUser, setUser };
 };

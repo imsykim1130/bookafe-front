@@ -299,6 +299,10 @@ const FavoriteUserList = () => {
 
   if (isNicknameListError) return <ErrorComp />;
 
+  if (totalUserList.length === 0) {
+    return <p className="text-black/60">아직 받은 좋아요가 없습니다</p>;
+  }
+
   return (
     <div>
       {totalUserList.map((user: ReviewFavoriteUser, index: number) => (
@@ -350,6 +354,10 @@ const MyReviewList = () => {
   }, [reviewList]);
 
   if (isError) return <ErrorComp />;
+
+  if (totalReviewList.length === 0) {
+    return <p className="text-black/60">아직 리뷰를 남기지 않았습니다</p>;
+  }
 
   return (
     <div>
