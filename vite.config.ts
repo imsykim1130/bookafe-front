@@ -1,12 +1,6 @@
 import react from '@vitejs/plugin-react';
-import fs from 'fs';
 import path from 'path';
 import { defineConfig } from 'vitest/config';
-
-const options = {
-  key: fs.readFileSync('./cert/localhost-key.pem'),
-  cert: fs.readFileSync('./cert/localhost.pem'),
-};
 
 export default defineConfig({
   plugins: [react()],
@@ -21,6 +15,7 @@ export default defineConfig({
     setupFiles: '/src/test/setup.ts',
   },
   server: {
-    https: options,
-  },
+    host: '0.0.0.0',
+    port: 5173,
+  }
 });
