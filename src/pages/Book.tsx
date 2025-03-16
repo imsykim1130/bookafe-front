@@ -1,3 +1,4 @@
+import { request } from '@/api/template';
 import Container from '@/components/Container';
 import TextAreaComp from '@/components/TextAreaComp';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,8 @@ import { useRecommendBookMutation, useRecommendQuery } from '@/hook/recommend.bo
 import { useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
 import { useChangePage, usePage } from '@/store/page.store';
+import { ErrorResponse } from '@/types/common.type';
+import { DOMAIN } from '@/utils/env';
 import { toBookSite } from '@/utils/utils';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
@@ -384,12 +387,13 @@ const Review = ({
   review: Comment;
   page: number;
 }) => {
-  const [isFavorite] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [favoriteCount] = useState<number>(0);
   const [replyCount, setReplyCount] = useState<number>(0);
   const [replyOpen, setReplyOpen] = useState<boolean>(false);
   const { isbn } = useParams();
   const changePage = useChangePage();
+  const { user } = useUserQuery();
 
   const [isModify, setIsModify] = useState<boolean>(false);
   const [content, setContent] = useState('');
@@ -426,10 +430,48 @@ const Review = ({
     setContent(oldReply.content);
   };
 
+  // 리뷰 좋아요 누르기
+  function likeReview() {
+    // 미로그인 상태에서 요청 보내지 않음
+    if (!user) {
+      window.alert('로그인이 필요합니다');
+      return;
+    }
+    setIsFavorite(true);
+    request
+      .post(DOMAIN + '/comment/favorite/' + review.id, null)
+      .then(() => {
+        console.log('like review success');
+      })
+      .catch((err: ErrorResponse) => {
+        setIsFavorite(false);
+        window.alert(err.message);
+      });
+  }
+
+  // 리뷰 좋아요 취소하기
+  function unlikeReview() {
+    // 미로그인 상태에서 요청 보내지 않음
+    if (!user) {
+      window.alert('로그인이 필요합니다');
+      return;
+    }
+    setIsFavorite(false);
+    request
+      .delete(DOMAIN + '/comment/favorite/' + review.id)
+      .then(() => {
+        console.log('unlike review success');
+      })
+      .catch((err: ErrorResponse) => {
+        setIsFavorite(true);
+        window.alert(err.message);
+      });
+  }
+
   useEffect(() => {
     setReplyCount(review.replyCount);
     setContent(review.content);
-  }, []);
+  }, [setReplyCount, setContent, review]);
 
   return (
     <article>
@@ -469,6 +511,8 @@ const Review = ({
           setReplyOpen={() => setReplyOpen(!replyOpen)}
           isFavorite={isFavorite}
           favoriteCount={favoriteCount}
+          likeReview={likeReview}
+          unlikeReview={unlikeReview}
         />
       </div>
       <ReplySection isOpen={replyOpen} reviewId={review.id} />
@@ -482,10 +526,12 @@ interface ReviewStatsProps {
   setReplyOpen: () => void;
   isFavorite: boolean;
   favoriteCount: number;
+  likeReview: () => void;
+  unlikeReview: () => void;
 }
 
 const ReviewStats = (props: ReviewStatsProps) => {
-  const { replyCount, setReplyOpen, isFavorite, favoriteCount } = props;
+  const { replyCount, setReplyOpen, isFavorite, favoriteCount, likeReview, unlikeReview } = props;
   return (
     <div className="flex justify-end gap-[1.5rem]">
       <div
@@ -498,7 +544,15 @@ const ReviewStats = (props: ReviewStatsProps) => {
         <span>{replyCount}</span>
       </div>
       <div className={'flex gap-[5px] items-center cursor-pointer'}>
-        <span>{isFavorite ? <span>❤️</span> : <span className={'opacity-40'}>❤️</span>}</span>
+        <span>
+          {isFavorite ? (
+            <span onClick={unlikeReview}>❤️</span>
+          ) : (
+            <span className={'opacity-40'} onClick={likeReview}>
+              ❤️
+            </span>
+          )}
+        </span>
         <span>{favoriteCount}</span>
       </div>
     </div>
@@ -618,7 +672,7 @@ const ReviewContent = ({
     if (!isModify || !reviewContentRef.current || !reviewContent) return;
     reviewContentRef.current.focus();
     reviewContentRef.current.setSelectionRange(reviewContent.length, reviewContent.length);
-  }, [isModify]);
+  }, [isModify, reviewContentRef, reviewContent]);
 
   if (isDeleted) {
     return <p>삭제된 댓글입니다</p>;
