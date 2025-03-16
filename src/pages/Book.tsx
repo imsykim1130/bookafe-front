@@ -246,8 +246,6 @@ const ReviewInput = () => {
 
   const { createReview } = useCommentMutation({ onCreateReviewError, onCreateReviewSuccess });
 
-  console.log('review input render');
-
   function onCreateReviewSuccess() {
     // 리뷰 작성 성공 시 리뷰 리스트 캐시 무효화 하고 첫번째 페이지로 이동
     queryClient.invalidateQueries({
@@ -280,6 +278,9 @@ const ReviewInput = () => {
         <Button
           onClick={() => {
             if (!isbn) return;
+            if (content === '') {
+              window.alert('리뷰 내용을 입력하세요');
+            }
             createReview({
               isbn,
               content,
@@ -552,7 +553,7 @@ const ReviewModify = ({
     <Container>
       <button onClick={() => setIsModify(true)}>수정</button>
       <span className="border-r-[0.0625rem]"></span>
-      <AlertDialogComp logoutClickHandler={deleteReview} message="삭제하시겠습니까?">
+      <AlertDialogComp onConfirmClick={deleteReview} message="삭제하시겠습니까?">
         <button>삭제</button>
       </AlertDialogComp>
     </Container>
