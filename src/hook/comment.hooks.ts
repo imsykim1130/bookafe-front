@@ -246,7 +246,6 @@ type UseCommentMutation = (params: UseCommentMutationParams) => UseCommentMutati
 export const useCommentMutation: UseCommentMutation = (params: UseCommentMutationParams) => {
   const {
     onCreateReviewSuccess,
-    onCreateReviewError,
 
     onFixReviewSuccess,
     onFixReviewError,
@@ -269,7 +268,9 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
         parentId: null,
       });
     },
-    onError: onCreateReviewError,
+    onError: (err: ErrorResponse) => {
+      window.alert(err.message);
+    },
     onSuccess: onCreateReviewSuccess,
   });
 
