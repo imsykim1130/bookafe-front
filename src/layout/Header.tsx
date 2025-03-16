@@ -12,7 +12,6 @@ const Header = () => {
   const [isNavOpened, setIsNavOpened] = useState<boolean>(false);
 
   const { user } = useUserQuery();
-  const { refetchUser } = useUserQuery();
 
   // function: 로그인 버튼 클릭 핸들러
   // 로그인 성공 시 로그인 버튼을 누른 페이지로 다시 돌아가기 위해 state 에 돌아올 pathname 넣어서 보냄
@@ -24,25 +23,7 @@ const Header = () => {
   useEffect(() => {
     // 메뉴 네비게이션 드롭다운 닫기
     setIsNavOpened(false);
-    const isLoggedIn = localStorage.getItem('login');
-
-    if (pathname.includes('auth') || !isLoggedIn) return;
-    // 유저 정보 가져오기(유저 정보 가져오기 겸 로그인 여부 확인용)
-    refetchUser();
-  }, []);
-
-  // useEffect(() => {
-  //   // 로그인 되어 있는 상태에서 user 값이 존재하지 않게 변경되면
-  //   // 로그아웃 처리
-  //   if (auth && !user) {
-  //     changeAuth(false);
-  //   }
-  //   // 로그인 되어 있지 않은 상태에서 user 값이 있으면
-  //   // 로그인 처리
-  //   if (!auth && user) {
-  //     changeAuth(true);
-  //   }
-  // }, [user]);
+  }, [pathname]);
 
   return (
     <header
@@ -91,7 +72,7 @@ const Header = () => {
                 내 정보
               </Link>
               <AlertDialogComp
-                logoutClickHandler={() => {
+                onConfirmClick={() => {
                   window.location.href = '/auth/sign-in?logout=true';
                 }}
                 message="정말 로그아웃 하시겠습니까?"

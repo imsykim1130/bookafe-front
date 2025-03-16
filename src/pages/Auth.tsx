@@ -1,19 +1,19 @@
+import { signInGoogle, signOutGoogle } from '@/auth/firelbase';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { SignInRequest, SignUpRequest, useAuthMutation } from '@/hook/auth.hooks';
+import { userKey } from '@/hook/user.hook';
 import { queryClient } from '@/main';
-import { ErrorResponse } from '@/types/common.type';
 import { getRandomNickname } from '@/utils/openai';
 import queryString from 'query-string';
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const Auth = () => {
   // index: top
   const { authType } = useParams();
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const pathname = state ? state.pathname : null;
   const isLogout = queryString.parse(window.location.search).logout;
 
   // Ref
@@ -33,78 +33,17 @@ const Auth = () => {
 
   const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
 
-  const { signIn, signUp, logout } = useAuthMutation({
-    onSignInSuccess,
-    onSignInError,
-    onSignUpSuccess,
-    onSignUpError,
-    onLogoutSuccess,
-    onLogoutError,
-  });
-
-  // hander: 로그아웃 성공 핸들러
-  function onLogoutSuccess() {
-    // 로그인 여부 삭제
-    localStorage.removeItem('login');
-    // 캐시 완전히 삭제
-    queryClient.clear();
-    navigate('/auth/sign-in');
-  }
-
-  // handler: 로그아웃 실패 핸들러
-  function onLogoutError() {
-    // 로그인 여부 삭제
-    localStorage.removeItem('login');
-    // 캐시 완전히 삭제
-    queryClient.clear();
-    navigate('/auth/sign-in');
-  }
+  const { signIn, signUp, logout } = useAuthMutation();
 
   // 로그아웃 요청으로 로그인 페이지 접속 시 서버에 로그아웃 요청
   useEffect(() => {
     if (isLogout) {
+      localStorage.removeItem('user');
+      queryClient.setQueryData([userKey], null);
+      signOutGoogle();
       logout();
     }
-  }, []);
-
-  // function: 로그인 / 회원가입 페이지 이동
-  function changeAuthType() {
-    if (authType === 'sign-in') {
-      navigate('/auth/sign-up');
-    } else {
-      navigate('/auth/sign-in');
-    }
-  }
-
-  // handler: 로그인 성공 핸들러
-  /**
-   * @param expire (초 단위)
-   */
-  function onSignInSuccess() {
-    localStorage.setItem('login', 'true');
-    // 페이지 이동
-    if (pathname) {
-      navigate(pathname);
-    } else {
-      navigate('/');
-    }
-  }
-
-  // handler: 로그인 실패 핸들러
-  function onSignInError(error: ErrorResponse) {
-    // 알 수 없는 에러
-    if (error.code === 'UNE') {
-      window.alert('네트워크 에러. 관리자에게 문의하세요');
-      navigate('/error/500');
-      return;
-    }
-    // 로그
-    const { message } = error;
-    console.log(message);
-
-    // 로그인 실패
-    window.alert('로그인 실패. 잠시후 다시 시도해주세요');
-  }
+  }, [isLogout, logout]);
 
   // handler: 로그인 버튼 클릭 핸들러
   const signInBtnClickHandler = () => {
@@ -144,24 +83,6 @@ const Auth = () => {
       isError = true;
     }
     return isError;
-  }
-
-  // handler: 회원가입 성공 핸들러
-  function onSignUpSuccess() {
-    window.alert('회원가입 성공!');
-    navigate('/auth/sign-in');
-  }
-  // handler: 회원가입 실패 핸들러
-  function onSignUpError(error: ErrorResponse) {
-    // 알 수 없는 에러 발생 시 에러 페이지로 이동
-    if (error.code === 'UNE') {
-      window.alert('네트워크 에러. 관리자에게 문의하세요');
-      navigate('/error/500');
-      return;
-    }
-
-    // 어떤 에러인지 팝업으로 띄움
-    window.alert(error.message);
   }
 
   // handler: 회원가입 버튼 클릭 핸들러
@@ -356,19 +277,52 @@ const Auth = () => {
             <p className="text-default-black">
               {authType === 'sign-in' ? '아직 계정이 없으신가요?' : '이미 계정이 있으신가요?'}
             </p>
-            <button className="font-semibold text-dark-black" onClick={changeAuthType}>
+            <button
+              className="font-semibold text-dark-black"
+              onClick={() => {
+                if (authType === 'sign-in') {
+                  navigate('/auth/sign-up');
+                } else {
+                  navigate('/auth/sign-in');
+                }
+              }}
+            >
               {`${authType === 'sign-in' ? '회원가입' : '로그인'} 하러 가기 >`}
             </button>
           </div>
           <p className="text-light-black">or</p>
-          {/* 구글 계정으로 인증하기 */}
-          <Button variant={'outline'} className={'border-gray-400 flex items-center'}>
-            <i className="flex items-center justify-center fi fi-brands-google"></i>
-            구글 계정으로 인증하기
-          </Button>
+          <GoogleAuthBtn />
         </div>
       </div>
     </main>
+  );
+};
+
+const GoogleAuthBtn = () => {
+  const { authType } = useParams();
+  const { authWithGoogle, isAuthWithGooglePending } = useAuthMutation();
+
+  function onGoogleAuthBtnClick() {
+    signInGoogle()
+      .then(async (result) => {
+        const idToken = await result.user.getIdToken();
+
+        authWithGoogle({
+          idToken,
+          isSignUp: authType === 'sign-up',
+        });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }
+
+  return (
+    <Button variant={'outline'} className={'border-gray-400 flex items-center'} onClick={onGoogleAuthBtnClick}>
+      <ClipLoader loading={isAuthWithGooglePending} color="#000000" size={10} />
+      <i className="flex items-center justify-center fi fi-brands-google"></i>
+      구글 계정으로 {authType === 'sign-in' ? '인증' : '가입'}하기
+    </Button>
   );
 };
 

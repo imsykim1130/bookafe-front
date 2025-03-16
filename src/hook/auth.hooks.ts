@@ -1,13 +1,17 @@
 //// mutation
 // types
 import { request } from '@/api/template';
+import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
 import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { userKey, UserResponse } from './user.hook';
 
 export type SignInRequest = {
   email: string;
   password: string;
+  isGoogleAuth?: boolean;
 };
 
 export type SignUpRequest = {
@@ -15,6 +19,11 @@ export type SignUpRequest = {
   password: string;
   nickname: string;
   role: 'user' | 'admin';
+};
+
+export type AuthWithGoogleRequest = {
+  idToken: string;
+  isSignUp: boolean;
 };
 
 type UseAuthMutationProps = {
@@ -37,24 +46,32 @@ interface UseAuthMutationReturn {
 
   logout: () => void;
   isLogoutPending: boolean;
+
+  authWithGoogle: (request: AuthWithGoogleRequest) => void;
+  isAuthWithGooglePending: boolean;
 }
 
 type UseAuthMutation = (props?: UseAuthMutationProps) => UseAuthMutationReturn;
 
 // mutate
 /**
- * 로그인, 회원가입, 로그아웃
+ * 로그인, 회원가입, 로그아웃, firebase 구글 회원가입
  * @param {UseAuthMutationProps}
  * @returns {UseAuthMutationReturn}
  * @description 인증 관련 mutation 들 모웃
  */
 export const useAuthMutation: UseAuthMutation = (props?: UseAuthMutationProps) => {
+  const navigate = useNavigate();
+
   // 로그인
   const { mutate: signIn, isPending: isSignInPending } = useMutation({
     mutationFn: (requestBody: SignInRequest) => {
-      return request.post<SignInRequest, number>(DOMAIN + '/auth/sign-in', requestBody, true);
+      return request.post<SignInRequest, UserResponse>(DOMAIN + '/auth/sign-in', requestBody, true);
     },
-    onSuccess: props?.onSignInSuccess,
+    onSuccess: (response: UserResponse) => {
+      queryClient.setQueryData([userKey], response);
+      navigate('/');
+    },
     onError: props?.onSignInError,
   });
 
@@ -76,5 +93,30 @@ export const useAuthMutation: UseAuthMutation = (props?: UseAuthMutationProps) =
     onError: props?.onLogoutError,
   });
 
-  return { signIn, isSignInPending, signUp, isSignUpPending, logout, isLogoutPending };
+  // 구글로 인증
+  const { mutate: authWithGoogle, isPending: isAuthWithGooglePending } = useMutation({
+    mutationFn: (requestBody: AuthWithGoogleRequest) => {
+      return request.post<AuthWithGoogleRequest, UserResponse>(DOMAIN + '/auth/google', requestBody, true);
+    },
+    onSuccess: (result: UserResponse) => {
+      // 로그인 성공 시 캐시 저장
+      queryClient.setQueryData([userKey], result);
+      navigate('/');
+    },
+    onError: (error: ErrorResponse) => {
+      console.log(error.message);
+      window.alert('다시 시도해주세요');
+    },
+  });
+
+  return {
+    signIn,
+    isSignInPending,
+    signUp,
+    isSignUpPending,
+    logout,
+    isLogoutPending,
+    authWithGoogle,
+    isAuthWithGooglePending,
+  };
 };
