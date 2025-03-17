@@ -1,3 +1,4 @@
+import AlertDialogComp from '@/components/AlertDialogComp';
 import ErrorComp from '@/components/ErrorComp';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +13,7 @@ import { useUserMutation, useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 // 유저 페이지
 const User = () => {
@@ -157,7 +159,10 @@ const ModifyModal = ({ isOpen }: { isOpen: boolean }) => {
         <button disabled={true}>
           닉네임 변경 🔒 <span className="text-xs opacity-40">지원 예정</span>
         </button>
-        <button onClick={cancelUser}>탈퇴하기</button>
+        <AlertDialogComp onConfirmClick={cancelUser} message="정말 탈퇴 하시겠습니까?">
+          {/* 로그아웃 팝업 띄울 트리거 버튼 */}
+          <button>탈퇴하기</button>
+        </AlertDialogComp>
       </div>
       <ProfileImgModifyModal isOpen={isProfileImgModifyModalOpen} setIsOpen={setIsProfileImgModifyModalOpen} />
     </div>
@@ -168,11 +173,7 @@ const ModifyModal = ({ isOpen }: { isOpen: boolean }) => {
 const ProfileImgModifyModal = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const { changeProfileImage } = useUserMutation();
-
-  useEffect(() => {
-    console.log(file);
-  }, [file]);
+  const { changeProfileImage, isChangeProfileImagePending } = useUserMutation();
 
   if (!isOpen) return;
 
@@ -195,12 +196,14 @@ const ProfileImgModifyModal = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOp
 
         <div className="flex flex-col gap-[1rem] w-full">
           <ImgSelectBtn setFile={setFile} setPreviewUrl={setPreviewUrl} />
+
           <Button
             onClick={() => {
               if (!file) return;
               changeProfileImage(file);
             }}
           >
+            <ClipLoader color="#ffffff" loading={isChangeProfileImagePending} size={12} />
             변경하기
           </Button>
         </div>

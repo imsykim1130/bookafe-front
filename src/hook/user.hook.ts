@@ -127,6 +127,8 @@ export const useSearchUserListQuery: UseSearchUserListQuery = (params: UseSearch
 interface UseUserMutationReturn {
   changeProfileImage: (img: File) => void;
   isChangeProfileImagePending: boolean;
+  isChangeProfileImageSuccess: boolean;
+  isChangeProfileImageError: boolean;
 
   cancelUser: () => void;
   isCancelUserPending: boolean;
@@ -137,13 +139,24 @@ type UseUserMutation = () => UseUserMutationReturn;
 // mutation
 export const useUserMutation: UseUserMutation = () => {
   // 프로필 이미지 변경
-  const { mutate: changeProfileImage, isPending: isChangeProfileImagePending } = useMutation({
+  const {
+    mutate: changeProfileImage,
+    isPending: isChangeProfileImagePending,
+    isSuccess: isChangeProfileImageSuccess,
+    isError: isChangeProfileImageError,
+  } = useMutation({
     mutationFn: (img: File) => {
       // 파일은 Form 에 담아 전달 해야한다
       const formData = new FormData();
       formData.append('file', img);
 
       return request.postFormData(DOMAIN + '/user/profile-image', formData);
+    },
+    onSuccess: () => {
+      window.alert('프로필 이미지 변경 성공! 이미지 변경은 잠시 후 적용됩니다.');
+    },
+    onError: (err: ErrorResponse) => {
+      window.alert(err.message);
     },
   });
 
@@ -162,5 +175,12 @@ export const useUserMutation: UseUserMutation = () => {
     },
   });
 
-  return { changeProfileImage, isChangeProfileImagePending, cancelUser, isCancelUserPending };
+  return {
+    changeProfileImage,
+    isChangeProfileImagePending,
+    isChangeProfileImageSuccess,
+    isChangeProfileImageError,
+    cancelUser,
+    isCancelUserPending,
+  };
 };
