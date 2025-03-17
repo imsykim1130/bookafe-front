@@ -633,14 +633,8 @@ const ReviewInfo = ({
 
   return (
     <div className={'flex gap-[10px] items-center'}>
-      <div className={'w-[30px] h-[30px] rounded-full overflow-hidden flex justify-center items-center'}>
-        {profileImg ? (
-          <img src={profileImg} alt="profile image" />
-        ) : (
-          <div className={'flex justify-center items-center w-full h-full bg-black bg-opacity-5'}>
-            <i className="text-black fi fi-br-user text-opacity-20"></i>
-          </div>
-        )}
+      <div className="size-[2rem] rounded-full overflow-auto flex justify-center items-center border-[0.0625rem] border-black/10">
+        {profileImg && <img src={profileImg} alt="reply profile image" />}
       </div>
       <span
         className={'font-semibold cursor-pointer'}
@@ -829,7 +823,7 @@ const Reply = ({ reply, deleteReply }: { reply: Comment; deleteReply: (replyId: 
       <i className="absolute top-[1.5rem] left-0 fi fi-rr-arrow-turn-down-right"></i>
       <div className="flex items-center gap-[1rem]">
         <div className="size-[2rem] rounded-full overflow-auto flex justify-center items-center border-[0.0625rem] border-black/10">
-          <img src={reply.profileImg} alt="reply profile image" />
+          {reply.profileImg && <img src={reply.profileImg} alt="reply profile image" />}
         </div>
         <div className="flex items-center gap-[1rem]">
           <p className="font-semibold">{reply.nickname}</p>
