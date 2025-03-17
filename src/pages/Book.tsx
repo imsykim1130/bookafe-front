@@ -21,7 +21,7 @@ import { DOMAIN } from '@/utils/env';
 import { toBookSite } from '@/utils/utils';
 import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AlertDialogComp from '../components/AlertDialogComp';
 
 //// page
@@ -480,6 +480,7 @@ const Review = ({
           <div className="flex items-center justify-between">
             <ReviewInfo
               profileImg={review.profileImg}
+              reviewUserId={review.userId}
               nickname={review.nickname}
               writeDate={review.writeDate}
               emoji={review.emoji}
@@ -617,15 +618,19 @@ const ReviewModify = ({
 //// 리뷰 정보
 const ReviewInfo = ({
   profileImg,
+  reviewUserId,
   nickname,
   writeDate,
   emoji,
 }: {
   profileImg: string | undefined;
+  reviewUserId: number | undefined;
   nickname: string | undefined;
   writeDate: string | undefined;
   emoji: string | undefined;
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className={'flex gap-[10px] items-center'}>
       <div className={'w-[30px] h-[30px] rounded-full overflow-hidden flex justify-center items-center'}>
@@ -637,7 +642,15 @@ const ReviewInfo = ({
           </div>
         )}
       </div>
-      <span className={'font-semibold'}>{nickname}</span>
+      <span
+        className={'font-semibold cursor-pointer'}
+        onClick={() => {
+          // 닉네임 클릭 시 해당 유저 페이지로 이동
+          navigate('/user/' + reviewUserId);
+        }}
+      >
+        {nickname}
+      </span>
       <span className={'text-black text-opacity-60'}>{moment(writeDate).format('YYYY.MM.DD')}</span>
       <span>{emoji ? emoji : ''}</span>
     </div>

@@ -6,6 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 // 책의 리뷰 리스트 쿼리
 export type Comment = {
   id: number;
+  userId: number;
   profileImg: string;
   nickname: string;
   writeDate: string;
