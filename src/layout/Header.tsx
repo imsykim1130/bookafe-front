@@ -73,6 +73,7 @@ const Header = () => {
               </Link>
               <AlertDialogComp
                 onConfirmClick={() => {
+                  localStorage.removeItem('user');
                   window.location.href = '/auth/sign-in?logout=true';
                 }}
                 message="정말 로그아웃 하시겠습니까?"

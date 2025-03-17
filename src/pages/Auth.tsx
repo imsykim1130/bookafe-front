@@ -38,7 +38,6 @@ const Auth = () => {
   // 로그아웃 요청으로 로그인 페이지 접속 시 서버에 로그아웃 요청
   useEffect(() => {
     if (isLogout) {
-      localStorage.removeItem('user');
       queryClient.setQueryData([userKey], null);
       signOutGoogle();
       logout();
