@@ -41,7 +41,7 @@ export const useBookQuery: UseBookQuery = (params: UseBookQueryParams) => {
   } = useQuery({
     queryKey: [bookKey, isbn],
     queryFn: () => {
-      return request.get<BookResponse>(DOMAIN + '/book/detail/' + isbn, false);
+      return request.get<BookResponse>(DOMAIN + '/book?isbn=' + isbn, false);
     },
     enabled: !!isbn,
     initialData: null,
@@ -139,7 +139,7 @@ export const useSearchBookListQuery: UseSearchBookListQuery = (params: UseSearch
     queryKey: [searchBookListQueryKey],
     queryFn: () => {
       return request.getWithParams<SearchBookListResponse, UseSearchBookListQueryParams>(
-        DOMAIN + '/books/search',
+        DOMAIN + '/books',
         params,
         false,
       );

@@ -21,8 +21,8 @@ interface UseTop10QueryReturn {
 
 type UseTop10Query = () => UseTop10QueryReturn;
 
-export const useTop10Query : UseTop10Query = () => {
-  const query = () => request.get<Top10Book[]>(DOMAIN + '/favorite/top10');
+export const useTop10Query: UseTop10Query = () => {
+  const query = () => request.get<Top10Book[]>(DOMAIN + '/books/top10');
 
   const {
     data: bookList,
@@ -32,7 +32,6 @@ export const useTop10Query : UseTop10Query = () => {
     queryKey: [],
     queryFn: query,
   });
-
 
   return { bookList, isTop10Loading, isTop10Error };
 };
@@ -71,17 +70,14 @@ export const useBookFavoriteInfoQuery: UseFavoriteBookInfoQuery = (params: UseFa
   } = useQuery({
     queryKey: [bookFavoriteInfoQueryKey, params.isbn],
     queryFn: () => {
-      return request.get<BookFavoriteInfo>(DOMAIN + '/favorite/' + params.isbn + '/permit');
+      if (!isbn) return;
+      return request.getWithParams<BookFavoriteInfo, { isbn: string }>(DOMAIN + '/book/like-info', { isbn });
     },
     enabled: isbn !== undefined,
-    initialData: {
-      isFavorite: false,
-      favoriteCount: 0,
-    },
   });
 
-  const isFavorite = data.isFavorite;
-  const favoriteCount = data.favoriteCount;
+  const isFavorite = data ? data.isFavorite : false;
+  const favoriteCount = data ? data.favoriteCount : 0;
 
   return { isFavorite, favoriteCount, isBookFavoriteInfoLoading, isBookFavoriteInfoError, refetchBookFavoriteInfo };
 };
@@ -120,6 +116,7 @@ type UseFavoriteBookListQuery = (params: UseFavoriteBookListQueryParams) => UseF
 export const favoriteBookListQueryKey = 'favoriteBookList';
 
 export const useFavoriteBookListQuery: UseFavoriteBookListQuery = (params: UseFavoriteBookListQueryParams) => {
+  // 좋아요 책 리스트 가져오기
   const {
     data,
     isLoading: isFavoriteBookListLoading,
@@ -129,7 +126,7 @@ export const useFavoriteBookListQuery: UseFavoriteBookListQuery = (params: UseFa
     queryKey: [favoriteBookListQueryKey, params.page],
     queryFn: () => {
       return request.getWithParams<FavoriteBookResponse, UseFavoriteBookListQueryParams>(
-        DOMAIN + '/favorite/list',
+        DOMAIN + '/books/like',
         params,
       );
     },
@@ -182,7 +179,7 @@ export const useFavoriteBookMutation: UseFavoriteBookMutation = (params) => {
   // 책 좋아요
   const { mutate: likeBook, isPending: isLikeBookPending } = useMutation({
     mutationFn: (isbn: string) => {
-      return request.put<void>(DOMAIN + '/favorite/' + isbn, null);
+      return request.post<null, void>(DOMAIN + '/book/like?isbn=' + isbn, null);
     },
     onError: onLikeBookError,
     onSuccess: onLikeBookSuccess,
@@ -191,7 +188,7 @@ export const useFavoriteBookMutation: UseFavoriteBookMutation = (params) => {
   // 책 좋아요 취소
   const { mutate: unlikeBook, isPending: isUnlikeBookPending } = useMutation({
     mutationFn: (isbn: string) => {
-      return request.delete<void>(DOMAIN + '/favorite/' + isbn);
+      return request.delete<void>(DOMAIN + '/book/like?isbn=' + isbn);
     },
     onError: onUnlikeBookError,
     onSuccess: onUnlikeBookSuccess,
@@ -200,7 +197,7 @@ export const useFavoriteBookMutation: UseFavoriteBookMutation = (params) => {
   // 좋아요 일괄 취소
   const { mutate: unlikeBookList, isPending: isUnlikeBookListPending } = useMutation({
     mutationFn: (isbnList: string[]) => {
-      return request.deleteWithBody<{ isbnList: string[] }>(DOMAIN + '/favorite/list', { isbnList });
+      return request.deleteWithBody<{ isbnList: string[] }>(DOMAIN + '/books/like', { isbnList });
     },
     onError: onUnlikeBookListError,
     onSuccess: onUnlikeBookListSuccess,

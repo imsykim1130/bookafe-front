@@ -25,11 +25,7 @@ export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRe
   const { isbn } = params;
   const { user } = useUserQuery();
 
-  const query = () =>
-    request.getWithParams<boolean, UseIsBookRecommendedQueryParams>(
-      DOMAIN + '/recommend-book/is-recommended/' + isbn,
-      params,
-    );
+  const query = () => request.get<boolean>(DOMAIN + '/admin/book/is-recommended?isbn=' + isbn);
 
   const {
     data,
@@ -76,7 +72,7 @@ export const useRecommendBookListQuery: UseRecommendBookListQuery = () => {
   } = useQuery({
     queryKey: [recommendBookListQueryKey],
     queryFn: () => {
-      return request.get<RecommendBook[]>(DOMAIN + '/recommend-book/all');
+      return request.get<RecommendBook[]>(DOMAIN + '/admin/books/recommend');
     },
     placeholderData: [],
     staleTime: 1000 * 60 * 60,
@@ -111,7 +107,7 @@ export const useRecommendBookMutation: UseRecommendBookMutation = (params?: UseR
   const { mutate: recommend, isPending: isRecommendPending } = useMutation({
     mutationFn: (isbn: string) => {
       console.log('책 추천');
-      return request.post(DOMAIN + '/recommend-book/' + isbn, null);
+      return request.post(DOMAIN + '/admin/book/recommend?isbn=' + isbn, null);
     },
     onSuccess: params?.onRecommendSuccess,
     onError: params?.onRecommendError,
@@ -121,7 +117,7 @@ export const useRecommendBookMutation: UseRecommendBookMutation = (params?: UseR
   const { mutate: unrecommend, isPending: isUnrecommendPending } = useMutation({
     mutationFn: (isbn: string) => {
       console.log('책 추천 취소');
-      return request.delete(DOMAIN + '/recommend-book/' + isbn);
+      return request.delete(DOMAIN + '/admin/book/recommend?isbn=' + isbn);
     },
     onSuccess: params?.onUnrecommendSuccess,
     onError: params?.onUnrecommendError,
