@@ -40,7 +40,7 @@ export const useReviewListQuery: UseReviewListQuery = (params) => {
   } = useQuery({
     queryKey: [reviewListQueryKey, isbn, page],
     queryFn: () => {
-      return request.get<Comment[]>(DOMAIN + '/comment/list/' + isbn, false);
+      return request.get<Comment[]>(DOMAIN + '/comments/review?isbn=' + isbn, false);
     },
     enabled: !!isbn,
   });
@@ -67,7 +67,7 @@ export const useReplyListQuery: UseReplyListQuery = (reviewId: number, replyOpen
     queryKey: [replyListQueryKey, reviewId],
     queryFn: () => {
       console.log('hi');
-      return request.get<Comment[]>(DOMAIN + '/comment/reply/list/' + reviewId, false);
+      return request.get<Comment[]>(DOMAIN + '/comments/reply?reviewId=' + reviewId, false);
     },
     enabled: replyOpen,
     initialData: [],
@@ -114,7 +114,7 @@ export const useUserReviewListQuery: UseUserReviewListQuery = (params) => {
     queryFn: () => {
       return userId
         ? request.getWithParams<MyReviewListResponse, { userId: string; size: number; page: number }>(
-            DOMAIN + '/comment/my/list',
+            DOMAIN + '/comments',
             {
               userId,
               page,
@@ -174,7 +174,7 @@ export const useReviweFavoriteUserListQuery: UseReviewFavoriteUserListQuery = (p
     queryFn: () => {
       return params.userId
         ? request.getWithParams<ReviewFavoriteUserListResonse, { userId: string; page: number; size: number }>(
-            DOMAIN + '/comment/favorite/user-list',
+            DOMAIN + '/comment/like/users',
             {
               userId: params.userId,
               page: params.page,
@@ -263,9 +263,9 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
 
   // 리뷰 작성하기
   const { mutate: createReview, isPending: isCreateReviewPending } = useMutation({
-    mutationFn: (params: { content: string; emoji: string; isbn: string }) => {
+    mutationFn: (requestBody: { content: string; emoji: string; isbn: string }) => {
       return request.post<PostCommentRequest>(DOMAIN + '/comment', {
-        ...params,
+        ...requestBody,
         parentId: null,
       });
     },
@@ -287,7 +287,7 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
   // 리뷰 삭제하기
   const { mutate: deleteReview, isPending: isDeleteReviewPending } = useMutation({
     mutationFn: (reviewId: number) => {
-      return request.delete(DOMAIN + '/comment/' + reviewId);
+      return request.delete(DOMAIN + '/comment?commentId=' + reviewId);
     },
     onError: onDeleteReviewError,
     onSuccess: onDeleteReviewSuccess,
@@ -295,8 +295,8 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
 
   // 댓글 작성하기
   const { mutate: createReply, isPending: isCreateReplyPending } = useMutation({
-    mutationFn: (params: { parentId: number; content: string; isbn: string }) => {
-      return request.post<PostCommentRequest, PostCommentRequest>(DOMAIN + '/comment', { ...params, emoji: null });
+    mutationFn: (requestBody: { parentId: number; content: string; isbn: string }) => {
+      return request.post<PostCommentRequest, PostCommentRequest>(DOMAIN + '/comment', { ...requestBody, emoji: null });
     },
     onError: onCreateReplyError,
     onSuccess: onCreateReplySuccess,
@@ -305,7 +305,7 @@ export const useCommentMutation: UseCommentMutation = (params: UseCommentMutatio
   // 댓글 삭제하기
   const { mutate: deleteReply, isPending: isDeleteReplyPending } = useMutation({
     mutationFn: (replyId: number) => {
-      return request.delete(DOMAIN + '/comment/' + replyId);
+      return request.delete(DOMAIN + '/comment?commentId=' + replyId);
     },
     onError: onDeleteReplyError,
     onSuccess: onDeleteReplySuccess,
