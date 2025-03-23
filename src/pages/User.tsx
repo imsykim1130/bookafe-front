@@ -1,3 +1,4 @@
+import { request } from '@/api/template';
 import AlertDialogComp from '@/components/AlertDialogComp';
 import ErrorComp from '@/components/ErrorComp';
 import { Button } from '@/components/ui/button';
@@ -9,8 +10,10 @@ import {
   userReviewListQueryKey,
   useUserReviewListQuery,
 } from '@/hook/comment.hooks';
-import { useUserMutation, useUserQuery } from '@/hook/user.hook';
+import { UserResponse, useUserMutation, useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
+import { ErrorResponse } from '@/types/common.type';
+import { DOMAIN } from '@/utils/env';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ClipLoader from 'react-spinners/ClipLoader';
@@ -27,10 +30,15 @@ const User = () => {
   const [isNicknameListOpen, setIsNicknameListOpen] = useState<boolean>(false);
   const [isReviewListOpen, setIsReviewListOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    setIsNicknameListOpen(false);
+    setIsReviewListOpen(false);
+  }, [userId]);
+
   return (
     <main className="py-[3rem] px-[2rem] min-h-[100vh]">
       <div className="max-w-[45rem] mx-auto">
-        <UserSection />
+        <UserSection isMe={isMe} />
         <div className="flex flex-col gap-[1rem] my-[3rem]">
           <StatBox
             title={isMe ? '내가 받은 좋아요' : '좋아요'}
@@ -69,15 +77,28 @@ const User = () => {
   );
 };
 
+// function: 유저 정보 가져오기
+function getUser(userId: number | string) {
+  return request
+    .get<UserResponse>(DOMAIN + '/user?userId=' + userId)
+    .then((user) => {
+      return user;
+    })
+    .catch((err: ErrorResponse) => {
+      console.log(err.message);
+      window.alert('유저 정보 가져오기 실패');
+      return null;
+    });
+}
+
 // 유저 정보 섹션
-const UserSection = () => {
+const UserSection = ({ isMe }: { isMe: boolean }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [user, setUser] = useState<UserResponse | null>(null);
+  const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
+  const [isUserError, setIsUserError] = useState<boolean>(false);
 
   const { userId } = useParams();
-  const { user } = useUserQuery();
-  // path query 로 넘어온 id 와 내 정보의 id 가 같으면 본인
-  // 본인 여부를 통해 버튼이나 문구를 다르게 하기 위해 필요한 정보
-  const isMe = userId && user ? parseInt(userId) === user.id : false;
 
   // handler: 수정/닫기 버튼 클릭 핸들러
   function onModifyBtnClick() {
@@ -88,11 +109,34 @@ const UserSection = () => {
     }
   }
 
+  useEffect(() => {
+    // 유저 정보 가져오기 메서드
+    const fetchUser = async (userId: string) => {
+      setIsUserLoading(true);
+      setIsUserError(false);
+
+      const user = await getUser(userId);
+
+      if (!user) {
+        setIsUserError(true);
+      }
+
+      setIsUserLoading(false);
+
+      setUser(user);
+    };
+
+    // userId 가 없다면 아무것도 하지 않음
+    if (!userId) return;
+    // 유저 정보 가져오기 메서드 호출
+    fetchUser(userId);
+  }, [userId]);
+
   return (
     <div className="relative flex justify-between">
       <div className="flex items-center gap-[1.5rem]">
-        <ProfileImage />
-        <UserInfo />
+        <ProfileImage user={user} isLoading={isUserLoading} isError={isUserError} />
+        <UserInfo user={user} isLoading={isUserLoading} isError={isUserError} />
       </div>
       {isMe && <Button onClick={onModifyBtnClick}>{isOpen ? '닫기' : '수정'}</Button>}
       {!isMe && <Button>즐겨찾기</Button>}
@@ -102,10 +146,16 @@ const UserSection = () => {
 };
 
 // 프로필 이미지
-const ProfileImage = () => {
-  const { user, isUserError, isUserLoading } = useUserQuery();
+type ProfileImageProps = {
+  user: UserResponse | null;
+  isLoading: boolean;
+  isError: boolean;
+};
 
-  if (!user || isUserLoading || isUserError) return <div className="size-[80px] bg-black/10"></div>;
+const ProfileImage = (props: ProfileImageProps) => {
+  const { user, isError, isLoading } = props;
+
+  if (!user || isLoading || isError) return <div className="size-[80px] bg-black/10"></div>;
 
   return (
     <div className={'flex flex-col items-center'}>
@@ -121,12 +171,18 @@ const ProfileImage = () => {
   );
 };
 
-const UserInfo = () => {
-  const { user, isUserError, isUserLoading } = useUserQuery();
+type UserInfoProps = {
+  user: UserResponse | null;
+  isLoading: boolean;
+  isError: boolean;
+};
 
-  if (!user || isUserLoading) return <p>로딩중입니다</p>;
+const UserInfo = (props: UserInfoProps) => {
+  const { user, isError, isLoading } = props;
 
-  if (isUserError) return <p>정보를 불러오지 못했습니다.</p>;
+  if (!user || isLoading) return <p>로딩중입니다</p>;
+
+  if (isError) return <p>정보를 불러오지 못했습니다.</p>;
 
   return (
     <div className={'flex flex-col gap-[5px] text-md'}>
@@ -311,7 +367,7 @@ const FavoriteUserList = () => {
       {totalUserList.map((user: ReviewFavoriteUser, index: number) => (
         <p key={index} className="py-[1rem] border-b-[0.0625rem]">
           <span
-            className="font-semibold"
+            className="font-semibold cursor-pointer"
             onClick={() => {
               // 닉네임 클릭하면 해당 유저의 페이지로 이동
               navigate('/user/' + user.userId);
