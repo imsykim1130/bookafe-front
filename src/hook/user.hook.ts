@@ -114,7 +114,8 @@ export const useSearchUserListQuery: UseSearchUserListQuery = (params: UseSearch
     refetch: refetchSearchUserList,
   } = useQuery({
     queryKey: [searchUserListQueryKey],
-    queryFn: () => request.getWithParams<SearchUser[], UseSearchUserListQueryParams>(DOMAIN + '/user/search', params),
+    queryFn: () =>
+      request.getWithParams<SearchUser[], UseSearchUserListQueryParams>(DOMAIN + '/admin/user/search', params),
     initialData: [],
     enabled: false,
   });
