@@ -170,7 +170,7 @@ export const useReviweFavoriteUserListQuery: UseReviewFavoriteUserListQuery = (p
     isError: isNicknameListError,
     isLoading: isNicknameListLoading,
   } = useQuery({
-    queryKey: [reviewFavoriteUserListQueryKey],
+    queryKey: [reviewFavoriteUserListQueryKey, params.userId],
     queryFn: () => {
       return params.userId
         ? request.getWithParams<ReviewFavoriteUserListResonse, { userId: string; page: number; size: number }>(
