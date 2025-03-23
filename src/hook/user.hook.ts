@@ -133,6 +133,9 @@ interface UseUserMutationReturn {
 
   cancelUser: () => void;
   isCancelUserPending: boolean;
+
+  initProfileImg: () => void;
+  isInitProfileImgPending: boolean;
 }
 
 type UseUserMutation = () => UseUserMutationReturn;
@@ -161,7 +164,21 @@ export const useUserMutation: UseUserMutation = () => {
     },
   });
 
-  // 탈퇴하기
+  // 프로필 이미지 초기화
+  const { mutate: initProfileImg, isPending: isInitProfileImgPending } = useMutation({
+    mutationFn: () => {
+      return request.delete(DOMAIN + '/user/profile-image');
+    },
+    onSuccess: () => {
+      window.alert('프로필 이미지 초기화 완료! 잠시 후 적용됩니다');
+    },
+    onError: (err: ErrorResponse) => {
+      console.log(err.message);
+      window.alert('다시 시도해주세요');
+    },
+  });
+
+  // 탈퇴하다
   const { mutate: cancelUser, isPending: isCancelUserPending } = useMutation({
     mutationFn: () => {
       return request.delete(DOMAIN + '/user');
@@ -183,5 +200,7 @@ export const useUserMutation: UseUserMutation = () => {
     isChangeProfileImageError,
     cancelUser,
     isCancelUserPending,
+    initProfileImg,
+    isInitProfileImgPending,
   };
 };
