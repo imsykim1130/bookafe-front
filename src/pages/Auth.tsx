@@ -47,7 +47,7 @@ const Auth = () => {
     if (isLogout) {
       logout();
     }
-  }, [isLogout]);
+  }, [isLogout, logout]);
 
   // handler: 로그인 버튼 클릭 핸들러
   const signInBtnClickHandler = () => {
