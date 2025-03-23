@@ -87,7 +87,7 @@ export const useAuthMutation: UseAuthMutation = (props?: UseAuthMutationProps) =
   // 로그아웃
   const { mutate: logout, isPending: isLogoutPending } = useMutation({
     mutationFn: () => {
-      return request.post(DOMAIN + '/auth/logout', {}, true);
+      return request.post(DOMAIN + '/auth/sign-out', {}, true);
     },
     onSuccess: props?.onLogoutSuccess,
     onError: props?.onLogoutError,
