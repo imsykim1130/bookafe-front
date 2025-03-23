@@ -8,9 +8,8 @@ axios.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      // 에러가 401 이면 jwt 만료로 인식
-      // local storage 의 user 정보 삭제하고 로그인 페이지로 이동
-      localStorage.removeItem('user');
+      // 에러가 401 이면 jwt 만료로 인식하여 로그아웃 할 수 있는 경로로 이동
+
       window.alert('다시 로그인 해주세요.');
       window.location.href = '/auth/sign-in?logout=true';
     }
