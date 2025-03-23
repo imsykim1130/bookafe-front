@@ -65,18 +65,8 @@ export const useUserQuery: UseUserQuery = () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       queryClient.setQueryData(['user'], JSON.parse(storedUser));
-      refetchUser(); // 🔥 서버에 유저 데이터 요청
     }
   }, [resetUser, setUser, refetchUser]);
-
-  // 유저 정보 변경을 로컬 스토리지의 유저값에 적용
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [user]);
 
   return { user, isUserError, isUserLoading, refetchUser, resetUser, setUser };
 };

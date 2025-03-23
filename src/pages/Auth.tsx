@@ -33,16 +33,21 @@ const Auth = () => {
 
   const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
 
-  const { signIn, signUp, logout } = useAuthMutation();
+  const { signIn, signUp, logout } = useAuthMutation({ onLogoutSuccess });
+
+  function onLogoutSuccess() {
+    localStorage.removeItem('user');
+    signOutGoogle();
+    queryClient.setQueryData([userKey], null);
+    navigate('/auth/sign-in');
+  }
 
   // 로그아웃 요청으로 로그인 페이지 접속 시 서버에 로그아웃 요청
   useEffect(() => {
     if (isLogout) {
-      queryClient.setQueryData([userKey], null);
-      signOutGoogle();
       logout();
     }
-  }, [isLogout, logout]);
+  }, [isLogout]);
 
   // handler: 로그인 버튼 클릭 핸들러
   const signInBtnClickHandler = () => {

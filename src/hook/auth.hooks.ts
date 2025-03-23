@@ -70,6 +70,7 @@ export const useAuthMutation: UseAuthMutation = (props?: UseAuthMutationProps) =
     },
     onSuccess: (response: UserResponse) => {
       queryClient.setQueryData([userKey], response);
+      localStorage.setItem('user', JSON.stringify(response));
       navigate('/');
     },
     onError: props?.onSignInError,
