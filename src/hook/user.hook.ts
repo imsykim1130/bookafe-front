@@ -126,6 +126,9 @@ interface UseUserMutationReturn {
 
   initProfileImg: () => void;
   isInitProfileImgPending: boolean;
+
+  changeNickname: (nickname: string) => void;
+  isChangeNicknamePending: boolean;
 }
 
 type UseUserMutation = () => UseUserMutationReturn;
@@ -183,6 +186,29 @@ export const useUserMutation: UseUserMutation = () => {
     },
   });
 
+  // 닉네임 변경하기
+  const { mutate: changeNickname, isPending: isChangeNicknamePending } = useMutation({
+    mutationFn: (nickname: string) => {
+      return request.patch<{ nickname: string }, string>(DOMAIN + '/user/nickname', { nickname });
+    },
+    onSuccess: (newNickname: string) => {
+      // 성공 메세지
+      window.alert('닉네임 변경 성공!');
+      // 로컬 스토리지와 캐시값의 nickname 변경
+      const oldUser = JSON.parse(localStorage.getItem('user') as string) as UserResponse;
+      const newUser = JSON.stringify({ ...oldUser, nickname: newNickname });
+      localStorage.setItem('user', newUser);
+      queryClient.setQueryData([userKey], newUser);
+      // 새로고침하여 유저 페이지에 보이는 유저 정보 다시 가져오기
+      // 유저 페이지의 유저 정보는 유저 id 에 따라 변경되기 때문에 내 페이지라고 해도 전역으로 사용하는 유저 정보와 따로 다시 유저 정보를 요청해서 가져온다
+      window.location.reload();
+    },
+    onError: (err: ErrorResponse) => {
+      console.log(err.message);
+      window.alert('다시 시도해주세요');
+    },
+  });
+
   return {
     changeProfileImage,
     isChangeProfileImagePending,
@@ -192,5 +218,7 @@ export const useUserMutation: UseUserMutation = () => {
     isCancelUserPending,
     initProfileImg,
     isInitProfileImgPending,
+    changeNickname,
+    isChangeNicknamePending,
   };
 };

@@ -2,6 +2,7 @@ import { request } from '@/api/template';
 import AlertDialogComp from '@/components/AlertDialogComp';
 import ErrorComp from '@/components/ErrorComp';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   MyReview,
   ReviewFavoriteUser,
@@ -197,6 +198,7 @@ const UserInfo = (props: UserInfoProps) => {
 
 const ModifyModal = ({ isOpen }: { isOpen: boolean }) => {
   const [isProfileImgModifyModalOpen, setIsProfileImgModifyModalOpen] = useState<boolean>(false);
+  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState<boolean>(false);
   const { cancelUser } = useUserMutation();
 
   if (!isOpen) return null;
@@ -212,9 +214,21 @@ const ModifyModal = ({ isOpen }: { isOpen: boolean }) => {
         >
           프로필 이미지 변경하기
         </button>
-        <button disabled={true}>
-          닉네임 변경 🔒 <span className="text-xs opacity-40">지원 예정</span>
+
+        <button
+          onClick={() => {
+            setIsNicknameModalOpen(true);
+          }}
+        >
+          닉네임 변경
         </button>
+        <NicknameModal
+          isOpen={isNicknameModalOpen}
+          closeModal={() => {
+            setIsNicknameModalOpen(false);
+          }}
+        />
+
         <AlertDialogComp onConfirmClick={cancelUser} message="정말 탈퇴 하시겠습니까?">
           {/* 로그아웃 팝업 띄울 트리거 버튼 */}
           <button>탈퇴하기</button>
@@ -315,6 +329,67 @@ const ImgSelectBtn = ({
   );
 };
 
+// 닉네임 변경 모달
+const NicknameModal = ({ isOpen, closeModal }: { isOpen: boolean; closeModal: () => void }) => {
+  const { user } = useUserQuery();
+  const { changeNickname } = useUserMutation();
+  const [newNickname, setNewNickname] = useState<string>('');
+  const [error, setError] = useState<boolean>(true);
+  const [errMsg, setErrMsg] = useState<string>('');
+  const sameNicknameErrMsg = '기존 닉네임과 동일합니다';
+  const notValidNicknameErrMsg = '닉네임은 5자 이상 15자 이하여야 합니다';
+  const nicknameRegex = RegExp('^(?=.*[A-Za-z])[A-Za-z\\d]{5,15}$');
+
+  // effect: 변경할 닉네임 에러 설정
+  useEffect(() => {
+    if (!nicknameRegex.test(newNickname) && newNickname === user?.nickname) {
+      setError(true);
+    } else {
+      setError(false);
+    }
+
+    if (!nicknameRegex.test(newNickname)) {
+      setErrMsg(notValidNicknameErrMsg);
+    }
+
+    if (newNickname === user?.nickname) {
+      setErrMsg(sameNicknameErrMsg);
+    }
+  }, [newNickname, user?.nickname, nicknameRegex]);
+
+  if (!isOpen) return;
+
+  return (
+    <div className="fixed top-0 bottom-0 left-0 right-0 flex items-center justify-center bg-black/10">
+      <div className="w-[20rem] bg-white rounded-[1rem] p-[1.5rem] flex flex-col">
+        <h1 className="text-lg font-semibold">닉네임 변경</h1>
+        <div className="relative my-[1rem]">
+          <Input
+            placeholder="변경할 닉네임을 입력해주세요"
+            value={newNickname}
+            onChange={(e) => setNewNickname(e.target.value)}
+          />
+          {error && <p className="absolute w-full top-[2.2rem] text-sm text-red-500 my-[0.2rem]">{errMsg}</p>}
+        </div>
+        <div className="flex flex-col gap-[1rem] mt-[2rem]">
+          <Button
+            className="w-full"
+            onClick={() => {
+              if (error) return;
+              changeNickname(newNickname);
+            }}
+          >
+            변경
+          </Button>
+          <Button className="w-full" variant={'outline'} onClick={closeModal}>
+            취소
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const StatBox = ({
   title,
   emoji,
@@ -354,6 +429,7 @@ const FavoriteUserList = () => {
     setPage(page + 1);
     // 받아온 데이터 기존 데이터에 합치기
     setTotalUserList([...totalUserList, ...userList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userList]);
 
   if (isNicknameListError) return <ErrorComp />;
