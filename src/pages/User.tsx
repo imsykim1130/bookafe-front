@@ -98,6 +98,7 @@ const UserSection = ({ isMe }: { isMe: boolean }) => {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
   const [isUserError, setIsUserError] = useState<boolean>(false);
+  const { likeUser } = useUserMutation();
 
   const { userId } = useParams();
 
@@ -140,7 +141,17 @@ const UserSection = ({ isMe }: { isMe: boolean }) => {
         <UserInfo user={user} isLoading={isUserLoading} isError={isUserError} />
       </div>
       {isMe && <Button onClick={onModifyBtnClick}>{isOpen ? '닫기' : '수정'}</Button>}
-      {!isMe && <Button>즐겨찾기</Button>}
+      {!isMe && (
+        <Button
+          onClick={() => {
+            // 즐겨찾기 추가 요청
+            if (!user) return;
+            likeUser(user.id);
+          }}
+        >
+          즐겨찾기
+        </Button>
+      )}
       <ModifyModal isOpen={isOpen} />
     </div>
   );
@@ -496,6 +507,7 @@ const MyReviewList = () => {
     setPage(page + 1);
     // 받아온 데이터 기존 데이터에 합치기
     setTotalReviewList([...totalReviewList, ...reviewList]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reviewList]);
 
   if (isError) return <ErrorComp />;

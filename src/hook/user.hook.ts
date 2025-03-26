@@ -129,6 +129,12 @@ interface UseUserMutationReturn {
 
   changeNickname: (nickname: string) => void;
   isChangeNicknamePending: boolean;
+
+  likeUser: (favoriteUserId: number) => void;
+  isLikeUserPending: boolean;
+
+  unlikeUser: (favoriteUserId: number) => void;
+  isUnlikeUserPending: boolean;
 }
 
 type UseUserMutation = () => UseUserMutationReturn;
@@ -219,6 +225,32 @@ export const useUserMutation: UseUserMutation = () => {
     },
   });
 
+  // 유저 즐겨찾기
+  const { mutate: likeUser, isPending: isLikeUserPending } = useMutation({
+    mutationFn: (favoriteUserId: number) => {
+      return request.post(DOMAIN + '/user/like?favoriteUserId=' + favoriteUserId, null);
+    },
+    onSuccess: () => {
+      window.alert('즐겨찾기 성공');
+    },
+    onError: () => {
+      window.alert('다시 시도해주세요');
+    },
+  });
+
+  // 유저 즐겨찾기 취소
+  const { mutate: unlikeUser, isPending: isUnlikeUserPending } = useMutation({
+    mutationFn: (favoriteUserId: number) => {
+      return request.delete(DOMAIN + '/user/like?favoriteUserId=' + favoriteUserId);
+    },
+    onSuccess: () => {
+      window.alert('즐겨찾기 취소 성공');
+    },
+    onError: () => {
+      window.alert('다시 시도해주세요');
+    },
+  });
+
   return {
     changeProfileImage,
     isChangeProfileImagePending,
@@ -230,5 +262,9 @@ export const useUserMutation: UseUserMutation = () => {
     isInitProfileImgPending,
     changeNickname,
     isChangeNicknamePending,
+    likeUser,
+    isLikeUserPending,
+    unlikeUser,
+    isUnlikeUserPending,
   };
 };
