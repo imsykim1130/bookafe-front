@@ -147,10 +147,15 @@ export const useUserMutation: UseUserMutation = () => {
       const formData = new FormData();
       formData.append('file', img);
 
-      return request.postFormData(DOMAIN + '/user/profile-image', formData);
+      return request.postFormData<string>(DOMAIN + '/user/profile-image', formData);
     },
-    onSuccess: () => {
+    onSuccess: (url: string) => {
       window.alert('프로필 이미지 변경 성공! 이미지 변경은 잠시 후 적용됩니다.');
+
+      const oldUser = JSON.parse(localStorage.getItem('user') as string) as UserResponse;
+      const newUser = JSON.stringify({ ...oldUser, profileImg: url });
+      localStorage.setItem('user', newUser);
+      queryClient.setQueryData([userKey], newUser);
     },
     onError: (err: ErrorResponse) => {
       window.alert(err.message);
@@ -164,6 +169,11 @@ export const useUserMutation: UseUserMutation = () => {
     },
     onSuccess: () => {
       window.alert('프로필 이미지 초기화 완료! 잠시 후 적용됩니다');
+
+      const oldUser = JSON.parse(localStorage.getItem('user') as string) as UserResponse;
+      const newUser = JSON.stringify({ ...oldUser, profileImg: null });
+      localStorage.setItem('user', newUser);
+      queryClient.setQueryData([userKey], newUser);
     },
     onError: (err: ErrorResponse) => {
       console.log(err.message);

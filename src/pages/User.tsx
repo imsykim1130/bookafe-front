@@ -243,7 +243,8 @@ const ModifyModal = ({ isOpen }: { isOpen: boolean }) => {
 const ProfileImgModifyModal = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (isOpen: boolean) => void }) => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const { changeProfileImage, isChangeProfileImagePending } = useUserMutation();
+  const { changeProfileImage, isChangeProfileImagePending, initProfileImg } = useUserMutation();
+  const { user } = useUserQuery();
 
   if (!isOpen) return;
 
@@ -265,6 +266,15 @@ const ProfileImgModifyModal = ({ isOpen, setIsOpen }: { isOpen: boolean; setIsOp
         <NewProfileImgPreview previewUrl={previewUrl} />
 
         <div className="flex flex-col gap-[1rem] w-full">
+          <Button
+            variant={'outline'}
+            onClick={() => {
+              if (!user?.profileImg) return;
+              initProfileImg();
+            }}
+          >
+            프로필 이미지 제거
+          </Button>
           <ImgSelectBtn setFile={setFile} setPreviewUrl={setPreviewUrl} />
 
           <Button
