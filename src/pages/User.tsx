@@ -98,7 +98,13 @@ const UserSection = ({ isMe }: { isMe: boolean }) => {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
   const [isUserError, setIsUserError] = useState<boolean>(false);
-  const { likeUser } = useUserMutation();
+  const { likeUser, unlikeUser } = useUserMutation({ afterLikeUserSuccess: fetchFavoriteUserIdList });
+  const [favoriteUserIdList, setFavoriteUserIdList] = useState<number[] | null>(null);
+  // 현재 로그인 되어있는 유저가 현재 페이지의 유저를 즐겨찾기 했는지 여부
+  const isFavoriteUser = () => {
+    if (!favoriteUserIdList || !user) return false;
+    return favoriteUserIdList.length > 0;
+  };
 
   const { userId } = useParams();
 
@@ -109,6 +115,18 @@ const UserSection = ({ isMe }: { isMe: boolean }) => {
     } else {
       setIsOpen(true);
     }
+  }
+
+  function fetchFavoriteUserIdList() {
+    request
+      .get<number[]>(DOMAIN + '/users/like/id')
+      .then((result: number[]) => {
+        console.log(result);
+        setFavoriteUserIdList(result);
+      })
+      .catch((err: ErrorResponse) => {
+        console.log(err.message);
+      });
   }
 
   useEffect(() => {
@@ -132,6 +150,8 @@ const UserSection = ({ isMe }: { isMe: boolean }) => {
     if (!userId) return;
     // 유저 정보 가져오기 메서드 호출
     fetchUser(userId);
+    // 현재 로그인된 유저의 즐겨찾기 유저 id 리스트 가져오기
+    fetchFavoriteUserIdList();
   }, [userId]);
 
   return (
@@ -141,7 +161,7 @@ const UserSection = ({ isMe }: { isMe: boolean }) => {
         <UserInfo user={user} isLoading={isUserLoading} isError={isUserError} />
       </div>
       {isMe && <Button onClick={onModifyBtnClick}>{isOpen ? '닫기' : '수정'}</Button>}
-      {!isMe && (
+      {!isMe && !isFavoriteUser() && (
         <Button
           onClick={() => {
             // 즐겨찾기 추가 요청
@@ -150,6 +170,17 @@ const UserSection = ({ isMe }: { isMe: boolean }) => {
           }}
         >
           즐겨찾기
+        </Button>
+      )}
+      {!isMe && isFavoriteUser() && (
+        <Button
+          onClick={() => {
+            // 즐겨찾기 취소 요청
+            if (!user) return;
+            unlikeUser(user.id);
+          }}
+        >
+          즐겨찾기 취소
         </Button>
       )}
       <ModifyModal isOpen={isOpen} />

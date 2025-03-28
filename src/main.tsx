@@ -17,6 +17,7 @@ import Auth from './pages/Auth.tsx';
 import Book from './pages/Book.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import Favorite from './pages/Favorite.tsx';
+import FavoriteUserPage from './pages/FavoriteUserPage.tsx';
 import Landing from './pages/Landing.tsx';
 import Test from './temp/gsap.test.tsx';
 
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
       {
         path: '/favorite',
         element: <Favorite />,
+      },
+      {
+        path: '/favorite/user',
+        element: <FavoriteUserPage />,
       },
       {
         path: '/book/detail/:isbn',

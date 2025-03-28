@@ -71,6 +71,9 @@ const Header = () => {
               <Link to={'/user/' + user?.id} className="icon-btn ">
                 내 정보
               </Link>
+              <Link to={'/favorite/user'} className="icon-btn ">
+                즐겨찾기
+              </Link>
               <AlertDialogComp
                 onConfirmClick={() => {
                   localStorage.removeItem('user');
