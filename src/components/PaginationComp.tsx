@@ -3,13 +3,12 @@ import React, { useState } from 'react';
 
 interface Props {
   currentPage: number;
+  pageCount: number;
   totalPages: number | undefined;
   setCurrentPage: (changePage: number) => void;
 }
 
-const pageCount = 3; // 한 번에 3개의 페이지씩 보여줌
-
-const PaginationComp = ({ currentPage, setCurrentPage, totalPages }: Props) => {
+const PaginationComp = ({ currentPage, pageCount, setCurrentPage, totalPages }: Props) => {
   const [startPage, setStartPage] = useState<number>(0);
   const isNextPossible = Math.round((totalPages as number) / pageCount) - 1 > startPage;
 
@@ -21,7 +20,7 @@ const PaginationComp = ({ currentPage, setCurrentPage, totalPages }: Props) => {
             className="flex items-center justify-center text-sm cursor-pointer fi fi-br-angle-left"
             onClick={() => {
               setStartPage(startPage - 1);
-              setCurrentPage(pageCount* startPage - 1);
+              setCurrentPage(pageCount * startPage - 1);
             }}
           ></i>
         )}
