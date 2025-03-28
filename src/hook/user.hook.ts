@@ -113,8 +113,60 @@ export const useSearchUserListQuery: UseSearchUserListQuery = (params: UseSearch
   return { searchUserList, isSearchUserListLoading, isSearchUserListError, refetchSearchUserList };
 };
 
+// 유저 즐겨찾기 리스트 쿼리
+export const favoriteUserListQueryKey = 'favoriteUserList';
+
+export type FavoriteUser = {
+  userId: number;
+  nickname: string;
+  createdAt: string;
+  favoriteCount: number;
+  reviewCount: number;
+};
+
+interface FavoriteUserListQueryReturn {
+  favoriteUserList: FavoriteUser[] | undefined;
+  isEnd: boolean;
+  totalPage: number;
+  isFavoriteUserListError: boolean;
+  isFavoriteUserListLoading: boolean;
+}
+
+type FavoriteUserListQuery = (params: { page: number; size: number }) => FavoriteUserListQueryReturn;
+
+type FavoriteUserListResponse = {
+  favoriteUserList: FavoriteUser[];
+  isEnd: boolean;
+  totalPage: number;
+};
+
+export const useFavoriteUserListQuery: FavoriteUserListQuery = (params) => {
+  const { page, size } = params;
+  const {
+    data,
+    isError: isFavoriteUserListError,
+    isLoading: isFavoriteUserListLoading,
+  } = useQuery({
+    queryKey: [favoriteUserListQueryKey],
+    queryFn: () => {
+      return request.getWithParams<FavoriteUserListResponse, { page: number; size: number }>(DOMAIN + '/users/like', {
+        page,
+        size,
+      });
+    },
+    staleTime: Infinity,
+  });
+
+  const favoriteUserList = data?.favoriteUserList;
+  const isEnd = data ? data.isEnd : false;
+  const totalPage = data ? data.totalPage : 0;
+
+  return { favoriteUserList, isEnd, totalPage, isFavoriteUserListError, isFavoriteUserListLoading };
+};
+
 // user mutation
 // types
+
 interface UseUserMutationReturn {
   changeProfileImage: (img: File) => void;
   isChangeProfileImagePending: boolean;
@@ -135,12 +187,14 @@ interface UseUserMutationReturn {
 
   unlikeUser: (favoriteUserId: number) => void;
   isUnlikeUserPending: boolean;
+
+  unlikeUsers: (userIdList: number[]) => void;
 }
 
-type UseUserMutation = () => UseUserMutationReturn;
+type UseUserMutation = (params?: { afterLikeUserSuccess?: () => void }) => UseUserMutationReturn;
 
 // mutation
-export const useUserMutation: UseUserMutation = () => {
+export const useUserMutation: UseUserMutation = (params) => {
   // 프로필 이미지 변경
   const {
     mutate: changeProfileImage,
@@ -232,6 +286,11 @@ export const useUserMutation: UseUserMutation = () => {
     },
     onSuccess: () => {
       window.alert('즐겨찾기 성공');
+      queryClient.invalidateQueries({
+        queryKey: [favoriteUserListQueryKey],
+      });
+      if (!params || !params.afterLikeUserSuccess) return;
+      params.afterLikeUserSuccess();
     },
     onError: () => {
       window.alert('다시 시도해주세요');
@@ -245,6 +304,29 @@ export const useUserMutation: UseUserMutation = () => {
     },
     onSuccess: () => {
       window.alert('즐겨찾기 취소 성공');
+      queryClient.invalidateQueries({
+        queryKey: [favoriteUserListQueryKey],
+      });
+
+      if (!params || !params.afterLikeUserSuccess) return;
+      params.afterLikeUserSuccess();
+    },
+    onError: () => {
+      window.alert('다시 시도해주세요');
+    },
+  });
+
+  // 유저 즐겨찾기 리스트 취소
+  const { mutate: unlikeUsers } = useMutation({
+    mutationFn: (userIdList: number[]) => {
+      return request.deleteWithBody<{ userIdList: number[] }>(DOMAIN + '/users/like', { userIdList });
+    },
+    onSuccess: () => {
+      window.alert('삭제 성공');
+      // 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: [favoriteUserListQueryKey],
+      });
     },
     onError: () => {
       window.alert('다시 시도해주세요');
@@ -266,5 +348,6 @@ export const useUserMutation: UseUserMutation = () => {
     isLikeUserPending,
     unlikeUser,
     isUnlikeUserPending,
+    unlikeUsers,
   };
 };
