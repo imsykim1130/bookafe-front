@@ -96,7 +96,7 @@ const Favorite = () => {
             bookCheckHandler={bookCheckHandler}
             checkedBookIsbnList={checkedBookIsbnList}
           />
-          <PaginationComp currentPage={page} setCurrentPage={setPage} totalPages={totalPages} />
+          <PaginationComp currentPage={page} pageCount={size} setCurrentPage={setPage} totalPages={totalPages} />
           {/* 일괄 삭제 버튼 */}
           {checkedBookIsbnList.length > 0 && (
             <Button
