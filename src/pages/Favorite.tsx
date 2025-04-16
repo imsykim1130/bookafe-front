@@ -131,7 +131,13 @@ function FavoriteBookList({
 
   // render
   if (isError) {
-    return <ErrorComp />;
+    return (
+      <ErrorComp
+        onReload={() => {
+          window.location.reload();
+        }}
+      />
+    );
   }
 
   if (isLoading) {
