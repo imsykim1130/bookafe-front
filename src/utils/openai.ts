@@ -12,8 +12,11 @@ export const getRandomNickname = async (): Promise<string | null> => {
     .create({
       model: 'gpt-4o',
       messages: [
-        { role: 'developer', content: '너는 5글자 이상 10글자 이하의 한글 랜덤 닉네임을 생성해주는 봇이야.' },
-        { role: 'user', content: '띄어쓰기 없이 한글 닉네임 1개를 생성해줘.' },
+        { role: 'developer', content: '너는 한글 랜덤 닉네임을 생성해주는 봇이야.' },
+        {
+          role: 'user',
+          content: '띄어쓰기 없이 한글 닉네임 1개를 생성해줘. 길이는 5자 이상 15자 이상인 닉네임이어야 해.',
+        },
       ],
       store: true,
     })
