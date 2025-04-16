@@ -64,16 +64,21 @@ const Header = () => {
           ) : (
             <>
               {/* 로그인 되어 있을 때 */}
-              {/* 좋아요, 내 정보, 로그아웃 */}
-              <Link to={'/favorite'} className="icon-btn ">
-                좋아요
-              </Link>
-              <Link to={'/user/' + user?.id} className="icon-btn ">
-                내 정보
-              </Link>
-              <Link to={'/favorite/user'} className="icon-btn ">
-                즐겨찾기
-              </Link>
+              {/* 좋아요, 내 정보, 즐겨찾기, 로그아웃 */}
+              {user.role === 'ROLE_USER' ? (
+                <>
+                  <Link to={'/favorite'} className="icon-btn ">
+                    좋아요
+                  </Link>
+                  <Link to={'/user/' + user?.id} className="icon-btn ">
+                    내 정보
+                  </Link>
+                  <Link to={'/favorite/user'} className="icon-btn ">
+                    즐겨찾기
+                  </Link>
+                </>
+              ) : null}
+
               <AlertDialogComp
                 onConfirmClick={() => {
                   localStorage.removeItem('user');
