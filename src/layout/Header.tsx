@@ -77,7 +77,16 @@ const Header = () => {
                     즐겨찾기
                   </Link>
                 </>
-              ) : null}
+              ) : (
+                <>
+                  <Link to={'/admin/user-management'} className="icon-btn ">
+                    유저 관리
+                  </Link>
+                  <Link to={'/admin/recommend-book'} className="icon-btn ">
+                    추천 도서 관리
+                  </Link>
+                </>
+              )}
 
               <AlertDialogComp
                 onConfirmClick={() => {
