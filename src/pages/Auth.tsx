@@ -241,7 +241,7 @@ const Auth = () => {
                   }}
                 />
               </div>
-              {nicknameErr && <p className={'absolute left-0 top-14 text-red-600'}>닉네입은 8자 이상이어야 합니다</p>}
+              {nicknameErr && <p className={'absolute left-0 top-14 text-red-600'}>닉네임은 5자 이상이어야 합니다</p>}
               {/* 랜덤 닉네임 생성 버튼 */}
               <button
                 onClick={randomNicknameClickHandler}
