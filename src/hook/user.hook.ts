@@ -176,6 +176,9 @@ interface UseUserMutationReturn {
   cancelUser: () => void;
   isCancelUserPending: boolean;
 
+  adminCancelUser: (userId: number) => void;
+  isAdminCancelUserPending: boolean;
+
   initProfileImg: () => void;
   isInitProfileImgPending: boolean;
 
@@ -241,7 +244,7 @@ export const useUserMutation: UseUserMutation = (params) => {
     },
   });
 
-  // 탈퇴하다
+  // 탈퇴하기
   const { mutate: cancelUser, isPending: isCancelUserPending } = useMutation({
     mutationFn: () => {
       return request.delete(DOMAIN + '/user');
@@ -252,6 +255,19 @@ export const useUserMutation: UseUserMutation = (params) => {
     },
     onError: (err: ErrorResponse) => {
       console.log(err.message);
+      window.alert('다시 시도해주세요');
+    },
+  });
+
+  // 탈퇴시키기
+  const { mutate: adminCancelUser, isPending: isAdminCancelUserPending } = useMutation({
+    mutationFn: (userId: number) => {
+      return request.delete<void>(DOMAIN + '/admin/user?userId=' + userId);
+    },
+    onSuccess: () => {
+      window.alert('탈퇴 완료');
+    },
+    onError: () => {
       window.alert('다시 시도해주세요');
     },
   });
@@ -340,6 +356,8 @@ export const useUserMutation: UseUserMutation = (params) => {
     isChangeProfileImageError,
     cancelUser,
     isCancelUserPending,
+    adminCancelUser,
+    isAdminCancelUserPending,
     initProfileImg,
     isInitProfileImgPending,
     changeNickname,
