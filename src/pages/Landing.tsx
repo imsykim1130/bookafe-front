@@ -30,7 +30,7 @@ const Landing = () => {
   // render: 관리자 페이지
   if (role === 'ROLE_ADMIN') {
     return (
-      <main className="flex flex-col items-center mt-[2rem] px-[5%]">
+      <main className="flex flex-col items-center mt-[2rem] px-[5%] min-h-screen">
         <div className="w-full max-w-[600px]">
           {/* 메뉴 목록 */}
           <div className="flex flex-col">
@@ -132,7 +132,7 @@ const RecommendBook = () => {
 const LandingSearchPart = ({ initSearchBookList }: { initSearchBookList: () => void }) => {
   const navigate = useNavigate();
   const [searchWord, setSearchWord] = useState<string>('');
-  const debouncedSearchWord = useDebounce(searchWord, 500);
+  const debouncedSearchWord = useDebounce(searchWord, 300);
 
   const requestDto: UseSearchBookListQueryParams = {
     query: debouncedSearchWord,
