@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { request } from '@/api/template';
 import SearchBox from '@/components/SearchBox.tsx';
+import { Button } from '@/components/ui/button.tsx';
 import { SearchBookListResponse } from '@/hook/book.hooks.ts';
 import { useDebounce } from '@/hook/hooks.ts';
 import { RecommendBook, useRecommendBookListQuery, useRecommendBookMutation } from '@/hook/recommend.book.hooks.ts';
@@ -45,7 +46,7 @@ const RecommendBookPage = () => {
   // function: 책 검색하기
   const searchBook = () => {
     request
-      .getWithParams<SearchBookListResponse, { query: string }>(DOMAIN + '/books/search', { query: searchWord }, false)
+      .getWithParams<SearchBookListResponse, { query: string }>(DOMAIN + '/books', { query: searchWord }, false)
       .then((data: SearchBookListResponse) => {
         setSearchBookList(data.bookList);
       })
@@ -96,37 +97,34 @@ const RecommendBookPage = () => {
         >
           <SearchBox searchWord={searchWord} setSearchWord={setSearchWord} />
           {/* 검색 결과 */}
-          <div className="shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-[10px]">
-            {/* 검색결과 있을 때 */}
-            {searchBookList && searchBookList.length > 0
-              ? searchBookList.map((book: BookSearchItem) => (
-                  <div
-                    key={book.isbn}
-                    className="flex items-start justify-between px-4 py-4 hover:bg-gray-100 rounded-[10px] border-b-[1px] border-gray-100"
-                  >
-                    <div className="flex flex-col gap-2">
-                      <h1 className="font-semibold">{book.title}</h1>
-                      <p>{book.isbn}</p>
-                      <p>{book.author}</p>
+          {searchBookList && (
+            <div className="shadow-[0_0_10px_rgba(0,0,0,0.1)] rounded-[10px] max-h-[20rem] overflow-scroll">
+              {/* 검색결과 있을 때 */}
+              {searchBookList.length > 0
+                ? searchBookList.map((book: BookSearchItem) => (
+                    <div
+                      key={book.isbn}
+                      className="flex items-start justify-between px-4 py-4 hover:bg-gray-100 rounded-[10px] border-b-[1px] border-gray-100"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <h1 className="font-semibold">{book.title}</h1>
+                        <p>{book.isbn}</p>
+                        <p>{book.author}</p>
+                      </div>
+                      <div>
+                        <Button onClick={() => recommend(book.isbn)}>추천</Button>
+                      </div>
                     </div>
-                    <div>
-                      <button
-                        className="px-2 py-1 text-white bg-black rounded-[10px]"
-                        onClick={() => recommend(book.isbn)}
-                      >
-                        추천
-                      </button>
-                    </div>
-                  </div>
-                ))
-              : null}
-            {/* 검색 결과 없을 때 */}
-            {searchBookList && searchBookList.length === 0 ? (
-              <div className="px-4 py-4">
-                <p className="text-gray-500">검색 결과가 없습니다</p>
-              </div>
-            ) : null}
-          </div>
+                  ))
+                : null}
+              {/* 검색 결과 없을 때 */}
+              {searchBookList.length === 0 ? (
+                <div className="px-4 py-4">
+                  <p className="text-gray-500">검색 결과가 없습니다</p>
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
         {/* 추천 책 리스트 */}
         <div className="py-[2rem]">
@@ -166,7 +164,10 @@ const RecommendBookList = ({
 
 const RecommendBookComp = ({ book }: { book: RecommendBookItem }) => {
   const { title, author, bookImg, publisher, isbn } = book;
-  const { unrecommend, invalidateRecommendBookList } = useRecommendBookMutation({ onUnrecommendSuccess, onUnrecommendError });
+  const { unrecommend, invalidateRecommendBookList } = useRecommendBookMutation({
+    onUnrecommendSuccess,
+    onUnrecommendError,
+  });
   const navigate = useNavigate();
 
   // 책 추천 취소 핸들러
