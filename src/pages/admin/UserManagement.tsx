@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { UserManagementItem } from '@/api/item.ts';
+import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/hook/hooks.ts';
 import { SearchUser, searchUserListQueryKey, useSearchUserListQuery, useUserMutation } from '@/hook/user.hook.ts';
 import { queryClient } from '@/main.tsx';
@@ -11,9 +12,9 @@ const UserManagement = () => {
 
   const { searchUserList, isSearchUserListError, isSearchUserListLoading, refetchSearchUserList } =
     useSearchUserListQuery({ searchWord });
-  
+
   return (
-    <main className={'flex flex-col items-center px-[5%] py-[5vh]'}>
+    <main className={'flex flex-col items-center px-[5%] py-[5vh] min-h-screen'}>
       <SearchBox
         searchWord={searchWord}
         setSearchWord={setSearchWord}
@@ -92,8 +93,8 @@ const SearchUserList = ({
 
 // 유저
 const UserComp = ({ user }: { user: UserManagementItem }) => {
-  const { email, point, datetime, commentCount } = user;
-  const { cancelUser } = useUserMutation();
+  const { email, datetime, commentCount, id } = user;
+  const { adminCancelUser } = useUserMutation();
 
   return (
     <div
@@ -102,22 +103,21 @@ const UserComp = ({ user }: { user: UserManagementItem }) => {
       <div className={'flex flex-col gap-[15px]'}>
         <div className={'flex items-center gap-[10px]'}>
           <p className={'font-bold'}>{email}</p>
-          <p>{datetime}</p>
         </div>
         <div>
-          <div className={'flex items-center gap-[10px]'}>
-            <p className={'min-w-[100px]'}>보유 포인트</p>
-            <p className={'text-black text-opacity-60'}>{point} P</p>
+          {/* 가입일 */}
+          <div className={'flex items-center gap-[0.8rem]'}>
+            <p className={'min-w-[100px]'}>가입일</p>
+            <p className={'text-black text-opacity-60'}>{datetime}</p>
           </div>
-          <div className={'flex items-center gap-[10px]'}>
+          {/* 작성 댓글 개수 */}
+          <div className={'flex items-center gap-[0.8rem]'}>
             <p className={'min-w-[100px]'}>작성 댓글 개수</p>
             <p className={'text-black text-opacity-60'}>댓글 {commentCount} 개</p>
           </div>
         </div>
       </div>
-      <button className={'border-[1px] border-black border-opacity-80 rounded-[5px] p-[5px]'} onClick={cancelUser}>
-        탈퇴
-      </button>
+      <Button onClick={() => adminCancelUser(id)}>탈퇴</Button>
     </div>
   );
 };
