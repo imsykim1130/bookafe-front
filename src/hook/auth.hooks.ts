@@ -81,8 +81,17 @@ export const useAuthMutation: UseAuthMutation = (props?: UseAuthMutationProps) =
     mutationFn: (requestBody: SignUpRequest) => {
       return request.post(DOMAIN + '/auth/sign-up', requestBody, false);
     },
-    onSuccess: props?.onSignUpSuccess,
-    onError: props?.onSignUpError,
+    onSuccess: props?.onSignUpSuccess
+      ? props.onSignUpSuccess
+      : () => {
+          window.alert('회원가입 성공!');
+          navigate('/auth/sign-in');
+        },
+    onError: props?.onSignUpError
+      ? props.onSignUpError
+      : (err: ErrorResponse) => {
+          window.alert(err.message);
+        },
   });
 
   // 로그아웃
