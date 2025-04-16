@@ -64,7 +64,6 @@ const Header = () => {
           ) : (
             <>
               {/* 로그인 되어 있을 때 */}
-              {/* 좋아요, 내 정보, 즐겨찾기, 로그아웃 */}
               {user.role === 'ROLE_USER' ? (
                 <>
                   <Link to={'/favorite'} className="icon-btn ">
