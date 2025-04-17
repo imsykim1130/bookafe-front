@@ -1,7 +1,7 @@
 import { Button } from './ui/button';
 
 type Props = {
-  onReload: () => void;
+  onReload?: () => void;
 };
 
 const ErrorComp = (props: Props) => {
