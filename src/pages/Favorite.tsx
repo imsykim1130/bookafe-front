@@ -3,7 +3,6 @@ import PaginationComp from '@/components/PaginationComp';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  FavoriteBook,
   favoriteBookListQueryKey,
   useFavoriteBookHandler,
   useFavoriteBookListQuery,
@@ -11,6 +10,7 @@ import {
 } from '@/hook/favorite.book.hooks';
 import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
+import { FavoriteBook } from '@/types/item';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 

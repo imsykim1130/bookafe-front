@@ -4,7 +4,6 @@ import TextAreaComp from '@/components/TextAreaComp';
 import { Button } from '@/components/ui/button';
 import { useBookQuery } from '@/hook/book.hooks';
 import {
-  Comment,
   replyListQueryKey,
   reviewListQueryKey,
   useCommentMutation,
@@ -17,6 +16,7 @@ import { useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
 import { useChangePage, usePage } from '@/store/page.store';
 import { ErrorResponse } from '@/types/common.type';
+import { Comment } from '@/types/item';
 import { DOMAIN } from '@/utils/env';
 import { toBookSite } from '@/utils/utils';
 import moment from 'moment';

@@ -1,30 +1,14 @@
 //// mutation
 // types
+import { AuthWithGoogleRequest, SignInRequest, SignUpRequest } from '@/api/request.dto';
+import { UserResponse } from '@/api/response.dto';
 import { request } from '@/api/template';
 import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
 import { DOMAIN } from '@/utils/env';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { userKey, UserResponse } from './user.hook';
-
-export type SignInRequest = {
-  email: string;
-  password: string;
-  isGoogleAuth?: boolean;
-};
-
-export type SignUpRequest = {
-  email: string;
-  password: string;
-  nickname: string;
-  role: 'user' | 'admin';
-};
-
-export type AuthWithGoogleRequest = {
-  idToken: string;
-  isSignUp: boolean;
-};
+import { userKey } from './user.hook';
 
 type UseAuthMutationProps = {
   onSignInSuccess?: (expire: number) => void;

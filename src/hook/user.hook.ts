@@ -1,20 +1,13 @@
+import { FavoriteUserListResponse, UserResponse } from '@/api/response.dto';
 import { request } from '@/api/template';
 import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
+import { FavoriteUser, SearchUser } from '@/types/item';
 import { DOMAIN } from '@/utils/env';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 
 // 유저 검색 쿼리
-export type UserResponse = {
-  id: number;
-  email: string;
-  nickname: string;
-  profileImg: string;
-  createDate: string;
-  role: string;
-};
-
 interface UseUserQueryReturn {
   user: UserResponse | null;
   isUserLoading: boolean;
@@ -74,14 +67,6 @@ export const useUserQuery: UseUserQuery = () => {
 // 유저 검색 리스트 쿼리
 export const searchUserListQueryKey = 'searchUserList';
 
-export type SearchUser = {
-  id: number;
-  email: string;
-  datetime: string;
-  point: number;
-  commentCount: number;
-};
-
 type UseSearchUserListQueryParams = {
   searchWord: string;
   filter?: 'nickname' | 'email';
@@ -116,14 +101,6 @@ export const useSearchUserListQuery: UseSearchUserListQuery = (params: UseSearch
 // 유저 즐겨찾기 리스트 쿼리
 export const favoriteUserListQueryKey = 'favoriteUserList';
 
-export type FavoriteUser = {
-  userId: number;
-  nickname: string;
-  createdAt: string;
-  favoriteCount: number;
-  reviewCount: number;
-};
-
 interface FavoriteUserListQueryReturn {
   favoriteUserList: FavoriteUser[] | undefined;
   isEnd: boolean;
@@ -133,12 +110,6 @@ interface FavoriteUserListQueryReturn {
 }
 
 type FavoriteUserListQuery = (params: { page: number; size: number }) => FavoriteUserListQueryReturn;
-
-type FavoriteUserListResponse = {
-  favoriteUserList: FavoriteUser[];
-  isEnd: boolean;
-  totalPage: number;
-};
 
 export const useFavoriteUserListQuery: FavoriteUserListQuery = (params) => {
   const { page, size } = params;

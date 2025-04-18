@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { SearchBookListResponse } from '@/api/response.dto.ts';
 import { request } from '@/api/template';
 import SearchBox from '@/components/SearchBox.tsx';
 import { Button } from '@/components/ui/button.tsx';
-import { SearchBookListResponse } from '@/hook/book.hooks.ts';
 import { useDebounce } from '@/hook/hooks.ts';
-import { RecommendBook, useRecommendBookListQuery, useRecommendBookMutation } from '@/hook/recommend.book.hooks.ts';
+import { useRecommendBookListQuery, useRecommendBookMutation } from '@/hook/recommend.book.hooks.ts';
 import { ErrorResponse } from '@/types/common.type.ts';
+import { RecommendBook } from '@/types/item.ts';
 import { DOMAIN } from '@/utils/env.ts';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookSearchItem, RecommendBookItem } from '../../api/item.ts';
+import { BookSearchItem, RecommendBookItem } from '../../types/item.ts';
 
 const RecommendBookPage = () => {
   const { recommendBookList, isRecommendBookListLoading, isRecommendBookListError, refetchRecommendBookList } =

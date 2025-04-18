@@ -1,21 +1,11 @@
+import { MyReviewListResponse, ReviewFavoriteUserListResonse } from '@/api/response.dto';
 import { request } from '@/api/template';
 import { ErrorResponse } from '@/types/common.type';
+import { Comment, MyReview, ReviewFavoriteUser } from '@/types/item';
 import { DOMAIN } from '@/utils/env';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 // 책의 리뷰 리스트 쿼리
-export type Comment = {
-  id: number;
-  userId: number;
-  profileImg: string;
-  nickname: string;
-  writeDate: string;
-  emoji: string;
-  content: string;
-  replyCount: number;
-  isDeleted: boolean;
-};
-
 type UseReviewListQueryParams = {
   isbn: string | undefined;
   page?: number;
@@ -79,19 +69,6 @@ export const useReplyListQuery: UseReplyListQuery = (reviewId: number, replyOpen
 };
 
 // 유저의 리뷰 리스트 쿼리
-export type MyReview = {
-  content: string;
-  createdAt: string;
-  title: string;
-  author: string;
-};
-
-type MyReviewListResponse = {
-  reviewList: MyReview[];
-  isEnd: boolean;
-  totalCount: number;
-};
-
 type UseUserReviewListQueryParams = {
   userId: string | undefined; // 유저 id
   page: number; // 가져올 페이지
@@ -135,17 +112,6 @@ export const useUserReviewListQuery: UseUserReviewListQuery = (params) => {
 
 // 내 리뷰의 좋아요 유저 리스트 쿼리
 export const reviewFavoriteUserListQueryKey = 'reviewFavoriteUserList';
-
-export type ReviewFavoriteUser = {
-  userId: number;
-  nickname: string;
-};
-
-type ReviewFavoriteUserListResonse = {
-  userList: ReviewFavoriteUser[];
-  isEnd: boolean;
-  totalCount: number;
-};
 
 type UseReviewFavoriteUserListQueryParams = {
   userId: string | undefined;

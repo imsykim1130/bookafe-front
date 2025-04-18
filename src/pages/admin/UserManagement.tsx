@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { UserManagementItem } from '@/api/item.ts';
 import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/hook/hooks.ts';
-import { SearchUser, searchUserListQueryKey, useSearchUserListQuery, useUserMutation } from '@/hook/user.hook.ts';
+import { searchUserListQueryKey, useSearchUserListQuery, useUserMutation } from '@/hook/user.hook.ts';
 import { queryClient } from '@/main.tsx';
+import { SearchUser, UserManagementItem } from '@/types/item';
 import { useEffect, useState } from 'react';
 
 const UserManagement = () => {

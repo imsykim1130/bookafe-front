@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import SearchBox from '@/components/SearchBox.tsx';
-import { SearchBook, useSearchBookListQuery } from '@/hook/book.hooks.ts';
+import { useSearchBookListQuery } from '@/hook/book.hooks.ts';
+import { SearchBook } from '@/types/item.ts';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BookPrev from '../components/BookPrev.tsx';

@@ -1,82 +1,61 @@
-import { DeliveryInfoItem, FavoriteBookItem } from '@/api/item.ts';
-import {
-  BookDetailData,
-  BookSearchItem,
-  CommentItem,
-  CouponData,
-  DeliveryStatus,
-  OrderDetail,
-  UserItem,
-} from './item.ts';
+import { FavoriteBook, FavoriteUser, MyReview, ReviewFavoriteUser, SearchBook } from '@/types/item.ts';
 
-export interface ResponseDto {
-  code: string;
-  message: string;
-}
+export type BookResponse = {
+  isbn: string;
+  bookImg: string;
+  title: string;
+  price: number;
+  publisher: string;
+  author: string;
+  pubDate: string;
+  description: string;
+};
 
-export interface SignInResponseDto extends Response {
-  jwt: string;
-  userItem: UserItem;
-}
+export type RecommendBookResponse = {
+  id: number;
+  title: string;
+  publisher: string;
+  author: string;
+  bookImg: string;
+  isbn: string;
+};
 
-export interface GetUserResponseDto extends ResponseDto {
-  user: UserItem;
-  totalPoint: number;
-}
-
-export interface GetSearchBookListResponseDto extends ResponseDto {
+export type SearchBookListResponse = {
   isEnd: boolean;
   pageableCount: number;
   totalCount: number;
-  bookList: BookSearchItem[];
-}
+  bookList: SearchBook[];
+};
 
-export interface GetBookResponseDto extends ResponseDto {
-  book: BookDetailData;
-}
+export type MyReviewListResponse = {
+  reviewList: MyReview[];
+  isEnd: boolean;
+  totalCount: number;
+};
 
-export interface GetAllFavoriteBookResponseDto extends ResponseDto {
-  favoriteBookList: FavoriteBookItem[];
+export type ReviewFavoriteUserListResonse = {
+  userList: ReviewFavoriteUser[];
+  isEnd: boolean;
+  totalCount: number;
+};
+
+export type FavoriteBookResponse = {
+  favoriteBookList: FavoriteBook[];
   isEnd: boolean;
   totalPages: number;
-}
+};
 
-export interface GetBookFavoriteUserIdListResponseDto extends ResponseDto {
-  userIdList: string[];
-}
+export type UserResponse = {
+  id: number;
+  email: string;
+  nickname: string;
+  profileImg: string;
+  createDate: string;
+  role: string;
+};
 
-export interface GetBookCartUserIdListResponseDto extends ResponseDto {
-  userIdList: string[];
-}
-
-export interface GetCommentListResponse extends ResponseDto {
-  commentItemList: CommentItem[];
-}
-
-export interface GetOrderDetailListResponseDto {
-  isStart: boolean;
+export type FavoriteUserListResponse = {
+  favoriteUserList: FavoriteUser[];
   isEnd: boolean;
-  orderDetailList: OrderDetail[];
-}
-
-export interface GetDeliveryStatusListResponseDto {
-  isFirst: boolean;
-  isLast: boolean;
-  deliveryStatusViewList: DeliveryStatus[];
-}
-
-export interface getCouponListResponseDto extends ResponseDto {
-  userCouponViewList: CouponData[];
-}
-
-export interface GetDeliveryInfoResponseDto extends ResponseDto {
-  userDeliveryInfo: DeliveryInfoItem | null;
-}
-export interface GetAllDeliveryInfoResponseDto extends ResponseDto {
-  userDeliveryInfoList: DeliveryInfoItem[];
-}
-
-export interface GetBookFavoriteInfoResponseDto extends ResponseDto {
-  isFavorite: boolean;
-  favoriteCount: number;
-}
+  totalPage: number;
+};

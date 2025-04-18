@@ -1,18 +1,12 @@
+import { FavoriteBookResponse } from '@/api/response.dto';
 import { request } from '@/api/template';
 import { ErrorResponse } from '@/types/common.type';
+import { BookFavoriteInfo, FavoriteBook, Top10Book } from '@/types/item';
 import { DOMAIN } from '@/utils/env';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 // top10 쿼리
-type Top10Book = {
-  isbn: string;
-  bookImg: string;
-  title: string;
-  author: string;
-  favoriteCount: number;
-};
-
 interface UseTop10QueryReturn {
   bookList: Top10Book[] | undefined;
   isTop10Loading: boolean;
@@ -36,13 +30,7 @@ export const useTop10Query: UseTop10Query = () => {
   return { bookList, isTop10Loading, isTop10Error };
 };
 
-// query
-// 책의 좋아요 정보
-export type BookFavoriteInfo = {
-  isFavorite: boolean;
-  favoriteCount: number;
-};
-
+// 책의 좋아요 정보 쿼리
 type UseFavoriteBookInfoQueryParams = {
   isbn: string | undefined;
 };
@@ -83,24 +71,11 @@ export const useBookFavoriteInfoQuery: UseFavoriteBookInfoQuery = (params: UseFa
 };
 
 // 좋아요 책 리스트
-
-export type FavoriteBook = {
-  isbn: string;
-  bookImg: string;
-  title: string;
-  author: string;
-  price: number;
-};
-type FavoriteBookResponse = {
-  favoriteBookList: FavoriteBook[];
-  isEnd: boolean;
-  totalPages: number;
-};
-
 type UseFavoriteBookListQueryParams = {
   size: number;
   page: number;
 };
+
 interface UseFavoriteBookListQueryReturn {
   favoriteBookList: FavoriteBook[];
   isEnd: boolean;

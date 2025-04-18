@@ -1,7 +1,8 @@
 import PaginationComp from '@/components/PaginationComp';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FavoriteUser, useFavoriteUserListQuery, useUserMutation } from '@/hook/user.hook';
+import { useFavoriteUserListQuery, useUserMutation } from '@/hook/user.hook';
+import { FavoriteUser } from '@/types/item';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 

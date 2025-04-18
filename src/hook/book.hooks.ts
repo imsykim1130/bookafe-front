@@ -1,20 +1,11 @@
 // Book 페이지 컴포넌트 관련 상태, 메서드
+import { BookResponse, RecommendBookResponse, SearchBookListResponse } from '@/api/response.dto';
 import { request } from '@/api/template';
+import { SearchBook } from '@/types/item';
 import { DOMAIN } from '@/utils/env';
 import { useQuery } from '@tanstack/react-query';
 
 //// 책 상세 정보
-type BookResponse = {
-  isbn: string;
-  bookImg: string;
-  title: string;
-  price: number;
-  publisher: string;
-  author: string;
-  pubDate: string;
-  description: string;
-};
-
 type UseBookQueryParams = {
   isbn: string | undefined;
 };
@@ -52,16 +43,6 @@ export const useBookQuery: UseBookQuery = (params: UseBookQueryParams) => {
 
 // 오늘의 추천책
 // 관리자가 설정한 추천 책 중에서 랜덤한 책 1권
-
-export type RecommendBookResponse = {
-  id: number;
-  title: string;
-  publisher: string;
-  author: string;
-  bookImg: string;
-  isbn: string;
-};
-
 interface UseRecommendBookQueryReturn {
   recommendBook: RecommendBookResponse | null;
   isRecommendBookLoading: boolean;
@@ -91,21 +72,6 @@ export const useRecommendBookQuery: UseRecommendBookQuery = () => {
 };
 
 //// 책 검색 리스트 쿼리
-export type SearchBook = {
-  isbn: string;
-  bookImg: string;
-  title: string;
-  author: string;
-  price: string;
-};
-
-export type SearchBookListResponse = {
-  isEnd: boolean;
-  pageableCount: number;
-  totalCount: number;
-  bookList: SearchBook[];
-};
-
 export type UseSearchBookListQueryParams = {
   query: string;
   sort?: 'accuracy' | 'latest'; // 기본 accuracy

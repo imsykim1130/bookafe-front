@@ -1,19 +1,19 @@
+import { UserResponse } from '@/api/response.dto';
 import { request } from '@/api/template';
 import AlertDialogComp from '@/components/AlertDialogComp';
 import ErrorComp from '@/components/ErrorComp';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  MyReview,
-  ReviewFavoriteUser,
   reviewFavoriteUserListQueryKey,
   useReviweFavoriteUserListQuery,
   userReviewListQueryKey,
   useUserReviewListQuery,
 } from '@/hook/comment.hooks';
-import { UserResponse, useUserMutation, useUserQuery } from '@/hook/user.hook';
+import { useUserMutation, useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
+import { MyReview, ReviewFavoriteUser } from '@/types/item';
 import { DOMAIN } from '@/utils/env';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';

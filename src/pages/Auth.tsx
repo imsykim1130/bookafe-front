@@ -1,9 +1,10 @@
-import { signInGoogle, signOutGoogle } from '@/auth/firelbase';
+import { SignInRequest, SignUpRequest } from '@/api/request.dto';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
-import { SignInRequest, SignUpRequest, useAuthMutation } from '@/hook/auth.hooks';
+import { useAuthMutation } from '@/hook/auth.hooks';
 import { userKey } from '@/hook/user.hook';
 import { queryClient } from '@/main';
+import { signInGoogle, signOutGoogle } from '@/utils/firelbase';
 import { getRandomNickname } from '@/utils/openai';
 import queryString from 'query-string';
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';

@@ -19,7 +19,6 @@ import ErrorPage from './pages/ErrorPage.tsx';
 import Favorite from './pages/Favorite.tsx';
 import FavoriteUserPage from './pages/FavoriteUserPage.tsx';
 import Landing from './pages/Landing.tsx';
-import Test from './temp/gsap.test.tsx';
 
 export const queryClient = new QueryClient({});
 
@@ -67,10 +66,6 @@ const router = createBrowserRouter([
       {
         path: '/error/:code',
         element: <ErrorPage />,
-      },
-      {
-        path: '/test',
-        element: <Test />,
       },
     ],
   },

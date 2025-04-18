@@ -1,6 +1,7 @@
 import { request } from '@/api/template';
 import { queryClient } from '@/main';
 import { ErrorResponse } from '@/types/common.type';
+import { RecommendBook } from '@/types/item';
 import { DOMAIN } from '@/utils/env';
 import { skipToken, useMutation, useQuery } from '@tanstack/react-query';
 import { useUserQuery } from './user.hook';
@@ -44,14 +45,6 @@ export const useRecommendQuery: UseIsBookRecommendedQuery = (params: UseIsBookRe
 };
 
 // 추천 책 리스트 쿼리
-export type RecommendBook = {
-  id: number;
-  title: string;
-  publisher: string;
-  author: string;
-  bookImg: string;
-  isbn: string;
-};
 interface UseRecommendBookListQueryReturn {
   recommendBookList: RecommendBook[] | undefined;
   isRecommendBookListLoading: boolean;

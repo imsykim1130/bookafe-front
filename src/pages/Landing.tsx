@@ -2,7 +2,6 @@
 import BookPrev from '@/components/BookPrev.tsx';
 import SearchBox from '@/components/SearchBox.tsx';
 import {
-  SearchBook,
   searchBookListQueryKey,
   useRecommendBookQuery,
   useSearchBookListQuery,
@@ -12,6 +11,7 @@ import { useTop10Query } from '@/hook/favorite.book.hooks';
 import { useDebounce } from '@/hook/hooks.ts';
 import { useUserQuery } from '@/hook/user.hook';
 import { queryClient } from '@/main';
+import { SearchBook } from '@/types/item';
 import { useEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link, useNavigate } from 'react-router-dom';
