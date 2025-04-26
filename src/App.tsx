@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import './App.css';
 import Footer from './layout/Footer.tsx';
 import Header from './layout/Header.tsx';
+import { Toaster } from './components/ui/toaster.tsx';
 
 const App = () => {
   const { pathname } = useLocation();
@@ -20,6 +21,7 @@ const App = () => {
         <Outlet />
       </div>
       <Footer />
+      <Toaster />
     </>
   );
 };
