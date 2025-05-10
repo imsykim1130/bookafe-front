@@ -1,4 +1,4 @@
-import { FavoriteBook, FavoriteUser, MyReview, ReviewFavoriteUser, SearchBook } from '@/types/item.ts';
+import { Alarm, FavoriteBook, FavoriteUser, MyReview, ReviewFavoriteUser, SearchBook } from '@/types/item.ts';
 
 export type BookResponse = {
   isbn: string;
@@ -59,3 +59,8 @@ export type FavoriteUserListResponse = {
   isEnd: boolean;
   totalPage: number;
 };
+
+export type AlarmResponse = {
+  notifications: Alarm[];
+  isEnd : boolean;
+}

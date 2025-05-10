@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input.tsx';
 import { useAuthMutation } from '@/hook/auth.hooks';
 import { userKey } from '@/hook/user.hook';
 import { queryClient } from '@/main';
+import { useUnsubscribe } from '@/store/alarm.store';
 import { signInGoogle, signOutGoogle } from '@/utils/firelbase';
 import { getRandomNickname } from '@/utils/openai';
 import queryString from 'query-string';
@@ -35,9 +36,14 @@ const Auth = () => {
   const [isTooltipOpen, setIsTooltipOpen] = useState<boolean>(false);
 
   const { signIn, signUp, logout } = useAuthMutation({ onLogoutSuccess });
+  const unsubscribe = useUnsubscribe();
 
+  // function: 로그아웃 성공 시 호출되는 함수
+  // 세션 스토리지에서 user 정보 삭제 및 구글 로그아웃
+  // 쿼리 키에 해당하는 캐시 데이터 삭제 후 로그인 페이지로 이동
   function onLogoutSuccess() {
-    localStorage.removeItem('user');
+    unsubscribe();
+    sessionStorage.removeItem('user');
     signOutGoogle();
     queryClient.setQueryData([userKey], null);
     navigate('/auth/sign-in');

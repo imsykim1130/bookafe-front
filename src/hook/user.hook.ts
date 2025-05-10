@@ -53,9 +53,9 @@ export const useUserQuery: UseUserQuery = () => {
     queryClient.setQueryData([userKey], user);
   }, []);
 
-  // 새로고침 시 localStorage에서 유저 정보 복구
+  // 새로고침 시 sessionStorage 에서 유저 정보 복구
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
       queryClient.setQueryData(['user'], JSON.parse(storedUser));
     }
@@ -186,9 +186,9 @@ export const useUserMutation: UseUserMutation = (params) => {
     onSuccess: (url: string) => {
       window.alert('프로필 이미지 변경 성공! 이미지 변경은 잠시 후 적용됩니다.');
 
-      const oldUser = JSON.parse(localStorage.getItem('user') as string) as UserResponse;
+      const oldUser = JSON.parse(sessionStorage.getItem('user') as string) as UserResponse;
       const newUser = JSON.stringify({ ...oldUser, profileImg: url });
-      localStorage.setItem('user', newUser);
+      sessionStorage.setItem('user', newUser);
       queryClient.setQueryData([userKey], newUser);
     },
     onError: (err: ErrorResponse) => {
@@ -204,9 +204,9 @@ export const useUserMutation: UseUserMutation = (params) => {
     onSuccess: () => {
       window.alert('프로필 이미지 초기화 완료! 잠시 후 적용됩니다');
 
-      const oldUser = JSON.parse(localStorage.getItem('user') as string) as UserResponse;
+      const oldUser = JSON.parse(sessionStorage.getItem('user') as string) as UserResponse;
       const newUser = JSON.stringify({ ...oldUser, profileImg: null });
-      localStorage.setItem('user', newUser);
+      sessionStorage.setItem('user', newUser);
       queryClient.setQueryData([userKey], newUser);
     },
     onError: (err: ErrorResponse) => {
@@ -252,9 +252,9 @@ export const useUserMutation: UseUserMutation = (params) => {
       // 성공 메세지
       window.alert('닉네임 변경 성공!');
       // 로컬 스토리지와 캐시값의 nickname 변경
-      const oldUser = JSON.parse(localStorage.getItem('user') as string) as UserResponse;
+      const oldUser = JSON.parse(sessionStorage.getItem('user') as string) as UserResponse;
       const newUser = JSON.stringify({ ...oldUser, nickname: newNickname });
-      localStorage.setItem('user', newUser);
+      sessionStorage.setItem('user', newUser);
       queryClient.setQueryData([userKey], newUser);
       // 새로고침하여 유저 페이지에 보이는 유저 정보 다시 가져오기
       // 유저 페이지의 유저 정보는 유저 id 에 따라 변경되기 때문에 내 페이지라고 해도 전역으로 사용하는 유저 정보와 따로 다시 유저 정보를 요청해서 가져온다

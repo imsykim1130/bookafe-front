@@ -100,3 +100,9 @@ export type FavoriteUser = {
   favoriteCount: number;
   reviewCount: number;
 };
+export type Alarm = {
+  id: number;
+  userId: number;
+  message: string;
+  createdAt: string;
+};

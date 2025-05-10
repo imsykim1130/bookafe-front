@@ -9,6 +9,7 @@ import { DOMAIN } from '@/utils/env';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { userKey } from './user.hook';
+import { toast } from '@/hooks/use-toast';
 
 type UseAuthMutationProps = {
   onSignInSuccess?: (expire: number) => void;
@@ -53,9 +54,14 @@ export const useAuthMutation: UseAuthMutation = (props?: UseAuthMutationProps) =
       return request.post<SignInRequest, UserResponse>(DOMAIN + '/auth/sign-in', requestBody, true);
     },
     onSuccess: (response: UserResponse) => {
+      // 로그인 성공
+      toast({
+        title: '로그인 성공',
+        description: '환영합니다!', duration: 2000,});
       queryClient.setQueryData([userKey], response);
-      localStorage.setItem('user', JSON.stringify(response));
+      sessionStorage.setItem('user', JSON.stringify(response));
       navigate('/');
+
     },
     onError: props?.onSignInError,
   });

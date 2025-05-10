@@ -382,7 +382,6 @@ const ReviewList = (props: ReviewListProps) => {
 const Review = ({
   review,
   page,
-  // pageChange,
 }: {
   review: Comment;
   page: number;
@@ -439,9 +438,14 @@ const Review = ({
     }
     setIsFavorite(true);
     request
-      .post(DOMAIN + '/comment/favorite/' + review.id, null)
+      .post(DOMAIN + '/comment/like?commentId=' + review.id, null)
       .then(() => {
         console.log('like review success');
+        // 좋아요를 한 리뷰 작성자에게 알림 보내기
+        request.post<{ reviewId: number; fromUsername: string }, void>(DOMAIN + '/sse/like', {
+          reviewId: review.id,
+          fromUsername: user.nickname,
+        });
       })
       .catch((err: ErrorResponse) => {
         setIsFavorite(false);
@@ -458,7 +462,7 @@ const Review = ({
     }
     setIsFavorite(false);
     request
-      .delete(DOMAIN + '/comment/favorite/' + review.id)
+      .delete(DOMAIN + '/comment/like?reviewId=' + review.id)
       .then(() => {
         console.log('unlike review success');
       })
@@ -468,9 +472,22 @@ const Review = ({
       });
   }
 
+  function getIsFavorite() {
+    request
+      .get<boolean>(DOMAIN + '/comment/is-like?commentId=' + review.id)
+      .then((result) => {
+        setIsFavorite(result);
+      })
+      .catch((err: ErrorResponse) => {
+        console.log(err.message);
+        setIsFavorite(false);
+      });
+  }
+
   useEffect(() => {
     setReplyCount(review.replyCount);
     setContent(review.content);
+    getIsFavorite();
   }, [setReplyCount, setContent, review]);
 
   return (
